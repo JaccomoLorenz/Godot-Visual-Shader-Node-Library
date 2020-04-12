@@ -1,0 +1,107 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeDeepParallax",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/deep_parallax.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeDepth",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/depth.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeDepthWorldPosition",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/depth_world_position.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeDistanceFade",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/distance_fade.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeDither",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/dither.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeEmissionAdd",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/emission_add.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeEmissionMultiply",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/emission_multiply.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeFlowMap",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/flowmap.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeFlowMapAddUV",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/flowmap_add_uv.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeObjectWorldPosition",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/object_world_position.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeProximityFade",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/proximity_fade.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeRefraction",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/refraction.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeRotation2D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/rotation_2d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeRotation3D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd"
+} ]
+_global_script_class_icons={
+"VisualShaderNodeDeepParallax": "",
+"VisualShaderNodeDepth": "",
+"VisualShaderNodeDepthWorldPosition": "",
+"VisualShaderNodeDistanceFade": "",
+"VisualShaderNodeDither": "",
+"VisualShaderNodeEmissionAdd": "",
+"VisualShaderNodeEmissionMultiply": "",
+"VisualShaderNodeFlowMap": "",
+"VisualShaderNodeFlowMapAddUV": "",
+"VisualShaderNodeObjectWorldPosition": "",
+"VisualShaderNodeProximityFade": "",
+"VisualShaderNodeRefraction": "",
+"VisualShaderNodeRotation2D": "",
+"VisualShaderNodeRotation3D": ""
+}
+
+[application]
+
+config/name="Visual Shader Node Library"
+run/main_scene="res://addons/visual_shader_node_library/examples/3D/examples_3d.tscn"
+config/icon="res://addons/visual_shader_node_library/icon.png"
+
+[rendering]
+
+environment/default_environment="res://addons/visual_shader_node_library/examples/3D/default_env.tres"
