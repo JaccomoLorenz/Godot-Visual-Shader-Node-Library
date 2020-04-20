@@ -65,6 +65,11 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/proximity_fade.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeReadNormalMap",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/read_normalmap.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeRefraction",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/refraction.gd"
@@ -78,6 +83,11 @@ _global_script_classes=[ {
 "class": "VisualShaderNodeRotation3D",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeScreenSpaceRefraction",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd"
 } ]
 _global_script_class_icons={
 "VisualShaderNodeDeepParallax": "",
@@ -91,9 +101,11 @@ _global_script_class_icons={
 "VisualShaderNodeFlowMapAddUV": "",
 "VisualShaderNodeObjectWorldPosition": "",
 "VisualShaderNodeProximityFade": "",
+"VisualShaderNodeReadNormalMap": "",
 "VisualShaderNodeRefraction": "",
 "VisualShaderNodeRotation2D": "",
-"VisualShaderNodeRotation3D": ""
+"VisualShaderNodeRotation3D": "",
+"VisualShaderNodeScreenSpaceRefraction": ""
 }
 
 [application]
