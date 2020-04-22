@@ -1,8 +1,8 @@
 shader_type spatial;
 
 void dither(in vec4 fragcoord, in float fade, out float alpha_scissor) {
-	int x = int(fragcoord.x) % 4;
-	int y = int(fragcoord.y) % 4;
+	int x = int(int(fragcoord.x) % 4);
+	int y = int(int(fragcoord.y) % 4);
 	int index = x + y * 4;
 	float limit = 0.0;
 
