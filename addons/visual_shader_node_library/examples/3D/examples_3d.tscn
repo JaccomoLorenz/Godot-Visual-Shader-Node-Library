@@ -412,19 +412,19 @@ shader = SubResource( 31 )
 
 [sub_resource type="VisualShaderNodeScalarConstant" id=33]
 
-[sub_resource type="VisualShaderNodeCustom" id=34]
+[sub_resource type="VisualShaderNodeTextureUniformTriplanar" id=34]
+uniform_name = "normal_map"
+texture_type = 2
+
+[sub_resource type="VisualShaderNodeCustom" id=35]
 default_input_values = [ 1, 1.5, 2, 0.2, 4, 1.0 ]
 script = ExtResource( 26 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=35]
+[sub_resource type="VisualShaderNodeScalarConstant" id=36]
 constant = 1.5
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=36]
+[sub_resource type="VisualShaderNodeVec3Constant" id=37]
 constant = Vector3( 1, 1, 1 )
-
-[sub_resource type="VisualShaderNodeTexture" id=37]
-texture = ExtResource( 5 )
-texture_type = 2
 
 [sub_resource type="VisualShaderNodeCustom" id=38]
 script = ExtResource( 27 )
@@ -441,9 +441,24 @@ uniform_name = "thickness"
 [sub_resource type="VisualShader" id=42]
 code = "shader_type spatial;
 uniform float thickness;
-uniform sampler2D tex_frg_5 : hint_normal;
+uniform sampler2D normal_map : hint_normal;
 
 
+// TRIPLANAR FUNCTION GLOBAL CODE
+	vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos) {
+		vec4 samp = vec4(0.0);
+		samp += texture(p_sampler, p_triplanar_pos.xy) * p_weights.z;
+		samp += texture(p_sampler, p_triplanar_pos.xz) * p_weights.y;
+		samp += texture(p_sampler, p_triplanar_pos.zy * vec2(-1.0, 1.0)) * p_weights.x;
+		return samp;
+	}
+
+	uniform vec3 triplanar_scale = vec3(1.0, 1.0, 1.0);
+	uniform vec3 triplanar_offset;
+	uniform float triplanar_sharpness = 0.5;
+
+	varying vec3 triplanar_power_normal;
+	varying vec3 triplanar_pos;
 // ReadNormalMap
 
 // Pulled straight from Godot's scene.glsl file
@@ -710,6 +725,11 @@ void screenspace_refraction(in float ssr_ior, in float ssr_roughness, in float s
 void vertex() {
 // Output:0
 
+	// TRIPLANAR FUNCTION VERTEX CODE
+		triplanar_power_normal = pow(abs(NORMAL), vec3(triplanar_sharpness));
+		triplanar_power_normal /= dot(triplanar_power_normal, vec3(1.0));
+		triplanar_pos = VERTEX * triplanar_scale + triplanar_offset;
+		triplanar_pos *= vec3(1.0, -1.0, 1.0);
 }
 
 void fragment() {
@@ -728,10 +748,14 @@ void fragment() {
 // Scalar:10
 	float n_out10p0 = 0.000000;
 
-// Texture:5
-	vec4 tex_frg_5_read = texture(tex_frg_5, UV.xy);
-	vec3 n_out5p0 = tex_frg_5_read.rgb;
-	float n_out5p1 = tex_frg_5_read.a;
+// TextureUniformTriplanar:11
+	vec3 n_out11p0;
+	float n_out11p1;
+	{
+		vec4 n_tex_read = triplanar_texture( normal_map, triplanar_power_normal, triplanar_pos );
+		n_out11p0 = n_tex_read.rgb;
+		n_out11p1 = n_tex_read.a;
+	}
 
 // Scalar:7
 	float n_out7p0 = 0.200000;
@@ -739,7 +763,7 @@ void fragment() {
 // ReadNormalMap:6
 	vec3 n_out6p0;
 	{
-		n_out6p0 = read_normalmap(n_out5p0, NORMAL, TANGENT, BINORMAL, n_out7p0);
+		n_out6p0 = read_normalmap(n_out11p0, NORMAL, TANGENT, BINORMAL, n_out7p0);
 	}
 
 // ScreenSpaceRefraction:2
@@ -762,16 +786,14 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -276, 140 )
+graph_offset = Vector2( -392, 128 )
 nodes/fragment/0/position = Vector2( 380, 160 )
-nodes/fragment/2/node = SubResource( 34 )
+nodes/fragment/2/node = SubResource( 35 )
 nodes/fragment/2/position = Vector2( 20, 180 )
-nodes/fragment/3/node = SubResource( 35 )
+nodes/fragment/3/node = SubResource( 36 )
 nodes/fragment/3/position = Vector2( -240, 160 )
-nodes/fragment/4/node = SubResource( 36 )
+nodes/fragment/4/node = SubResource( 37 )
 nodes/fragment/4/position = Vector2( -380, 280 )
-nodes/fragment/5/node = SubResource( 37 )
-nodes/fragment/5/position = Vector2( -460, 360 )
 nodes/fragment/6/node = SubResource( 38 )
 nodes/fragment/6/position = Vector2( -160, 440 )
 nodes/fragment/7/node = SubResource( 39 )
@@ -782,11 +804,17 @@ nodes/fragment/9/node = SubResource( 41 )
 nodes/fragment/9/position = Vector2( -240, 220 )
 nodes/fragment/10/node = SubResource( 33 )
 nodes/fragment/10/position = Vector2( -240, 360 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 2, 3, 5, 0, 6, 0, 7, 0, 6, 4, 6, 0, 0, 7, 6, 0, 2, 6, 2, 0, 0, 0, 2, 1, 0, 5, 3, 0, 2, 0, 8, 0, 0, 3, 8, 0, 2, 2, 10, 0, 2, 4, 9, 0, 2, 1 )
+nodes/fragment/11/node = SubResource( 34 )
+nodes/fragment/11/position = Vector2( -540, 380 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 2, 3, 7, 0, 6, 4, 6, 0, 0, 7, 6, 0, 2, 6, 2, 0, 0, 0, 2, 1, 0, 5, 3, 0, 2, 0, 8, 0, 0, 3, 8, 0, 2, 2, 10, 0, 2, 4, 9, 0, 2, 1, 11, 0, 6, 0 )
 
 [sub_resource type="ShaderMaterial" id=43]
 shader = SubResource( 42 )
-shader_param/thickness = 1.4
+shader_param/thickness = 1.467
+shader_param/triplanar_scale = Vector3( 0.5, 0.5, 0.5 )
+shader_param/triplanar_offset = Vector3( 0, 0, 0 )
+shader_param/triplanar_sharpness = 5.0
+shader_param/normal_map = ExtResource( 5 )
 
 [sub_resource type="VisualShaderNodeCustom" id=44]
 default_input_values = [ 0, 1.0 ]
