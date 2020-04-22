@@ -58,9 +58,10 @@ operator = 2
 constant = 0.5
 
 [sub_resource type="VisualShaderNodeGlobalExpression" id=10]
-size = Vector2( 450, 134 )
-expression = "// The parallax texture must be set in the
-// Shader params in the inspector panel"
+size = Vector2( 569, 136 )
+expression = "/*The parallax texture must be passed as sampler2D from a
+TextureUniform node. The texture can be set in the 
+Shader params in the inspector panel */"
 
 [sub_resource type="VisualShaderNodeGlobalExpression" id=11]
 size = Vector2( 304, 143 )
@@ -79,14 +80,15 @@ script = ExtResource( 19 )
 default_input_values = [ 2, 0.05, 3, 8, 4, 32, 9, Vector2( 1, 1 ), 10, "test" ]
 script = ExtResource( 12 )
 
-[sub_resource type="VisualShaderNodeTexture" id=15]
-texture = ExtResource( 6 )
+[sub_resource type="VisualShaderNodeTextureUniform" id=15]
+uniform_name = "ParallaxTexture"
 
 [sub_resource type="VisualShaderNodeScalarConstant" id=16]
 constant = 0.18
 
 [sub_resource type="VisualShader" id=17]
 code = "shader_type spatial;
+uniform sampler2D ParallaxTexture;
 uniform sampler2D tex_frg_2 : hint_albedo;
 uniform sampler2D tex_frg_14;
 uniform sampler2D tex_frg_13;
@@ -118,8 +120,9 @@ void deep_parallax(in vec3 uv_in, in sampler2D depth_texture, in float depth_sca
 	uv_out.xy = mix(ofs, prev_ofs, weight);
 }
 // GlobalExpression:0
-	// The parallax texture must be set in the
-	// Shader params in the inspector panel
+	/*The parallax texture must be passed as sampler2D from a
+	TextureUniform node. The texture can be set in the 
+	Shader params in the inspector panel */
 // GlobalExpression:1
 	// Simply use the output 
 	// as uv for other textures
@@ -130,6 +133,15 @@ void vertex() {
 }
 
 void fragment() {
+// TextureUniform:23
+	vec3 n_out23p0;
+	float n_out23p1;
+	{
+		vec4 n_tex_read = texture(ParallaxTexture, UV.xy);
+		n_out23p0 = n_tex_read.rgb;
+		n_out23p1 = n_tex_read.a;
+	}
+
 // Scalar:6
 	float n_out6p0 = 0.180000;
 
@@ -138,7 +150,7 @@ void fragment() {
 	float n_in21p4 = 32.00000;
 	vec3 n_out21p0;
 	{
-		deep_parallax(vec3(UV, 0.0), texture_parallax_default, n_out6p0, n_in21p3, n_in21p4, VERTEX, NORMAL, TANGENT, BINORMAL, vec3(1.0, 1.0, 0.0), n_out21p0);
+		deep_parallax(vec3(UV, 0.0), ParallaxTexture, n_out6p0, n_in21p3, n_in21p4, VERTEX, NORMAL, TANGENT, BINORMAL, vec3(1.0, 1.0, 0.0), n_out21p0);
 	}
 
 // Texture:2
@@ -195,12 +207,12 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -1445.68, 154.2 )
+graph_offset = Vector2( -2105, 442 )
 nodes/fragment/0/position = Vector2( -540, 360 )
 nodes/fragment/2/node = SubResource( 12 )
 nodes/fragment/2/position = Vector2( -1060, 80 )
 nodes/fragment/6/node = SubResource( 16 )
-nodes/fragment/6/position = Vector2( -1740, 880 )
+nodes/fragment/6/position = Vector2( -1680, 1060 )
 nodes/fragment/10/node = SubResource( 2 )
 nodes/fragment/10/position = Vector2( -1100, 960 )
 nodes/fragment/11/node = SubResource( 3 )
@@ -218,12 +230,13 @@ nodes/fragment/16/position = Vector2( -900, 320 )
 nodes/fragment/17/node = SubResource( 9 )
 nodes/fragment/17/position = Vector2( -1100, 640 )
 nodes/fragment/18/node = SubResource( 10 )
-nodes/fragment/18/position = Vector2( -1960, 640 )
-nodes/fragment/18/size = Vector2( 450, 134 )
+nodes/fragment/18/position = Vector2( -2060, 640 )
+nodes/fragment/18/size = Vector2( 569, 136 )
 nodes/fragment/18/input_ports = ""
 nodes/fragment/18/output_ports = ""
-nodes/fragment/18/expression = "// The parallax texture must be set in the
-// Shader params in the inspector panel"
+nodes/fragment/18/expression = "/*The parallax texture must be passed as sampler2D from a
+TextureUniform node. The texture can be set in the 
+Shader params in the inspector panel */"
 nodes/fragment/19/node = SubResource( 11 )
 nodes/fragment/19/position = Vector2( -1520, 480 )
 nodes/fragment/19/size = Vector2( 304, 143 )
@@ -235,12 +248,13 @@ nodes/fragment/20/node = SubResource( 13 )
 nodes/fragment/20/position = Vector2( -1400, 940 )
 nodes/fragment/21/node = SubResource( 14 )
 nodes/fragment/21/position = Vector2( -1400, 640 )
-nodes/fragment/22/node = SubResource( 15 )
-nodes/fragment/22/position = Vector2( -1760, 960 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 10, 0, 0, 8, 11, 0, 0, 9, 12, 0, 0, 3, 13, 0, 0, 6, 14, 0, 16, 0, 15, 0, 0, 2, 16, 0, 15, 0, 17, 0, 0, 4, 6, 0, 20, 2, 21, 0, 10, 0, 21, 0, 13, 0, 21, 0, 14, 0, 21, 0, 2, 0, 6, 0, 21, 2, 22, 0, 20, 1 )
+nodes/fragment/23/node = SubResource( 15 )
+nodes/fragment/23/position = Vector2( -1800, 820 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 10, 0, 0, 8, 11, 0, 0, 9, 12, 0, 0, 3, 13, 0, 0, 6, 14, 0, 16, 0, 15, 0, 0, 2, 16, 0, 15, 0, 17, 0, 0, 4, 6, 0, 20, 2, 21, 0, 10, 0, 21, 0, 13, 0, 21, 0, 14, 0, 21, 0, 2, 0, 6, 0, 21, 2, 23, 2, 21, 1, 23, 0, 20, 1 )
 
 [sub_resource type="ShaderMaterial" id=18]
 shader = SubResource( 17 )
+shader_param/ParallaxTexture = ExtResource( 6 )
 
 [sub_resource type="VisualShaderNodeCustom" id=19]
 default_input_values = [ 2, 4.0 ]
