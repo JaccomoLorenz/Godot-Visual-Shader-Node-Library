@@ -1,6 +1,6 @@
 extends Spatial
 
-const INTERP_SPEED = 2
+const INTERP_SPEED = 4
 const ROT_SPEED = 0.003
 const ZOOM_SPEED = 0.1
 const ZOOM_MAX = 2.5
@@ -39,7 +39,6 @@ func _unhandled_input(ev):
 		camera_holder.transform.basis = Basis(Vector3(0, rot_y, 0))
 		rotation_x.transform.basis = Basis(Vector3(rot_x, 0, 0))
 
-
 func _process(delta):
 	var current_tester = testers.get_child(tester_index)
 	material_name.text = current_tester.get_name()
@@ -52,7 +51,6 @@ func _process(delta):
 func _on_Previous_pressed():
 	if tester_index > 0:
 		tester_index -= 1
-
 
 func _on_Next_pressed():
 	if tester_index < testers.get_child_count() -1:
