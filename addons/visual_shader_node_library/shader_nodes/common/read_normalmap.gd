@@ -76,7 +76,7 @@ func _get_code(input_vars, output_vars, mode, type):
 	var normal = "NORMAL"
 	var tangent = "TANGENT"
 	var binormal = "BINORMAL"
-	var normal_depth = "NORMAL_DEPTH"
+	var normal_depth = "NORMALMAP_DEPTH"
 	
 	if input_vars[0]:
 		normalmap_data = input_vars[0]

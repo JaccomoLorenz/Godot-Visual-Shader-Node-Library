@@ -72,15 +72,19 @@ func _get_output_port_type(port):
 			return VisualShaderNode.PORT_TYPE_VECTOR
 
 func _get_global_code(mode):
+	if OS.get_current_video_driver() == OS.VIDEO_DRIVER_GLES2:
+		push_warning("Screenspace refraction is not supported in GLES 2!")
+		return ""
+	
 	if mode != Shader.MODE_SPATIAL:
 		return ""
-		
+	
 	var code = preload("screenspace_refraction.shader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 
 func _get_code(input_vars, output_vars, mode, type):
-	if mode != Shader.MODE_SPATIAL or type != VisualShader.TYPE_FRAGMENT:
+	if mode != Shader.MODE_SPATIAL or type != VisualShader.TYPE_FRAGMENT or OS.get_current_video_driver() == OS.VIDEO_DRIVER_GLES2:
 		return ""
 	
 	# Default values
