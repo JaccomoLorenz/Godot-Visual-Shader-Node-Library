@@ -1,8 +1,11 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=69 format=2]
 
 [ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_2d.gd" type="Script" id=3]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_4d.gd" type="Script" id=4]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_3d.gd" type="Script" id=5]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_2d.gd" type="Script" id=6]
 
 [sub_resource type="VisualShaderNodeCustom" id=1]
 script = ExtResource( 3 )
@@ -62,7 +65,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -505, -73 )
+graph_offset = Vector2( -606, -85 )
 mode = 1
 flags/light_only = false
 nodes/vertex/0/position = Vector2( 260, 140 )
@@ -188,6 +191,1675 @@ nodes/vertex/connections = PoolIntArray( 5, 0, 6, 0, 7, 0, 0, 0, 3, 0, 7, 3, 4, 
 [sub_resource type="ShaderMaterial" id=12]
 shader = SubResource( 11 )
 
+[sub_resource type="VisualShaderNodeInput" id=34]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=38]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeCustom" id=39]
+script = ExtResource( 6 )
+
+[sub_resource type="VisualShader" id=35]
+code = "shader_type canvas_item;
+
+
+// PerlinNoise2D
+
+
+// GLSL textureless classic 2D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-08-22
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+//
+
+vec4 mod289(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x) {
+    return mod289(((x * 34.0) + 1.0) * x);
+}
+
+vec4 taylorInvSqrt(vec4 r) {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec2 fade(vec2 t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_2d_np(vec2 P) {
+    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
+    Pi = mod289(Pi); // To avoid truncation effects in permutation
+    vec4 ix = Pi.xzxz;
+    vec4 iy = Pi.yyww;
+    vec4 fx = Pf.xzxz;
+    vec4 fy = Pf.yyww;
+
+    vec4 i = permute(permute(ix) + iy);
+
+    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+    vec4 gy = abs(gx) - 0.5 ;
+    vec4 tx = floor(gx + 0.5);
+    gx = gx - tx;
+
+    vec2 g00 = vec2(gx.x,gy.x);
+    vec2 g10 = vec2(gx.y,gy.y);
+    vec2 g01 = vec2(gx.z,gy.z);
+    vec2 g11 = vec2(gx.w,gy.w);
+    
+    vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    g00 *= norm.x;
+    g01 *= norm.y;
+    g10 *= norm.z;
+    g11 *= norm.w;
+    
+    float n00 = dot(g00, vec2(fx.x, fy.x));
+    float n10 = dot(g10, vec2(fx.y, fy.y));
+    float n01 = dot(g01, vec2(fx.z, fy.z));
+    float n11 = dot(g11, vec2(fx.w, fy.w));
+    
+    vec2 fade_xy = fade(Pf.xy);
+    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+    return 1.15 * n_xy + 0.5;
+}
+
+// Classic Perlin noise, periodic variant
+float perlin_noise_2d_p(vec2 P, vec2 rep) {
+    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
+    Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
+    Pi = mod289(Pi); // To avoid truncation effects in permutation
+    vec4 ix = Pi.xzxz;
+    vec4 iy = Pi.yyww;
+    vec4 fx = Pf.xzxz;
+    vec4 fy = Pf.yyww;
+    
+    vec4 i = permute(permute(ix) + iy);
+    
+    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+    vec4 gy = abs(gx) - 0.5 ;
+    vec4 tx = floor(gx + 0.5);
+    gx = gx - tx;
+    
+    vec2 g00 = vec2(gx.x,gy.x);
+    vec2 g10 = vec2(gx.y,gy.y);
+    vec2 g01 = vec2(gx.z,gy.z);
+    vec2 g11 = vec2(gx.w,gy.w);
+    
+    vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    g00 *= norm.x;
+    g01 *= norm.y;
+    g10 *= norm.z;
+    g11 *= norm.w;
+
+    float n00 = dot(g00, vec2(fx.x, fy.x));
+    float n10 = dot(g10, vec2(fx.y, fy.y));
+    float n01 = dot(g01, vec2(fx.z, fy.z));
+    float n11 = dot(g11, vec2(fx.w, fy.w));
+    
+    vec2 fade_xy = fade(Pf.xy);
+    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+    return 1.15 * n_xy + 0.5;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Scalar:5
+	float n_out5p0 = 10.000000;
+
+// PerlinNoise2D:6
+	float n_out6p0;
+	{
+		n_out6p0 = perlin_noise_2d_np(((n_out3p0).xy).xy * (vec3(n_out5p0)).xy.xy);
+	}
+
+// Output:0
+	COLOR.rgb = vec3(n_out6p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -477.933, 7 )
+mode = 1
+flags/light_only = false
+nodes/fragment/3/node = SubResource( 34 )
+nodes/fragment/3/position = Vector2( -120, 140 )
+nodes/fragment/5/node = SubResource( 38 )
+nodes/fragment/5/position = Vector2( -120, 300 )
+nodes/fragment/6/node = SubResource( 39 )
+nodes/fragment/6/position = Vector2( 140, 140 )
+nodes/fragment/connections = PoolIntArray( 6, 0, 0, 0, 3, 0, 6, 0, 5, 0, 6, 2 )
+
+[sub_resource type="ShaderMaterial" id=36]
+shader = SubResource( 35 )
+
+[sub_resource type="VisualShaderNodeCustom" id=42]
+script = ExtResource( 6 )
+
+[sub_resource type="VisualShaderNodeInput" id=43]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=44]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=45]
+constant = Vector3( 5, 2, 0 )
+
+[sub_resource type="VisualShader" id=46]
+code = "shader_type canvas_item;
+
+
+// PerlinNoise2D
+
+
+// GLSL textureless classic 2D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-08-22
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+//
+
+vec4 mod289(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x) {
+    return mod289(((x * 34.0) + 1.0) * x);
+}
+
+vec4 taylorInvSqrt(vec4 r) {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec2 fade(vec2 t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_2d_np(vec2 P) {
+    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
+    Pi = mod289(Pi); // To avoid truncation effects in permutation
+    vec4 ix = Pi.xzxz;
+    vec4 iy = Pi.yyww;
+    vec4 fx = Pf.xzxz;
+    vec4 fy = Pf.yyww;
+
+    vec4 i = permute(permute(ix) + iy);
+
+    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+    vec4 gy = abs(gx) - 0.5 ;
+    vec4 tx = floor(gx + 0.5);
+    gx = gx - tx;
+
+    vec2 g00 = vec2(gx.x,gy.x);
+    vec2 g10 = vec2(gx.y,gy.y);
+    vec2 g01 = vec2(gx.z,gy.z);
+    vec2 g11 = vec2(gx.w,gy.w);
+    
+    vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    g00 *= norm.x;
+    g01 *= norm.y;
+    g10 *= norm.z;
+    g11 *= norm.w;
+    
+    float n00 = dot(g00, vec2(fx.x, fy.x));
+    float n10 = dot(g10, vec2(fx.y, fy.y));
+    float n01 = dot(g01, vec2(fx.z, fy.z));
+    float n11 = dot(g11, vec2(fx.w, fy.w));
+    
+    vec2 fade_xy = fade(Pf.xy);
+    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+    return 1.15 * n_xy + 0.5;
+}
+
+// Classic Perlin noise, periodic variant
+float perlin_noise_2d_p(vec2 P, vec2 rep) {
+    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
+    Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
+    Pi = mod289(Pi); // To avoid truncation effects in permutation
+    vec4 ix = Pi.xzxz;
+    vec4 iy = Pi.yyww;
+    vec4 fx = Pf.xzxz;
+    vec4 fy = Pf.yyww;
+    
+    vec4 i = permute(permute(ix) + iy);
+    
+    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+    vec4 gy = abs(gx) - 0.5 ;
+    vec4 tx = floor(gx + 0.5);
+    gx = gx - tx;
+    
+    vec2 g00 = vec2(gx.x,gy.x);
+    vec2 g10 = vec2(gx.y,gy.y);
+    vec2 g01 = vec2(gx.z,gy.z);
+    vec2 g11 = vec2(gx.w,gy.w);
+    
+    vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    g00 *= norm.x;
+    g01 *= norm.y;
+    g10 *= norm.z;
+    g11 *= norm.w;
+
+    float n00 = dot(g00, vec2(fx.x, fy.x));
+    float n10 = dot(g10, vec2(fx.y, fy.y));
+    float n01 = dot(g01, vec2(fx.z, fy.z));
+    float n11 = dot(g11, vec2(fx.w, fy.w));
+    
+    vec2 fade_xy = fade(Pf.xy);
+    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+    return 1.15 * n_xy + 0.5;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Vector:5
+	vec3 n_out5p0 = vec3(5.000000, 2.000000, 0.000000);
+
+// Scalar:4
+	float n_out4p0 = 10.000000;
+
+// PerlinNoise2D:2
+	float n_out2p0;
+	{
+		n_out2p0 = perlin_noise_2d_p(((n_out3p0).xy).xy * (vec3(n_out4p0)).xy.xy, (n_out5p0).xy);
+	}
+
+// Output:0
+	COLOR.rgb = vec3(n_out2p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -477.933, 7 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 260, 120 )
+nodes/fragment/2/node = SubResource( 42 )
+nodes/fragment/2/position = Vector2( -20, 140 )
+nodes/fragment/3/node = SubResource( 43 )
+nodes/fragment/3/position = Vector2( -340, 80 )
+nodes/fragment/4/node = SubResource( 44 )
+nodes/fragment/4/position = Vector2( -380, 160 )
+nodes/fragment/5/node = SubResource( 45 )
+nodes/fragment/5/position = Vector2( -460, 240 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 2, 0, 4, 0, 2, 2, 5, 0, 2, 1 )
+
+[sub_resource type="ShaderMaterial" id=47]
+shader = SubResource( 46 )
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=13]
+constant = Vector3( 12, 12, 3 )
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=14]
+constant = Vector3( 5, 5, 1 )
+
+[sub_resource type="VisualShaderNodeCustom" id=40]
+script = ExtResource( 5 )
+
+[sub_resource type="VisualShaderNodeCustom" id=41]
+script = ExtResource( 5 )
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=17]
+
+[sub_resource type="VisualShaderNodeInput" id=18]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=19]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=20]
+
+[sub_resource type="VisualShaderNodeInput" id=21]
+input_name = "time"
+
+[sub_resource type="VisualShader" id=22]
+code = "shader_type canvas_item;
+
+
+// PerlinNoise3D
+
+// GLSL textureless classic 3D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-10-11
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+//
+
+vec3 mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289_4(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x) {
+    return mod289_4(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r) {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 fade(vec3 t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_3d_np(vec3 P) {
+    vec3 Pi0 = floor(P); // Integer part for indexing
+    vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
+    Pi0 = mod289_3(Pi0);
+    Pi1 = mod289_3(Pi1);
+    vec3 Pf0 = fract(P); // Fractional part for interpolation
+    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.z);
+    vec4 iz1 = vec4(Pi1.z);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    
+    vec4 gx0 = ixy0 * (1.0 / 7.0);
+    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+    gx0 = fract(gx0);
+    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+    vec4 sz0 = step(gz0, vec4(0.0));
+    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+    
+    vec4 gx1 = ixy1 * (1.0 / 7.0);
+    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+    gx1 = fract(gx1);
+    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+    vec4 sz1 = step(gz1, vec4(0.0));
+    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+    
+    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+    
+    vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    g000 *= norm0.x;
+    g010 *= norm0.y;
+    g100 *= norm0.z;
+    g110 *= norm0.w;
+    vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    g001 *= norm1.x;
+    g011 *= norm1.y;
+    g101 *= norm1.z;
+    g111 *= norm1.w;
+    
+    float n000 = dot(g000, Pf0);
+    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+    float n111 = dot(g111, Pf1);
+    
+    vec3 fade_xyz = fade(Pf0);
+    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+    return 2.2 * n_xyz;
+}
+
+// Classic Perlin noise, periodic variant
+float perlin_noise_3d_p(vec3 P, vec3 rep) {
+    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
+    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
+    Pi0 = mod289_3(Pi0);
+    Pi1 = mod289_3(Pi1);
+    vec3 Pf0 = fract(P); // Fractional part for interpolation
+    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.z);
+    vec4 iz1 = vec4(Pi1.z);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    
+    vec4 gx0 = ixy0 * (1.0 / 7.0);
+    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+    gx0 = fract(gx0);
+    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+    vec4 sz0 = step(gz0, vec4(0.0));
+    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+    
+    vec4 gx1 = ixy1 * (1.0 / 7.0);
+    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+    gx1 = fract(gx1);
+    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+    vec4 sz1 = step(gz1, vec4(0.0));
+    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+    
+    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+    
+    vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    g000 *= norm0.x;
+    g010 *= norm0.y;
+    g100 *= norm0.z;
+    g110 *= norm0.w;
+    vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    g001 *= norm1.x;
+    g011 *= norm1.y;
+    g101 *= norm1.z;
+    g111 *= norm1.w;
+    
+    float n000 = dot(g000, Pf0);
+    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+    float n111 = dot(g111, Pf1);
+    
+    vec3 fade_xyz = fade(Pf0);
+    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+    return 2.2 * n_xyz;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:4
+	vec3 n_out4p0 = vec3(UV, 0.0);
+
+// VectorDecompose:7
+	float n_out7p0 = n_out4p0.x;
+	float n_out7p1 = n_out4p0.y;
+	float n_out7p2 = n_out4p0.z;
+
+// Input:8
+	float n_out8p0 = TIME;
+
+// VectorCompose:6
+	vec3 n_out6p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
+
+// Vector:17
+	vec3 n_out17p0 = vec3(5.000000, 5.000000, 1.000000);
+
+// PerlinNoise3D:18
+	float n_out18p0;
+	{
+		n_out18p0 = perlin_noise_3d_np(n_out6p0 * n_out17p0);
+	}
+
+// Vector:16
+	vec3 n_out16p0 = vec3(12.000000, 12.000000, 3.000000);
+
+// PerlinNoise3D:19
+	float n_out19p0;
+	{
+		n_out19p0 = perlin_noise_3d_np(n_out6p0 * n_out16p0);
+	}
+
+// VectorCompose:3
+	float n_in3p1 = 0.00000;
+	vec3 n_out3p0 = vec3(n_out18p0, n_in3p1, n_out19p0);
+
+// Output:0
+	COLOR.rgb = n_out3p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -477.933, 7 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 580, 100 )
+nodes/fragment/3/node = SubResource( 17 )
+nodes/fragment/3/position = Vector2( 360, 100 )
+nodes/fragment/4/node = SubResource( 18 )
+nodes/fragment/4/position = Vector2( -560, 80 )
+nodes/fragment/6/node = SubResource( 19 )
+nodes/fragment/6/position = Vector2( -160, 80 )
+nodes/fragment/7/node = SubResource( 20 )
+nodes/fragment/7/position = Vector2( -380, 80 )
+nodes/fragment/8/node = SubResource( 21 )
+nodes/fragment/8/position = Vector2( -380, 220 )
+nodes/fragment/16/node = SubResource( 13 )
+nodes/fragment/16/position = Vector2( -300, 300 )
+nodes/fragment/17/node = SubResource( 14 )
+nodes/fragment/17/position = Vector2( -300, -60 )
+nodes/fragment/18/node = SubResource( 40 )
+nodes/fragment/18/position = Vector2( 140, 40 )
+nodes/fragment/19/node = SubResource( 41 )
+nodes/fragment/19/position = Vector2( 140, 180 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 0, 0, 7, 0, 6, 0, 7, 1, 6, 1, 8, 0, 6, 2, 4, 0, 7, 0, 18, 0, 3, 0, 6, 0, 18, 0, 17, 0, 18, 2, 19, 0, 3, 2, 16, 0, 19, 2, 6, 0, 19, 0 )
+
+[sub_resource type="ShaderMaterial" id=23]
+shader = SubResource( 22 )
+
+[sub_resource type="VisualShaderNodeCustom" id=48]
+script = ExtResource( 5 )
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=49]
+constant = Vector3( 2, 2, 5 )
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=50]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=51]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=52]
+
+[sub_resource type="VisualShaderNodeInput" id=53]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeInput" id=54]
+input_name = "uv"
+
+[sub_resource type="VisualShader" id=55]
+code = "shader_type canvas_item;
+
+
+// PerlinNoise3D
+
+// GLSL textureless classic 3D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-10-11
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+//
+
+vec3 mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289_4(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x) {
+    return mod289_4(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r) {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 fade(vec3 t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_3d_np(vec3 P) {
+    vec3 Pi0 = floor(P); // Integer part for indexing
+    vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
+    Pi0 = mod289_3(Pi0);
+    Pi1 = mod289_3(Pi1);
+    vec3 Pf0 = fract(P); // Fractional part for interpolation
+    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.z);
+    vec4 iz1 = vec4(Pi1.z);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    
+    vec4 gx0 = ixy0 * (1.0 / 7.0);
+    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+    gx0 = fract(gx0);
+    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+    vec4 sz0 = step(gz0, vec4(0.0));
+    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+    
+    vec4 gx1 = ixy1 * (1.0 / 7.0);
+    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+    gx1 = fract(gx1);
+    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+    vec4 sz1 = step(gz1, vec4(0.0));
+    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+    
+    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+    
+    vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    g000 *= norm0.x;
+    g010 *= norm0.y;
+    g100 *= norm0.z;
+    g110 *= norm0.w;
+    vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    g001 *= norm1.x;
+    g011 *= norm1.y;
+    g101 *= norm1.z;
+    g111 *= norm1.w;
+    
+    float n000 = dot(g000, Pf0);
+    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+    float n111 = dot(g111, Pf1);
+    
+    vec3 fade_xyz = fade(Pf0);
+    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+    return 2.2 * n_xyz;
+}
+
+// Classic Perlin noise, periodic variant
+float perlin_noise_3d_p(vec3 P, vec3 rep) {
+    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
+    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
+    Pi0 = mod289_3(Pi0);
+    Pi1 = mod289_3(Pi1);
+    vec3 Pf0 = fract(P); // Fractional part for interpolation
+    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.z);
+    vec4 iz1 = vec4(Pi1.z);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    
+    vec4 gx0 = ixy0 * (1.0 / 7.0);
+    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+    gx0 = fract(gx0);
+    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+    vec4 sz0 = step(gz0, vec4(0.0));
+    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+    
+    vec4 gx1 = ixy1 * (1.0 / 7.0);
+    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+    gx1 = fract(gx1);
+    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+    vec4 sz1 = step(gz1, vec4(0.0));
+    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+    
+    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+    
+    vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    g000 *= norm0.x;
+    g010 *= norm0.y;
+    g100 *= norm0.z;
+    g110 *= norm0.w;
+    vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    g001 *= norm1.x;
+    g011 *= norm1.y;
+    g101 *= norm1.z;
+    g111 *= norm1.w;
+    
+    float n000 = dot(g000, Pf0);
+    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+    float n111 = dot(g111, Pf1);
+    
+    vec3 fade_xyz = fade(Pf0);
+    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+    return 2.2 * n_xyz;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:8
+	vec3 n_out8p0 = vec3(UV, 0.0);
+
+// VectorDecompose:6
+	float n_out6p0 = n_out8p0.x;
+	float n_out6p1 = n_out8p0.y;
+	float n_out6p2 = n_out8p0.z;
+
+// Input:7
+	float n_out7p0 = TIME;
+
+// VectorCompose:5
+	vec3 n_out5p0 = vec3(n_out6p0, n_out6p1, n_out7p0);
+
+// Vector:3
+	vec3 n_out3p0 = vec3(2.000000, 2.000000, 5.000000);
+
+// Scalar:4
+	float n_out4p0 = 10.000000;
+
+// PerlinNoise3D:2
+	float n_out2p0;
+	{
+		n_out2p0 = perlin_noise_3d_p(n_out5p0 * vec3(n_out4p0), n_out3p0);
+	}
+
+// Output:0
+	COLOR.rgb = vec3(n_out2p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -549.933, 24 )
+mode = 1
+flags/light_only = false
+nodes/fragment/2/node = SubResource( 48 )
+nodes/fragment/2/position = Vector2( 100, 160 )
+nodes/fragment/3/node = SubResource( 49 )
+nodes/fragment/3/position = Vector2( -360, 180 )
+nodes/fragment/4/node = SubResource( 50 )
+nodes/fragment/4/position = Vector2( -274.933, 327 )
+nodes/fragment/5/node = SubResource( 51 )
+nodes/fragment/5/position = Vector2( -140, 20 )
+nodes/fragment/6/node = SubResource( 52 )
+nodes/fragment/6/position = Vector2( -380, -40 )
+nodes/fragment/7/node = SubResource( 53 )
+nodes/fragment/7/position = Vector2( -380, 100 )
+nodes/fragment/8/node = SubResource( 54 )
+nodes/fragment/8/position = Vector2( -600, -40 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 2, 1, 4, 0, 2, 2, 5, 0, 2, 0, 6, 0, 5, 0, 6, 1, 5, 1, 7, 0, 5, 2, 8, 0, 6, 0 )
+
+[sub_resource type="ShaderMaterial" id=56]
+shader = SubResource( 55 )
+
+[sub_resource type="VisualShaderNodeCustom" id=24]
+script = ExtResource( 4 )
+
+[sub_resource type="VisualShaderNodeInput" id=25]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=26]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeInput" id=27]
+input_name = "screen_uv"
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=28]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=29]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=30]
+
+[sub_resource type="VisualShader" id=31]
+code = "shader_type canvas_item;
+
+
+// PerlinNoise4D
+
+
+// GLSL textureless classic 4D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-08-22
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+
+vec4 mod289(vec4 x) {
+	return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x) {
+	return mod289(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r) {
+	return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec4 fade(vec4 t) {
+	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_4d_np(vec4 P) {
+    vec4 Pi0 = floor(P); // Integer part for indexing
+    vec4 Pi1 = Pi0 + 1.0; // Integer part + 1
+    Pi0 = mod289(Pi0);
+    Pi1 = mod289(Pi1);
+    vec4 Pf0 = fract(P); // Fractional part for interpolation
+    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.zzzz);
+    vec4 iz1 = vec4(Pi1.zzzz);
+    vec4 iw0 = vec4(Pi0.wwww);
+    vec4 iw1 = vec4(Pi1.wwww);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    vec4 ixy00 = permute(ixy0 + iw0);
+    vec4 ixy01 = permute(ixy0 + iw1);
+    vec4 ixy10 = permute(ixy1 + iw0);
+    vec4 ixy11 = permute(ixy1 + iw1);
+    
+    vec4 gx00 = ixy00 * (1.0 / 7.0);
+    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
+    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
+    gx00 = fract(gx00) - 0.5;
+    gy00 = fract(gy00) - 0.5;
+    gz00 = fract(gz00) - 0.5;
+    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
+    vec4 sw00 = step(gw00, vec4(0.0));
+    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
+    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
+    
+    vec4 gx01 = ixy01 * (1.0 / 7.0);
+    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
+    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
+    gx01 = fract(gx01) - 0.5;
+    gy01 = fract(gy01) - 0.5;
+    gz01 = fract(gz01) - 0.5;
+    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
+    vec4 sw01 = step(gw01, vec4(0.0));
+    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
+    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
+    
+    vec4 gx10 = ixy10 * (1.0 / 7.0);
+    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
+    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
+    gx10 = fract(gx10) - 0.5;
+    gy10 = fract(gy10) - 0.5;
+    gz10 = fract(gz10) - 0.5;
+    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
+    vec4 sw10 = step(gw10, vec4(0.0));
+    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
+    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
+    
+    vec4 gx11 = ixy11 * (1.0 / 7.0);
+    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
+    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
+    gx11 = fract(gx11) - 0.5;
+    gy11 = fract(gy11) - 0.5;
+    gz11 = fract(gz11) - 0.5;
+    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
+    vec4 sw11 = step(gw11, vec4(0.0));
+    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
+    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
+    
+    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
+    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
+    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
+    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
+    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
+    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
+    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
+    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
+    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
+    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
+    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
+    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
+    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
+    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
+    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
+    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
+    
+    vec4 norm00 = taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    g0000 *= norm00.x;
+    g0100 *= norm00.y;
+    g1000 *= norm00.z;
+    g1100 *= norm00.w;
+    
+    vec4 norm01 = taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    g0001 *= norm01.x;
+    g0101 *= norm01.y;
+    g1001 *= norm01.z;
+    g1101 *= norm01.w;
+    
+    vec4 norm10 = taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    g0010 *= norm10.x;
+    g0110 *= norm10.y;
+    g1010 *= norm10.z;
+    g1110 *= norm10.w;
+    
+    vec4 norm11 = taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    g0011 *= norm11.x;
+    g0111 *= norm11.y;
+    g1011 *= norm11.z;
+    g1111 *= norm11.w;
+    
+    float n0000 = dot(g0000, Pf0);
+    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
+    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
+    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
+    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
+    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
+    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
+    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
+    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
+    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
+    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
+    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
+    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
+    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
+    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
+    float n1111 = dot(g1111, Pf1);
+    
+    vec4 fade_xyzw = fade(Pf0);
+    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
+    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
+    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
+    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
+    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
+    return 1.1 * n_xyzw + 0.5;
+}
+
+// Classic Perlin noise, periodic version
+float perlin_noise_4d_p(vec4 P, vec4 rep) {
+    vec4 Pi0 = mod(floor(P), rep); // Integer part modulo rep
+    vec4 Pi1 = mod(Pi0 + 1.0, rep); // Integer part + 1 mod rep
+    Pi0 = mod289(Pi0);
+    Pi1 = mod289(Pi1);
+    vec4 Pf0 = fract(P); // Fractional part for interpolation
+    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.zzzz);
+    vec4 iz1 = vec4(Pi1.zzzz);
+    vec4 iw0 = vec4(Pi0.wwww);
+    vec4 iw1 = vec4(Pi1.wwww);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    vec4 ixy00 = permute(ixy0 + iw0);
+    vec4 ixy01 = permute(ixy0 + iw1);
+    vec4 ixy10 = permute(ixy1 + iw0);
+    vec4 ixy11 = permute(ixy1 + iw1);
+    
+    vec4 gx00 = ixy00 * (1.0 / 7.0);
+    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
+    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
+    gx00 = fract(gx00) - 0.5;
+    gy00 = fract(gy00) - 0.5;
+    gz00 = fract(gz00) - 0.5;
+    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
+    vec4 sw00 = step(gw00, vec4(0.0));
+    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
+    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
+    
+    vec4 gx01 = ixy01 * (1.0 / 7.0);
+    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
+    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
+    gx01 = fract(gx01) - 0.5;
+    gy01 = fract(gy01) - 0.5;
+    gz01 = fract(gz01) - 0.5;
+    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
+    vec4 sw01 = step(gw01, vec4(0.0));
+    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
+    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
+    
+    vec4 gx10 = ixy10 * (1.0 / 7.0);
+    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
+    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
+    gx10 = fract(gx10) - 0.5;
+    gy10 = fract(gy10) - 0.5;
+    gz10 = fract(gz10) - 0.5;
+    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
+    vec4 sw10 = step(gw10, vec4(0.0));
+    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
+    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
+    
+    vec4 gx11 = ixy11 * (1.0 / 7.0);
+    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
+    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
+    gx11 = fract(gx11) - 0.5;
+    gy11 = fract(gy11) - 0.5;
+    gz11 = fract(gz11) - 0.5;
+    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
+    vec4 sw11 = step(gw11, vec4(0.0));
+    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
+    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
+    
+    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
+    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
+    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
+    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
+    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
+    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
+    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
+    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
+    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
+    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
+    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
+    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
+    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
+    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
+    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
+    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
+    
+    vec4 norm00 = taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    g0000 *= norm00.x;
+    g0100 *= norm00.y;
+    g1000 *= norm00.z;
+    g1100 *= norm00.w;
+    
+    vec4 norm01 = taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    g0001 *= norm01.x;
+    g0101 *= norm01.y;
+    g1001 *= norm01.z;
+    g1101 *= norm01.w;
+    
+    vec4 norm10 = taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    g0010 *= norm10.x;
+    g0110 *= norm10.y;
+    g1010 *= norm10.z;
+    g1110 *= norm10.w;
+    
+    vec4 norm11 = taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    g0011 *= norm11.x;
+    g0111 *= norm11.y;
+    g1011 *= norm11.z;
+    g1111 *= norm11.w;
+    
+    float n0000 = dot(g0000, Pf0);
+    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
+    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
+    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
+    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
+    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
+    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
+    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
+    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
+    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
+    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
+    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
+    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
+    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
+    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
+    float n1111 = dot(g1111, Pf1);
+    
+    vec4 fade_xyzw = fade(Pf0);
+    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
+    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
+    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
+    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
+    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
+    return 1.1 * n_xyzw + 0.5;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// VectorDecompose:7
+	float n_out7p0 = n_out3p0.x;
+	float n_out7p1 = n_out3p0.y;
+	float n_out7p2 = n_out3p0.z;
+
+// Input:5
+	vec3 n_out5p0 = vec3(SCREEN_UV, 0.0);
+
+// VectorDecompose:8
+	float n_out8p0 = n_out5p0.x;
+	float n_out8p1 = n_out5p0.y;
+	float n_out8p2 = n_out5p0.z;
+
+// VectorCompose:6
+	vec3 n_out6p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
+
+// Scalar:4
+	float n_out4p0 = 10.000000;
+
+// PerlinNoise4D:2
+	float n_out2p0;
+	{
+		n_out2p0 = perlin_noise_4d_np(vec4(n_out6p0, n_out8p1) * vec4(vec3(n_out4p0), n_out4p0));
+	}
+
+// Output:0
+	COLOR.rgb = vec3(n_out2p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -606, -85 )
+mode = 1
+flags/light_only = false
+nodes/fragment/2/node = SubResource( 24 )
+nodes/fragment/2/position = Vector2( 160, 140 )
+nodes/fragment/3/node = SubResource( 25 )
+nodes/fragment/3/position = Vector2( -520, 40 )
+nodes/fragment/4/node = SubResource( 26 )
+nodes/fragment/4/position = Vector2( -260, 340 )
+nodes/fragment/5/node = SubResource( 27 )
+nodes/fragment/5/position = Vector2( -580, 160 )
+nodes/fragment/6/node = SubResource( 28 )
+nodes/fragment/6/position = Vector2( -60, 60 )
+nodes/fragment/7/node = SubResource( 29 )
+nodes/fragment/7/position = Vector2( -340, 40 )
+nodes/fragment/8/node = SubResource( 30 )
+nodes/fragment/8/position = Vector2( -340, 160 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 4, 0, 2, 4, 4, 0, 2, 5, 6, 0, 2, 0, 3, 0, 7, 0, 7, 0, 6, 0, 7, 1, 6, 1, 5, 0, 8, 0, 8, 0, 6, 2, 8, 1, 2, 1 )
+
+[sub_resource type="ShaderMaterial" id=32]
+shader = SubResource( 31 )
+
+[sub_resource type="VisualShaderNodeCustom" id=57]
+script = ExtResource( 4 )
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=58]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=59]
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=60]
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=61]
+constant = 2.0
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=62]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeInput" id=63]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeInput" id=64]
+input_name = "screen_uv"
+
+[sub_resource type="VisualShader" id=65]
+code = "shader_type canvas_item;
+
+
+// PerlinNoise4D
+
+
+// GLSL textureless classic 4D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-08-22
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+
+vec4 mod289(vec4 x) {
+	return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x) {
+	return mod289(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r) {
+	return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec4 fade(vec4 t) {
+	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_4d_np(vec4 P) {
+    vec4 Pi0 = floor(P); // Integer part for indexing
+    vec4 Pi1 = Pi0 + 1.0; // Integer part + 1
+    Pi0 = mod289(Pi0);
+    Pi1 = mod289(Pi1);
+    vec4 Pf0 = fract(P); // Fractional part for interpolation
+    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.zzzz);
+    vec4 iz1 = vec4(Pi1.zzzz);
+    vec4 iw0 = vec4(Pi0.wwww);
+    vec4 iw1 = vec4(Pi1.wwww);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    vec4 ixy00 = permute(ixy0 + iw0);
+    vec4 ixy01 = permute(ixy0 + iw1);
+    vec4 ixy10 = permute(ixy1 + iw0);
+    vec4 ixy11 = permute(ixy1 + iw1);
+    
+    vec4 gx00 = ixy00 * (1.0 / 7.0);
+    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
+    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
+    gx00 = fract(gx00) - 0.5;
+    gy00 = fract(gy00) - 0.5;
+    gz00 = fract(gz00) - 0.5;
+    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
+    vec4 sw00 = step(gw00, vec4(0.0));
+    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
+    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
+    
+    vec4 gx01 = ixy01 * (1.0 / 7.0);
+    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
+    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
+    gx01 = fract(gx01) - 0.5;
+    gy01 = fract(gy01) - 0.5;
+    gz01 = fract(gz01) - 0.5;
+    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
+    vec4 sw01 = step(gw01, vec4(0.0));
+    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
+    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
+    
+    vec4 gx10 = ixy10 * (1.0 / 7.0);
+    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
+    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
+    gx10 = fract(gx10) - 0.5;
+    gy10 = fract(gy10) - 0.5;
+    gz10 = fract(gz10) - 0.5;
+    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
+    vec4 sw10 = step(gw10, vec4(0.0));
+    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
+    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
+    
+    vec4 gx11 = ixy11 * (1.0 / 7.0);
+    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
+    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
+    gx11 = fract(gx11) - 0.5;
+    gy11 = fract(gy11) - 0.5;
+    gz11 = fract(gz11) - 0.5;
+    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
+    vec4 sw11 = step(gw11, vec4(0.0));
+    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
+    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
+    
+    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
+    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
+    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
+    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
+    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
+    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
+    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
+    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
+    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
+    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
+    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
+    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
+    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
+    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
+    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
+    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
+    
+    vec4 norm00 = taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    g0000 *= norm00.x;
+    g0100 *= norm00.y;
+    g1000 *= norm00.z;
+    g1100 *= norm00.w;
+    
+    vec4 norm01 = taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    g0001 *= norm01.x;
+    g0101 *= norm01.y;
+    g1001 *= norm01.z;
+    g1101 *= norm01.w;
+    
+    vec4 norm10 = taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    g0010 *= norm10.x;
+    g0110 *= norm10.y;
+    g1010 *= norm10.z;
+    g1110 *= norm10.w;
+    
+    vec4 norm11 = taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    g0011 *= norm11.x;
+    g0111 *= norm11.y;
+    g1011 *= norm11.z;
+    g1111 *= norm11.w;
+    
+    float n0000 = dot(g0000, Pf0);
+    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
+    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
+    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
+    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
+    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
+    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
+    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
+    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
+    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
+    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
+    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
+    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
+    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
+    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
+    float n1111 = dot(g1111, Pf1);
+    
+    vec4 fade_xyzw = fade(Pf0);
+    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
+    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
+    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
+    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
+    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
+    return 1.1 * n_xyzw + 0.5;
+}
+
+// Classic Perlin noise, periodic version
+float perlin_noise_4d_p(vec4 P, vec4 rep) {
+    vec4 Pi0 = mod(floor(P), rep); // Integer part modulo rep
+    vec4 Pi1 = mod(Pi0 + 1.0, rep); // Integer part + 1 mod rep
+    Pi0 = mod289(Pi0);
+    Pi1 = mod289(Pi1);
+    vec4 Pf0 = fract(P); // Fractional part for interpolation
+    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.zzzz);
+    vec4 iz1 = vec4(Pi1.zzzz);
+    vec4 iw0 = vec4(Pi0.wwww);
+    vec4 iw1 = vec4(Pi1.wwww);
+    
+    vec4 ixy = permute(permute(ix) + iy);
+    vec4 ixy0 = permute(ixy + iz0);
+    vec4 ixy1 = permute(ixy + iz1);
+    vec4 ixy00 = permute(ixy0 + iw0);
+    vec4 ixy01 = permute(ixy0 + iw1);
+    vec4 ixy10 = permute(ixy1 + iw0);
+    vec4 ixy11 = permute(ixy1 + iw1);
+    
+    vec4 gx00 = ixy00 * (1.0 / 7.0);
+    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
+    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
+    gx00 = fract(gx00) - 0.5;
+    gy00 = fract(gy00) - 0.5;
+    gz00 = fract(gz00) - 0.5;
+    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
+    vec4 sw00 = step(gw00, vec4(0.0));
+    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
+    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
+    
+    vec4 gx01 = ixy01 * (1.0 / 7.0);
+    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
+    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
+    gx01 = fract(gx01) - 0.5;
+    gy01 = fract(gy01) - 0.5;
+    gz01 = fract(gz01) - 0.5;
+    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
+    vec4 sw01 = step(gw01, vec4(0.0));
+    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
+    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
+    
+    vec4 gx10 = ixy10 * (1.0 / 7.0);
+    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
+    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
+    gx10 = fract(gx10) - 0.5;
+    gy10 = fract(gy10) - 0.5;
+    gz10 = fract(gz10) - 0.5;
+    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
+    vec4 sw10 = step(gw10, vec4(0.0));
+    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
+    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
+    
+    vec4 gx11 = ixy11 * (1.0 / 7.0);
+    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
+    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
+    gx11 = fract(gx11) - 0.5;
+    gy11 = fract(gy11) - 0.5;
+    gz11 = fract(gz11) - 0.5;
+    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
+    vec4 sw11 = step(gw11, vec4(0.0));
+    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
+    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
+    
+    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
+    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
+    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
+    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
+    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
+    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
+    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
+    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
+    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
+    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
+    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
+    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
+    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
+    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
+    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
+    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
+    
+    vec4 norm00 = taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    g0000 *= norm00.x;
+    g0100 *= norm00.y;
+    g1000 *= norm00.z;
+    g1100 *= norm00.w;
+    
+    vec4 norm01 = taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    g0001 *= norm01.x;
+    g0101 *= norm01.y;
+    g1001 *= norm01.z;
+    g1101 *= norm01.w;
+    
+    vec4 norm10 = taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    g0010 *= norm10.x;
+    g0110 *= norm10.y;
+    g1010 *= norm10.z;
+    g1110 *= norm10.w;
+    
+    vec4 norm11 = taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    g0011 *= norm11.x;
+    g0111 *= norm11.y;
+    g1011 *= norm11.z;
+    g1111 *= norm11.w;
+    
+    float n0000 = dot(g0000, Pf0);
+    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
+    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
+    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
+    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
+    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
+    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
+    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
+    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
+    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
+    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
+    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
+    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
+    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
+    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
+    float n1111 = dot(g1111, Pf1);
+    
+    vec4 fade_xyzw = fade(Pf0);
+    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
+    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
+    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
+    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
+    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
+    return 1.1 * n_xyzw + 0.5;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:8
+	vec3 n_out8p0 = vec3(UV, 0.0);
+
+// VectorDecompose:3
+	float n_out3p0 = n_out8p0.x;
+	float n_out3p1 = n_out8p0.y;
+	float n_out3p2 = n_out8p0.z;
+
+// Input:9
+	vec3 n_out9p0 = vec3(SCREEN_UV, 0.0);
+
+// VectorDecompose:4
+	float n_out4p0 = n_out9p0.x;
+	float n_out4p1 = n_out9p0.y;
+	float n_out4p2 = n_out9p0.z;
+
+// VectorCompose:5
+	vec3 n_out5p0 = vec3(n_out3p0, n_out3p1, n_out4p0);
+
+// Scalar:6
+	float n_out6p0 = 2.000000;
+
+// Scalar:7
+	float n_out7p0 = 10.000000;
+
+// PerlinNoise4D:2
+	float n_out2p0;
+	{
+		n_out2p0 = perlin_noise_4d_p(vec4(n_out5p0, n_out4p1) * vec4(vec3(n_out7p0), n_out7p0), vec4(vec3(n_out6p0), n_out6p0));
+	}
+
+// Output:0
+	COLOR.rgb = vec3(n_out2p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -1076.93, 3 )
+mode = 1
+flags/light_only = false
+nodes/fragment/2/node = SubResource( 57 )
+nodes/fragment/2/position = Vector2( 80, 120 )
+nodes/fragment/3/node = SubResource( 58 )
+nodes/fragment/3/position = Vector2( -520, 60 )
+nodes/fragment/4/node = SubResource( 59 )
+nodes/fragment/4/position = Vector2( -520, 200 )
+nodes/fragment/5/node = SubResource( 60 )
+nodes/fragment/5/position = Vector2( -160, 60 )
+nodes/fragment/6/node = SubResource( 61 )
+nodes/fragment/6/position = Vector2( -220, 240 )
+nodes/fragment/7/node = SubResource( 62 )
+nodes/fragment/7/position = Vector2( -220, 300 )
+nodes/fragment/8/node = SubResource( 63 )
+nodes/fragment/8/position = Vector2( -720, 60 )
+nodes/fragment/9/node = SubResource( 64 )
+nodes/fragment/9/position = Vector2( -780, 200 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 5, 0, 3, 1, 5, 1, 4, 0, 5, 2, 4, 1, 2, 1, 5, 0, 2, 0, 6, 0, 2, 2, 6, 0, 2, 3, 7, 0, 2, 4, 7, 0, 2, 5, 8, 0, 3, 0, 9, 0, 4, 0 )
+
+[sub_resource type="ShaderMaterial" id=66]
+shader = SubResource( 65 )
+
 [node name="Node2D" type="Node2D"]
 
 [node name="Rotation" type="Sprite" parent="."]
@@ -216,6 +1888,129 @@ margin_top = 38.4532
 margin_right = 27.0557
 margin_bottom = 52.4532
 text = "Rotation 3D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Perlin Noise 2D" type="ColorRect" parent="."]
+material = SubResource( 36 )
+margin_left = 284.839
+margin_top = 34.1266
+margin_right = 345.839
+margin_bottom = 95.1266
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Perlin Noise 2D"]
+margin_left = -13.8511
+margin_top = 63.2814
+margin_right = 92.1489
+margin_bottom = 77.2814
+text = "Perlin noise (2D)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Perlin Noise 2D periodic" type="ColorRect" parent="."]
+material = SubResource( 47 )
+margin_left = 286.961
+margin_top = 143.728
+margin_right = 347.961
+margin_bottom = 204.728
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Perlin Noise 2D periodic"]
+margin_left = -10.4644
+margin_top = 65.1213
+margin_right = 77.5356
+margin_bottom = 96.1213
+text = " Perlin noise
+(2D, periodic)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Perlin Noise 3D" type="ColorRect" parent="."]
+material = SubResource( 23 )
+margin_left = 416.5
+margin_top = 31.5
+margin_right = 477.5
+margin_bottom = 92.5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Perlin Noise 3D"]
+margin_left = -14.3511
+margin_top = 63.2814
+margin_right = 91.6489
+margin_bottom = 77.2814
+text = "Perlin noise (3D)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Perlin Noise 3D periodic" type="ColorRect" parent="."]
+material = SubResource( 56 )
+margin_left = 422.157
+margin_top = 143.223
+margin_right = 483.157
+margin_bottom = 204.223
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Perlin Noise 3D periodic"]
+margin_left = -14.3511
+margin_top = 63.2814
+margin_right = 91.6489
+margin_bottom = 77.2814
+text = " Perlin noise
+(3D, periodic)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Perlin Noise 4D" type="ColorRect" parent="."]
+material = SubResource( 32 )
+margin_left = 545.865
+margin_top = 32.3969
+margin_right = 606.865
+margin_bottom = 93.3969
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Perlin Noise 4D"]
+margin_left = -20.2103
+margin_top = 62.7814
+margin_right = 85.7897
+margin_bottom = 76.7814
+text = "Perlin noise (4D)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Perlin Noise 4D periodic" type="ColorRect" parent="."]
+material = SubResource( 66 )
+margin_left = 550.108
+margin_top = 144.12
+margin_right = 611.108
+margin_bottom = 205.12
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Perlin Noise 4D periodic"]
+margin_left = -10.1005
+margin_top = 63.7071
+margin_right = 77.8995
+margin_bottom = 94.7071
+text = " Perlin noise
+(4D, periodic)"
 __meta__ = {
 "_edit_use_anchors_": false
 }
