@@ -80,6 +80,11 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/proximity_fade.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeRandomNoise",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/random.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeReadNormalMap",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/read_normalmap.gd"
@@ -119,6 +124,7 @@ _global_script_class_icons={
 "VisualShaderNodePerlinNoise3D": "",
 "VisualShaderNodePerlinNoise4D": "",
 "VisualShaderNodeProximityFade": "",
+"VisualShaderNodeRandomNoise": "",
 "VisualShaderNodeReadNormalMap": "",
 "VisualShaderNodeRefraction": "",
 "VisualShaderNodeRotation2D": "",
@@ -134,4 +140,5 @@ config/icon="res://addons/visual_shader_node_library/icon.png"
 
 [rendering]
 
+quality/driver/driver_name="GLES2"
 environment/default_environment="res://addons/visual_shader_node_library/examples/3D/default_env.tres"
