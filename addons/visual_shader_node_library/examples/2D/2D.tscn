@@ -1,4 +1,4 @@
-[gd_scene load_steps=78 format=2]
+[gd_scene load_steps=109 format=2]
 
 [ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
@@ -7,6 +7,10 @@
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_3d.gd" type="Script" id=5]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_2d.gd" type="Script" id=6]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/random.gd" type="Script" id=7]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d.gd" type="Script" id=8]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d_2x2.gd" type="Script" id=9]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d.gd" type="Script" id=10]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d_2x2x2.gd" type="Script" id=11]
 
 [sub_resource type="VisualShaderNodeCustom" id=1]
 script = ExtResource( 3 )
@@ -1860,24 +1864,24 @@ nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 5, 0, 3, 1, 5, 1, 4
 [sub_resource type="ShaderMaterial" id=62]
 shader = SubResource( 61 )
 
-[sub_resource type="VisualShaderNodeInput" id=64]
+[sub_resource type="VisualShaderNodeInput" id=63]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeInput" id=65]
+[sub_resource type="VisualShaderNodeInput" id=64]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeCustom" id=68]
+[sub_resource type="VisualShaderNodeCustom" id=65]
 script = ExtResource( 7 )
 
-[sub_resource type="VisualShaderNodeScalarInterp" id=69]
+[sub_resource type="VisualShaderNodeScalarInterp" id=66]
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=70]
+[sub_resource type="VisualShaderNodeVectorDecompose" id=67]
 
-[sub_resource type="VisualShaderNodeScalarOp" id=71]
+[sub_resource type="VisualShaderNodeScalarOp" id=68]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 9
 
-[sub_resource type="VisualShader" id=66]
+[sub_resource type="VisualShader" id=69]
 code = "shader_type canvas_item;
 
 
@@ -1930,26 +1934,836 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -422, 38.5 )
+graph_offset = Vector2( -649.333, 47 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 280, 120 )
-nodes/fragment/3/node = SubResource( 64 )
+nodes/fragment/3/node = SubResource( 63 )
 nodes/fragment/3/position = Vector2( -1080, 120 )
-nodes/fragment/4/node = SubResource( 65 )
+nodes/fragment/4/node = SubResource( 64 )
 nodes/fragment/4/position = Vector2( -320, 200 )
-nodes/fragment/5/node = SubResource( 68 )
+nodes/fragment/5/node = SubResource( 65 )
 nodes/fragment/5/position = Vector2( 80, 120 )
-nodes/fragment/6/node = SubResource( 69 )
+nodes/fragment/6/node = SubResource( 66 )
 nodes/fragment/6/position = Vector2( -120, 240 )
-nodes/fragment/7/node = SubResource( 70 )
+nodes/fragment/7/node = SubResource( 67 )
 nodes/fragment/7/position = Vector2( -900, 220 )
-nodes/fragment/8/node = SubResource( 71 )
+nodes/fragment/8/node = SubResource( 68 )
 nodes/fragment/8/position = Vector2( -620, 220 )
 nodes/fragment/connections = PoolIntArray( 5, 0, 0, 0, 3, 0, 5, 0, 4, 0, 6, 0, 6, 0, 5, 1, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 6, 2 )
 
-[sub_resource type="ShaderMaterial" id=67]
-shader = SubResource( 66 )
+[sub_resource type="ShaderMaterial" id=70]
+shader = SubResource( 69 )
+
+[sub_resource type="VisualShaderNodeInput" id=71]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=72]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=73]
+constant = 1.0
+
+[sub_resource type="VisualShaderNodeCustom" id=74]
+output_port_for_preview = 2
+script = ExtResource( 8 )
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=75]
+
+[sub_resource type="VisualShaderNodeScalarOp" id=76]
+default_input_values = [ 0, 0.0, 1, 0.5 ]
+operator = 9
+
+[sub_resource type="VisualShaderNodeScalarInterp" id=77]
+output_port_for_preview = 0
+
+[sub_resource type="VisualShader" id=78]
+code = "shader_type canvas_item;
+
+
+// CellularNoise2D
+
+
+// Cellular noise (\"Worley noise\") in 2D in GLSL.
+// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
+// This code is released under the conditions of the MIT license.
+// See LICENSE file for details.
+// https://github.com/stegu/webgl-noise
+
+// Modulo 289 without a division (only multiplications)
+vec3 mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec2 mod289_2(vec2 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+// Modulo 7 without a division
+vec3 mod7(vec3 x) {
+    return x - floor(x * (1.0 / 7.0)) * 7.0;
+}
+
+// Permutation polynomial: (34x^2 + x) mod 289
+vec3 permute(vec3 x) {
+    return mod289_3((34.0 * x + 1.0) * x);
+}
+
+// Cellular noise, returning F1 and F2 in a vec2.
+// Standard 3x3 search window for good F1 and F2 values
+vec2 cellular_noise_2d(vec2 P, float jitter) {
+    float K = 0.142857142857; // 1/7
+    float Ko = 0.428571428571; // 3/7
+
+    vec2 Pi = mod289_2(floor(P));
+    vec2 Pf = fract(P);
+    vec3 oi = vec3(-1.0, 0.0, 1.0);
+    vec3 of = vec3(-0.5, 0.5, 1.5);
+    vec3 px = permute(Pi.x + oi);
+    vec3 p = permute(px.x + Pi.y + oi); // p11, p12, p13
+    vec3 ox = fract(p*K) - Ko;
+    vec3 oy = mod7(floor(p*K))*K - Ko;
+    vec3 dx = Pf.x + 0.5 + jitter*ox;
+    vec3 dy = Pf.y - of + jitter*oy;
+    vec3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
+    p = permute(px.y + Pi.y + oi); // p21, p22, p23
+    ox = fract(p*K) - Ko;
+    oy = mod7(floor(p*K))*K - Ko;
+    dx = Pf.x - 0.5 + jitter*ox;
+    dy = Pf.y - of + jitter*oy;
+    vec3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
+    p = permute(px.z + Pi.y + oi); // p31, p32, p33
+    ox = fract(p*K) - Ko;
+    oy = mod7(floor(p*K))*K - Ko;
+    dx = Pf.x - 1.5 + jitter*ox;
+    dy = Pf.y - of + jitter*oy;
+    vec3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared
+    // Sort out the two smallest distances (F1, F2)
+    vec3 d1a = min(d1, d2);
+    d2 = max(d1, d2); // Swap to keep candidates for F2
+    d2 = min(d2, d3); // neither F1 nor F2 are now in d3
+    d1 = min(d1a, d2); // F1 is now in d1
+    d2 = max(d1a, d2); // Swap to keep candidates for F2
+    d1.xy = (d1.x < d1.y) ? d1.xy : d1.yx; // Swap if smaller
+    d1.xz = (d1.x < d1.z) ? d1.xz : d1.zx; // F1 is in d1.x
+    d1.yz = min(d1.yz, d2.yz); // F2 is now not in d2.yz
+    d1.y = min(d1.y, d1.z); // nor in  d1.z
+    d1.y = min(d1.y, d2.x); // F2 is in d1.y, we're done.
+    return sqrt(d1.xy);
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Scalar:4
+	float n_out4p0 = 10.000000;
+
+// Scalar:5
+	float n_out5p0 = 1.000000;
+
+// CellularNoise2D:6
+	vec3 n_out6p0;
+	float n_out6p1;
+	float n_out6p2;
+	{
+		
+			
+			n_out6p0 = vec3(cellular_noise_2d((n_out3p0).xy * (vec3(n_out4p0)).xy, n_out5p0), 0.0);
+			n_out6p1 = n_out6p0.x;n_out6p2 = n_out6p0.y;
+			
+	}
+
+// VectorDecompose:7
+	float n_out7p0 = n_out3p0.x;
+	float n_out7p1 = n_out3p0.y;
+	float n_out7p2 = n_out3p0.z;
+
+// ScalarOp:8
+	float n_in8p1 = 0.50000;
+	float n_out8p0 = step(n_out7p0, n_in8p1);
+
+// ScalarMix:9
+	float n_out9p0 = mix(n_out6p2, n_out6p1, n_out8p0);
+
+// Output:0
+	COLOR.rgb = vec3(n_out9p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -212, -38.25 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 580, 120 )
+nodes/fragment/3/node = SubResource( 71 )
+nodes/fragment/3/position = Vector2( -280, 40 )
+nodes/fragment/4/node = SubResource( 72 )
+nodes/fragment/4/position = Vector2( -280, 120 )
+nodes/fragment/5/node = SubResource( 73 )
+nodes/fragment/5/position = Vector2( -280, 200 )
+nodes/fragment/6/node = SubResource( 74 )
+nodes/fragment/6/position = Vector2( 60, 120 )
+nodes/fragment/7/node = SubResource( 75 )
+nodes/fragment/7/position = Vector2( -120, -40 )
+nodes/fragment/8/node = SubResource( 76 )
+nodes/fragment/8/position = Vector2( 100, -40 )
+nodes/fragment/9/node = SubResource( 77 )
+nodes/fragment/9/position = Vector2( 360, 40 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 6, 0, 4, 0, 6, 1, 5, 0, 6, 2, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 9, 2, 9, 0, 0, 0, 6, 1, 9, 1, 6, 2, 9, 0 )
+
+[sub_resource type="ShaderMaterial" id=79]
+shader = SubResource( 78 )
+
+[sub_resource type="VisualShaderNodeScalarInterp" id=80]
+
+[sub_resource type="VisualShaderNodeInput" id=81]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=82]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=83]
+
+[sub_resource type="VisualShaderNodeScalarOp" id=84]
+default_input_values = [ 0, 0.0, 1, 0.5 ]
+operator = 9
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=85]
+constant = 1.0
+
+[sub_resource type="VisualShaderNodeCustom" id=86]
+script = ExtResource( 9 )
+
+[sub_resource type="VisualShader" id=87]
+code = "shader_type canvas_item;
+
+
+// CellularNoise2D_2X2
+
+
+// Cellular noise (\\\"Worley noise\\\") in 2D in GLSL.
+// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
+// This code is released under the conditions of the MIT license.
+// See LICENSE file for details.
+// https://github.com/stegu/webgl-noise
+
+// Modulo 289 without a division (only multiplications)
+vec2 mod289_2(vec2 x) {
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289_4(vec4 x) {
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+// Modulo 7 without a division
+vec4 mod7(vec4 x) {
+  return x - floor(x * (1.0 / 7.0)) * 7.0;
+}
+
+// Permutation polynomial: (34x^2 + x) mod 289
+vec4 permute(vec4 x) {
+  return mod289_4((34.0 * x + 1.0) * x);
+}
+
+// Cellular noise, returning F1 and F2 in a vec2.
+// Speeded up by using 2x2 search window instead of 3x3,
+// at the expense of some strong pattern artifacts.
+// F2 is often wrong and has sharp discontinuities.
+// If you need a smooth F2, use the slower 3x3 version.
+// F1 is sometimes wrong, too, but OK for most purposes.
+vec2 cellular_noise_2d_2x2(vec2 P, float jitter) {
+    float K = 0.142857142857; // 1/7
+    float K2 = 0.0714285714285; // K/2
+
+    vec2 Pi = mod289_2(floor(P));
+    vec2 Pf = fract(P);
+    vec4 Pfx = Pf.x + vec4(-0.5, -1.5, -0.5, -1.5);
+    vec4 Pfy = Pf.y + vec4(-0.5, -0.5, -1.5, -1.5);
+    vec4 p = permute(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
+    p = permute(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
+    vec4 ox = mod7(p)*K+K2;
+    vec4 oy = mod7(floor(p*K))*K+K2;
+    vec4 dx = Pfx + jitter*ox;
+    vec4 dy = Pfy + jitter*oy;
+    vec4 d = dx * dx + dy * dy; // d11, d12, d21 and d22, squared
+    // Sort out the two smallest distances
+
+/*// F1 Only Block (works faster of course)
+    d.xy = min(d.xy, d.zw);
+    d.x = min(d.x, d.y);
+    return vec2(sqrt(d.x)); // F1 duplicated, F2 not computed
+//*/// End of F1 Only Block
+
+//*// F1 and F2 block
+    d.xy = (d.x < d.y) ? d.xy : d.yx; // Swap if smaller
+    d.xz = (d.x < d.z) ? d.xz : d.zx;
+    d.xw = (d.x < d.w) ? d.xw : d.wx;
+    d.y = min(d.y, d.z);
+    d.y = min(d.y, d.w);
+    return sqrt(d.xy);
+//*/// End of F1 and F2 block
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:4
+	vec3 n_out4p0 = vec3(UV, 0.0);
+
+// Scalar:5
+	float n_out5p0 = 10.000000;
+
+// Scalar:8
+	float n_out8p0 = 1.000000;
+
+// CellularNoise2D_2X2:9
+	vec3 n_out9p0;
+	float n_out9p1;
+	float n_out9p2;
+	{
+		
+			
+			n_out9p0 = vec3(cellular_noise_2d_2x2((n_out4p0).xy * (vec3(n_out5p0)).xy, n_out8p0), 0.0);
+			n_out9p1 = n_out9p0.x;n_out9p2 = n_out9p0.y;
+			
+	}
+
+// VectorDecompose:6
+	float n_out6p0 = n_out4p0.x;
+	float n_out6p1 = n_out4p0.y;
+	float n_out6p2 = n_out4p0.z;
+
+// ScalarOp:7
+	float n_in7p1 = 0.50000;
+	float n_out7p0 = step(n_out6p0, n_in7p1);
+
+// ScalarMix:3
+	float n_out3p0 = mix(n_out9p2, n_out9p1, n_out7p0);
+
+// Output:0
+	COLOR.rgb = vec3(n_out3p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -92, -40 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 840, 60 )
+nodes/fragment/3/node = SubResource( 80 )
+nodes/fragment/3/position = Vector2( 660, 60 )
+nodes/fragment/4/node = SubResource( 81 )
+nodes/fragment/4/position = Vector2( 40, 0 )
+nodes/fragment/5/node = SubResource( 82 )
+nodes/fragment/5/position = Vector2( 40, 100 )
+nodes/fragment/6/node = SubResource( 83 )
+nodes/fragment/6/position = Vector2( 240, -40 )
+nodes/fragment/7/node = SubResource( 84 )
+nodes/fragment/7/position = Vector2( 440, -60 )
+nodes/fragment/8/node = SubResource( 85 )
+nodes/fragment/8/position = Vector2( 40, 200 )
+nodes/fragment/9/node = SubResource( 86 )
+nodes/fragment/9/position = Vector2( 360, 100 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 4, 0, 9, 0, 5, 0, 9, 1, 8, 0, 9, 2, 9, 1, 3, 1, 9, 2, 3, 0, 3, 0, 0, 0 )
+
+[sub_resource type="ShaderMaterial" id=88]
+shader = SubResource( 87 )
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=89]
+
+[sub_resource type="VisualShaderNodeCustom" id=90]
+script = ExtResource( 10 )
+
+[sub_resource type="VisualShaderNodeInput" id=91]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeScalarOp" id=92]
+default_input_values = [ 0, 0.0, 1, 0.1 ]
+operator = 2
+
+[sub_resource type="VisualShader" id=93]
+code = "shader_type canvas_item;
+
+
+// CelluarNoise3D
+
+
+// Cellular noise (\"Worley noise\") in 3D in GLSL.
+// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
+// This code is released under the conditions of the MIT license.
+// See LICENSE file for details.
+// https://github.com/stegu/webgl-noise
+
+// Modulo 289 without a division (only multiplications)
+vec3 mod289(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+// Modulo 7 without a division
+vec3 mod7(vec3 x) {
+    return x - floor(x * (1.0 / 7.0)) * 7.0;
+}
+
+// Permutation polynomial: (34x^2 + x) mod 289
+vec3 permute(vec3 x) {
+    return mod289((34.0 * x + 1.0) * x);
+}
+
+// Cellular noise, returning F1 and F2 in a vec2.
+// 3x3x3 search region for good F2 everywhere, but a lot
+// slower than the 2x2x2 version.
+// The code below is a bit scary even to its author,
+// but it has at least half decent performance on a
+// modern GPU. In any case, it beats any software
+// implementation of Worley noise hands down.
+
+vec2 cellular_noise_3d(vec3 P, float jitter) {
+    float K = 0.142857142857; // 1/7
+    float Ko = 0.428571428571; // 1/2-K/2
+    float K2 = 0.020408163265306; // 1/(7*7)
+    float Kz = 0.166666666667; // 1/6
+    float Kzo = 0.416666666667; // 1/2-1/6*2
+    
+    vec3 Pi = mod289(floor(P));
+    vec3 Pf = fract(P) - 0.5;
+    
+    vec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);
+    vec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);
+    vec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);
+    
+    vec3 p = permute(Pi.x + vec3(-1.0, 0.0, 1.0));
+    vec3 p1 = permute(p + Pi.y - 1.0);
+    vec3 p2 = permute(p + Pi.y);
+    vec3 p3 = permute(p + Pi.y + 1.0);
+    
+    vec3 p11 = permute(p1 + Pi.z - 1.0);
+    vec3 p12 = permute(p1 + Pi.z);
+    vec3 p13 = permute(p1 + Pi.z + 1.0);
+    
+    vec3 p21 = permute(p2 + Pi.z - 1.0);
+    vec3 p22 = permute(p2 + Pi.z);
+    vec3 p23 = permute(p2 + Pi.z + 1.0);
+    
+    vec3 p31 = permute(p3 + Pi.z - 1.0);
+    vec3 p32 = permute(p3 + Pi.z);
+    vec3 p33 = permute(p3 + Pi.z + 1.0);
+    
+    vec3 ox11 = fract(p11*K) - Ko;
+    vec3 oy11 = mod7(floor(p11*K))*K - Ko;
+    vec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed
+    
+    vec3 ox12 = fract(p12*K) - Ko;
+    vec3 oy12 = mod7(floor(p12*K))*K - Ko;
+    vec3 oz12 = floor(p12*K2)*Kz - Kzo;
+    
+    vec3 ox13 = fract(p13*K) - Ko;
+    vec3 oy13 = mod7(floor(p13*K))*K - Ko;
+    vec3 oz13 = floor(p13*K2)*Kz - Kzo;
+    
+    vec3 ox21 = fract(p21*K) - Ko;
+    vec3 oy21 = mod7(floor(p21*K))*K - Ko;
+    vec3 oz21 = floor(p21*K2)*Kz - Kzo;
+    
+    vec3 ox22 = fract(p22*K) - Ko;
+    vec3 oy22 = mod7(floor(p22*K))*K - Ko;
+    vec3 oz22 = floor(p22*K2)*Kz - Kzo;
+    
+    vec3 ox23 = fract(p23*K) - Ko;
+    vec3 oy23 = mod7(floor(p23*K))*K - Ko;
+    vec3 oz23 = floor(p23*K2)*Kz - Kzo;
+    
+    vec3 ox31 = fract(p31*K) - Ko;
+    vec3 oy31 = mod7(floor(p31*K))*K - Ko;
+    vec3 oz31 = floor(p31*K2)*Kz - Kzo;
+    
+    vec3 ox32 = fract(p32*K) - Ko;
+    vec3 oy32 = mod7(floor(p32*K))*K - Ko;
+    vec3 oz32 = floor(p32*K2)*Kz - Kzo;
+    
+    vec3 ox33 = fract(p33*K) - Ko;
+    vec3 oy33 = mod7(floor(p33*K))*K - Ko;
+    vec3 oz33 = floor(p33*K2)*Kz - Kzo;
+    
+    vec3 dx11 = Pfx + jitter*ox11;
+    vec3 dy11 = Pfy.x + jitter*oy11;
+    vec3 dz11 = Pfz.x + jitter*oz11;
+    
+    vec3 dx12 = Pfx + jitter*ox12;
+    vec3 dy12 = Pfy.x + jitter*oy12;
+    vec3 dz12 = Pfz.y + jitter*oz12;
+    
+    vec3 dx13 = Pfx + jitter*ox13;
+    vec3 dy13 = Pfy.x + jitter*oy13;
+    vec3 dz13 = Pfz.z + jitter*oz13;
+    
+    vec3 dx21 = Pfx + jitter*ox21;
+    vec3 dy21 = Pfy.y + jitter*oy21;
+    vec3 dz21 = Pfz.x + jitter*oz21;
+    
+    vec3 dx22 = Pfx + jitter*ox22;
+    vec3 dy22 = Pfy.y + jitter*oy22;
+    vec3 dz22 = Pfz.y + jitter*oz22;
+    
+    vec3 dx23 = Pfx + jitter*ox23;
+    vec3 dy23 = Pfy.y + jitter*oy23;
+    vec3 dz23 = Pfz.z + jitter*oz23;
+    
+    vec3 dx31 = Pfx + jitter*ox31;
+    vec3 dy31 = Pfy.z + jitter*oy31;
+    vec3 dz31 = Pfz.x + jitter*oz31;
+    
+    vec3 dx32 = Pfx + jitter*ox32;
+    vec3 dy32 = Pfy.z + jitter*oy32;
+    vec3 dz32 = Pfz.y + jitter*oz32;
+    
+    vec3 dx33 = Pfx + jitter*ox33;
+    vec3 dy33 = Pfy.z + jitter*oy33;
+    vec3 dz33 = Pfz.z + jitter*oz33;
+    
+    vec3 d11 = dx11 * dx11 + dy11 * dy11 + dz11 * dz11;
+    vec3 d12 = dx12 * dx12 + dy12 * dy12 + dz12 * dz12;
+    vec3 d13 = dx13 * dx13 + dy13 * dy13 + dz13 * dz13;
+    vec3 d21 = dx21 * dx21 + dy21 * dy21 + dz21 * dz21;
+    vec3 d22 = dx22 * dx22 + dy22 * dy22 + dz22 * dz22;
+    vec3 d23 = dx23 * dx23 + dy23 * dy23 + dz23 * dz23;
+    vec3 d31 = dx31 * dx31 + dy31 * dy31 + dz31 * dz31;
+    vec3 d32 = dx32 * dx32 + dy32 * dy32 + dz32 * dz32;
+    vec3 d33 = dx33 * dx33 + dy33 * dy33 + dz33 * dz33;
+    
+    // Sort out the two smallest distances (F1, F2)
+/*// F1 only block
+    vec3 d1 = min(min(d11,d12), d13);
+    vec3 d2 = min(min(d21,d22), d23);
+    vec3 d3 = min(min(d31,d32), d33);
+    vec3 d = min(min(d1,d2), d3);
+    d.x = min(min(d.x,d.y),d.z);
+    return vec2(sqrt(d.x)); // F1 duplicated, no F2 computed
+//*/// End of F1 only block
+//*// F1 and F2 block
+    vec3 d1a = min(d11, d12);
+    d12 = max(d11, d12);
+    d11 = min(d1a, d13); // Smallest now not in d12 or d13
+    d13 = max(d1a, d13);
+    d12 = min(d12, d13); // 2nd smallest now not in d13
+    vec3 d2a = min(d21, d22);
+    d22 = max(d21, d22);
+    d21 = min(d2a, d23); // Smallest now not in d22 or d23
+    d23 = max(d2a, d23);
+    d22 = min(d22, d23); // 2nd smallest now not in d23
+    vec3 d3a = min(d31, d32);
+    d32 = max(d31, d32);
+    d31 = min(d3a, d33); // Smallest now not in d32 or d33
+    d33 = max(d3a, d33);
+    d32 = min(d32, d33); // 2nd smallest now not in d33
+    vec3 da = min(d11, d21);
+    d21 = max(d11, d21);
+    d11 = min(da, d31); // Smallest now in d11
+    d31 = max(da, d31); // 2nd smallest now not in d31
+    d11.xy = (d11.x < d11.y) ? d11.xy : d11.yx;
+    d11.xz = (d11.x < d11.z) ? d11.xz : d11.zx; // d11.x now smallest
+    d12 = min(d12, d21); // 2nd smallest now not in d21
+    d12 = min(d12, d22); // nor in d22
+    d12 = min(d12, d31); // nor in d31
+    d12 = min(d12, d32); // nor in d32
+    d11.yz = min(d11.yz,d12.xy); // nor in d12.yz
+    d11.y = min(d11.y,d12.z); // Only two more to go
+    d11.y = min(d11.y,d11.z); // Done! (Phew!)
+    return sqrt(d11.xy); // F1, F2
+//*/// End of F1 and F2 block
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:4
+	vec3 n_out4p0 = vec3(UV, 0.0);
+
+// VectorDecompose:6
+	float n_out6p0 = n_out4p0.x;
+	float n_out6p1 = n_out4p0.y;
+	float n_out6p2 = n_out4p0.z;
+
+// Input:12
+	float n_out12p0 = TIME;
+
+// ScalarOp:13
+	float n_in13p1 = 0.10000;
+	float n_out13p0 = n_out12p0 * n_in13p1;
+
+// VectorCompose:10
+	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out13p0);
+
+// Scalar:5
+	float n_out5p0 = 10.000000;
+
+// Scalar:8
+	float n_out8p0 = 1.000000;
+
+// CelluarNoise3D:11
+	vec3 n_out11p0;
+	float n_out11p1;
+	float n_out11p2;
+	{
+		
+			
+			n_out11p0 = vec3(cellular_noise_3d(n_out10p0 * vec3(n_out5p0), n_out8p0), 0.0);
+			n_out11p1 = n_out11p0.x;n_out11p2 = n_out11p0.y;
+			
+	}
+
+// ScalarOp:7
+	float n_in7p1 = 0.50000;
+	float n_out7p0 = step(n_out6p0, n_in7p1);
+
+// ScalarMix:3
+	float n_out3p0 = mix(n_out11p2, n_out11p1, n_out7p0);
+
+// Output:0
+	COLOR.rgb = vec3(n_out3p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -345, -75 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 840, 60 )
+nodes/fragment/3/node = SubResource( 80 )
+nodes/fragment/3/position = Vector2( 660, 60 )
+nodes/fragment/4/node = SubResource( 81 )
+nodes/fragment/4/position = Vector2( -140, -20 )
+nodes/fragment/5/node = SubResource( 82 )
+nodes/fragment/5/position = Vector2( -160, 200 )
+nodes/fragment/6/node = SubResource( 83 )
+nodes/fragment/6/position = Vector2( 40, -60 )
+nodes/fragment/7/node = SubResource( 84 )
+nodes/fragment/7/position = Vector2( 440, -60 )
+nodes/fragment/8/node = SubResource( 85 )
+nodes/fragment/8/position = Vector2( -160, 280 )
+nodes/fragment/10/node = SubResource( 89 )
+nodes/fragment/10/position = Vector2( 140, 80 )
+nodes/fragment/11/node = SubResource( 90 )
+nodes/fragment/11/position = Vector2( 400, 100 )
+nodes/fragment/12/node = SubResource( 91 )
+nodes/fragment/12/position = Vector2( -300, 80 )
+nodes/fragment/13/node = SubResource( 92 )
+nodes/fragment/13/position = Vector2( -80, 60 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 11, 1, 3, 1, 10, 0, 11, 0, 5, 0, 11, 1, 8, 0, 11, 2, 12, 0, 13, 0, 13, 0, 10, 2, 11, 2, 3, 0 )
+
+[sub_resource type="ShaderMaterial" id=94]
+shader = SubResource( 93 )
+
+[sub_resource type="VisualShaderNodeCustom" id=98]
+script = ExtResource( 11 )
+
+[sub_resource type="VisualShader" id=96]
+code = "shader_type canvas_item;
+
+
+// CelluarNoise3D_2x2x2
+
+
+// Cellular noise (\"Worley noise\") in 3D in GLSL.
+// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
+// This code is released under the conditions of the MIT license.
+// See LICENSE file for details.
+// https://github.com/stegu/webgl-noise
+
+// Modulo 289 without a division (only multiplications)
+vec3 mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289_4(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+// Modulo 7 without a division
+vec4 mod7(vec4 x) {
+    return x - floor(x * (1.0 / 7.0)) * 7.0;
+}
+
+// Permutation polynomial: (34x^2 + x) mod 289
+vec3 permute_3(vec3 x) {
+    return mod289_3((34.0 * x + 1.0) * x);
+}
+
+vec4 permute_4(vec4 x) {
+    return mod289_4((34.0 * x + 1.0) * x);
+}
+
+// Cellular noise, returning F1 and F2 in a vec2.
+// Speeded up by using 2x2x2 search window instead of 3x3x3,
+// at the expense of some pattern artifacts.
+// F2 is often wrong and has sharp discontinuities.
+// If you need a good F2, use the slower 3x3x3 version.
+vec2 cellular_noise_3d_2x2x2(vec3 P, float jitter) {
+    float K = 0.142857142857; // 1/7
+    float Ko = 0.428571428571; // 1/2-K/2
+    float K2 = 0.020408163265306; // 1/(7*7)
+    float Kz = 0.166666666667; // 1/6
+    float Kzo = 0.416666666667; // 1/2-1/6*2
+
+    vec3 Pi = mod289_3(floor(P));
+    vec3 Pf = fract(P);
+    vec4 Pfx = Pf.x + vec4(0.0, -1.0, 0.0, -1.0);
+    vec4 Pfy = Pf.y + vec4(0.0, 0.0, -1.0, -1.0);
+    vec4 p = permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
+    p = permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
+    vec4 p1 = permute_4(p + Pi.z); // z+0
+    vec4 p2 = permute_4(p + Pi.z + vec4(1.0)); // z+1
+    vec4 ox1 = fract(p1*K) - Ko;
+    vec4 oy1 = mod7(floor(p1*K))*K - Ko;
+    vec4 oz1 = floor(p1*K2)*Kz - Kzo; // p1 < 289 guaranteed
+    vec4 ox2 = fract(p2*K) - Ko;
+    vec4 oy2 = mod7(floor(p2*K))*K - Ko;
+    vec4 oz2 = floor(p2*K2)*Kz - Kzo;
+    vec4 dx1 = Pfx + jitter*ox1;
+    vec4 dy1 = Pfy + jitter*oy1;
+    vec4 dz1 = Pf.z + jitter*oz1;
+    vec4 dx2 = Pfx + jitter*ox2;
+    vec4 dy2 = Pfy + jitter*oy2;
+    vec4 dz2 = Pf.z - 1.0 + jitter*oz2;
+    vec4 d1 = dx1 * dx1 + dy1 * dy1 + dz1 * dz1; // z+0
+    vec4 d2 = dx2 * dx2 + dy2 * dy2 + dz2 * dz2; // z+1
+
+    // Sort out the two smallest distances (F1, F2)
+/*// Block for F1 only
+    d1 = min(d1, d2);
+    d1.xy = min(d1.xy, d1.wz);
+    d1.x = min(d1.x, d1.y);
+    return vec2(sqrt(d1.x));
+//*///End of F1 only block
+//*// Block for both F1 and F2
+    vec4 d = min(d1,d2); // F1 is now in d
+    d2 = max(d1,d2); // Make sure we keep all candidates for F2
+    d.xy = (d.x < d.y) ? d.xy : d.yx; // Swap smallest to d.x
+    d.xz = (d.x < d.z) ? d.xz : d.zx;
+    d.xw = (d.x < d.w) ? d.xw : d.wx; // F1 is now in d.x
+    d.yzw = min(d.yzw, d2.yzw); // F2 now not in d2.yzw
+    d.y = min(d.y, d.z); // nor in d.z
+    d.y = min(d.y, d.w); // nor in d.w
+    d.y = min(d.y, d2.x); // F2 is now in d.y
+    return sqrt(d.xy); // F1 and F2
+//*/// End Of F1 and F2 block
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:4
+	vec3 n_out4p0 = vec3(UV, 0.0);
+
+// VectorDecompose:6
+	float n_out6p0 = n_out4p0.x;
+	float n_out6p1 = n_out4p0.y;
+	float n_out6p2 = n_out4p0.z;
+
+// Input:12
+	float n_out12p0 = TIME;
+
+// ScalarOp:13
+	float n_in13p1 = 0.10000;
+	float n_out13p0 = n_out12p0 * n_in13p1;
+
+// VectorCompose:10
+	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out13p0);
+
+// Scalar:5
+	float n_out5p0 = 10.000000;
+
+// Scalar:8
+	float n_out8p0 = 1.000000;
+
+// CelluarNoise3D_2x2x2:14
+	vec3 n_out14p0;
+	float n_out14p1;
+	float n_out14p2;
+	{
+		
+			
+			n_out14p0 = vec3(cellular_noise_3d_2x2x2(n_out10p0 * vec3(n_out5p0), n_out8p0), 0.0);
+			n_out14p1 = n_out14p0.x;n_out14p2 = n_out14p0.y;
+			
+	}
+
+// ScalarOp:7
+	float n_in7p1 = 0.50000;
+	float n_out7p0 = step(n_out6p0, n_in7p1);
+
+// ScalarMix:3
+	float n_out3p0 = mix(n_out14p2, n_out14p1, n_out7p0);
+
+// Output:0
+	COLOR.rgb = vec3(n_out3p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -212, -38.25 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 840, 60 )
+nodes/fragment/3/node = SubResource( 80 )
+nodes/fragment/3/position = Vector2( 660, 60 )
+nodes/fragment/4/node = SubResource( 81 )
+nodes/fragment/4/position = Vector2( -140, -20 )
+nodes/fragment/5/node = SubResource( 82 )
+nodes/fragment/5/position = Vector2( -160, 200 )
+nodes/fragment/6/node = SubResource( 83 )
+nodes/fragment/6/position = Vector2( 40, -60 )
+nodes/fragment/7/node = SubResource( 84 )
+nodes/fragment/7/position = Vector2( 440, -60 )
+nodes/fragment/8/node = SubResource( 85 )
+nodes/fragment/8/position = Vector2( -160, 280 )
+nodes/fragment/10/node = SubResource( 89 )
+nodes/fragment/10/position = Vector2( 140, 80 )
+nodes/fragment/12/node = SubResource( 91 )
+nodes/fragment/12/position = Vector2( -300, 80 )
+nodes/fragment/13/node = SubResource( 92 )
+nodes/fragment/13/position = Vector2( -80, 60 )
+nodes/fragment/14/node = SubResource( 98 )
+nodes/fragment/14/position = Vector2( 360, 140 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 12, 0, 13, 0, 13, 0, 10, 2, 14, 1, 3, 1, 14, 2, 3, 0, 10, 0, 14, 0, 5, 0, 14, 1, 8, 0, 14, 2 )
+
+[sub_resource type="ShaderMaterial" id=97]
+shader = SubResource( 96 )
 
 [node name="Node2D" type="Node2D"]
 
@@ -2107,7 +2921,7 @@ __meta__ = {
 }
 
 [node name="Random noise" type="ColorRect" parent="."]
-material = SubResource( 67 )
+material = SubResource( 70 )
 margin_left = 676.918
 margin_top = 28.6563
 margin_right = 737.918
@@ -2123,6 +2937,90 @@ margin_right = 59.6832
 margin_bottom = 97.0023
 text = "Random
   noise"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cellular Noise 2D" type="ColorRect" parent="."]
+material = SubResource( 79 )
+margin_left = 801.277
+margin_top = 28.8443
+margin_right = 862.277
+margin_bottom = 89.8443
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Cellular Noise 2D"]
+margin_left = -9.0
+margin_top = 66.0
+margin_right = 74.0
+margin_bottom = 97.0
+text = "Cellular noise
+       (2D)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cellular Noise 2D 2x2" type="ColorRect" parent="."]
+material = SubResource( 88 )
+margin_left = 911.52
+margin_top = 30.0354
+margin_right = 972.52
+margin_bottom = 91.0354
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Cellular Noise 2D 2x2"]
+margin_left = -9.0
+margin_top = 66.0
+margin_right = 74.0
+margin_bottom = 97.0
+text = "Cellular noise
+    (2D, 2x2)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cellular Noise 3D" type="ColorRect" parent="."]
+material = SubResource( 94 )
+margin_left = 800.958
+margin_top = 139.476
+margin_right = 861.958
+margin_bottom = 200.476
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Cellular Noise 3D"]
+margin_left = -9.0
+margin_top = 66.0
+margin_right = 74.0
+margin_bottom = 97.0
+text = "Cellular noise
+       (3D)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cellular Noise 3D 2x2x2" type="ColorRect" parent="."]
+material = SubResource( 97 )
+margin_left = 912.797
+margin_top = 141.998
+margin_right = 973.797
+margin_bottom = 202.998
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Cellular Noise 3D 2x2x2"]
+margin_left = -9.0
+margin_top = 66.0
+margin_right = 78.0
+margin_bottom = 97.0
+text = "Cellular noise
+  (3D, 2x2x2)"
 __meta__ = {
 "_edit_use_anchors_": false
 }

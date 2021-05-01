@@ -10,6 +10,26 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise2D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise2D_2X2",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d_2x2.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise3D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise3D_2x2x2",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d_2x2x2.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeDeepParallax",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/deep_parallax.gd"
@@ -110,6 +130,10 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd"
 } ]
 _global_script_class_icons={
+"VisualShaderNodeCellularNoise2D": "",
+"VisualShaderNodeCellularNoise2D_2X2": "",
+"VisualShaderNodeCellularNoise3D": "",
+"VisualShaderNodeCellularNoise3D_2x2x2": "",
 "VisualShaderNodeDeepParallax": "",
 "VisualShaderNodeDepth": "",
 "VisualShaderNodeDepthWorldPosition": "",
