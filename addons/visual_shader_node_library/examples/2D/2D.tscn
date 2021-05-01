@@ -1,4 +1,4 @@
-[gd_scene load_steps=117 format=2]
+[gd_scene load_steps=143 format=2]
 
 [ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d_2x2.gd" type="Script" id=9]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d.gd" type="Script" id=10]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d_2x2x2.gd" type="Script" id=11]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_2d_rg.gd" type="Script" id=12]
 
 [sub_resource type="VisualShaderNodeCustom" id=1]
 script = ExtResource( 3 )
@@ -225,19 +226,19 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 //
 
-vec4 HELPER_VisualShaderNodeCustom_mod289(vec4 x) {
+vec4 HELPER_PerlinNoise2D_mod289(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-    return HELPER_VisualShaderNodeCustom_mod289(((x * 34.0) + 1.0) * x);
+vec4 HELPER_PerlinNoise2D_permute(vec4 x) {
+    return HELPER_PerlinNoise2D_mod289(((x * 34.0) + 1.0) * x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4 r) {
+vec4 HELPER_PerlinNoise2D_taylorInvSqrt(vec4 r) {
     return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec2 HELPER_VisualShaderNodeCustom_fade(vec2 t) {
+vec2 HELPER_PerlinNoise2D_fade(vec2 t) {
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -245,13 +246,13 @@ vec2 HELPER_VisualShaderNodeCustom_fade(vec2 t) {
 float perlin_noise_2d_np(vec2 P) {
     vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = HELPER_VisualShaderNodeCustom_mod289(Pi); // To avoid truncation effects in permutation
+    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
     vec4 ix = Pi.xzxz;
     vec4 iy = Pi.yyww;
     vec4 fx = Pf.xzxz;
     vec4 fy = Pf.yyww;
 
-    vec4 i = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
+    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
 
     vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
     vec4 gy = abs(gx) - 0.5 ;
@@ -263,7 +264,7 @@ float perlin_noise_2d_np(vec2 P) {
     vec2 g01 = vec2(gx.z,gy.z);
     vec2 g11 = vec2(gx.w,gy.w);
     
-    vec4 norm = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
     g00 *= norm.x;
     g01 *= norm.y;
     g10 *= norm.z;
@@ -274,7 +275,7 @@ float perlin_noise_2d_np(vec2 P) {
     float n01 = dot(g01, vec2(fx.z, fy.z));
     float n11 = dot(g11, vec2(fx.w, fy.w));
     
-    vec2 fade_xy = HELPER_VisualShaderNodeCustom_fade(Pf.xy);
+    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 1.15 * n_xy + 0.5;
@@ -285,13 +286,13 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
     Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
-    Pi = HELPER_VisualShaderNodeCustom_mod289(Pi); // To avoid truncation effects in permutation
+    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
     vec4 ix = Pi.xzxz;
     vec4 iy = Pi.yyww;
     vec4 fx = Pf.xzxz;
     vec4 fy = Pf.yyww;
     
-    vec4 i = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
+    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
     
     vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
     vec4 gy = abs(gx) - 0.5 ;
@@ -303,7 +304,7 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     vec2 g01 = vec2(gx.z,gy.z);
     vec2 g11 = vec2(gx.w,gy.w);
     
-    vec4 norm = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
     g00 *= norm.x;
     g01 *= norm.y;
     g10 *= norm.z;
@@ -314,7 +315,7 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     float n01 = dot(g01, vec2(fx.z, fy.z));
     float n11 = dot(g11, vec2(fx.w, fy.w));
     
-    vec2 fade_xy = HELPER_VisualShaderNodeCustom_fade(Pf.xy);
+    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 1.15 * n_xy + 0.5;
@@ -395,19 +396,19 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 //
 
-vec4 HELPER_VisualShaderNodeCustom_mod289(vec4 x) {
+vec4 HELPER_PerlinNoise2D_mod289(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-    return HELPER_VisualShaderNodeCustom_mod289(((x * 34.0) + 1.0) * x);
+vec4 HELPER_PerlinNoise2D_permute(vec4 x) {
+    return HELPER_PerlinNoise2D_mod289(((x * 34.0) + 1.0) * x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4 r) {
+vec4 HELPER_PerlinNoise2D_taylorInvSqrt(vec4 r) {
     return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec2 HELPER_VisualShaderNodeCustom_fade(vec2 t) {
+vec2 HELPER_PerlinNoise2D_fade(vec2 t) {
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -415,13 +416,13 @@ vec2 HELPER_VisualShaderNodeCustom_fade(vec2 t) {
 float perlin_noise_2d_np(vec2 P) {
     vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = HELPER_VisualShaderNodeCustom_mod289(Pi); // To avoid truncation effects in permutation
+    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
     vec4 ix = Pi.xzxz;
     vec4 iy = Pi.yyww;
     vec4 fx = Pf.xzxz;
     vec4 fy = Pf.yyww;
 
-    vec4 i = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
+    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
 
     vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
     vec4 gy = abs(gx) - 0.5 ;
@@ -433,7 +434,7 @@ float perlin_noise_2d_np(vec2 P) {
     vec2 g01 = vec2(gx.z,gy.z);
     vec2 g11 = vec2(gx.w,gy.w);
     
-    vec4 norm = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
     g00 *= norm.x;
     g01 *= norm.y;
     g10 *= norm.z;
@@ -444,7 +445,7 @@ float perlin_noise_2d_np(vec2 P) {
     float n01 = dot(g01, vec2(fx.z, fy.z));
     float n11 = dot(g11, vec2(fx.w, fy.w));
     
-    vec2 fade_xy = HELPER_VisualShaderNodeCustom_fade(Pf.xy);
+    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 1.15 * n_xy + 0.5;
@@ -455,13 +456,13 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
     Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
-    Pi = HELPER_VisualShaderNodeCustom_mod289(Pi); // To avoid truncation effects in permutation
+    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
     vec4 ix = Pi.xzxz;
     vec4 iy = Pi.yyww;
     vec4 fx = Pf.xzxz;
     vec4 fy = Pf.yyww;
     
-    vec4 i = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
+    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
     
     vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
     vec4 gy = abs(gx) - 0.5 ;
@@ -473,7 +474,7 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     vec2 g01 = vec2(gx.z,gy.z);
     vec2 g11 = vec2(gx.w,gy.w);
     
-    vec4 norm = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
     g00 *= norm.x;
     g01 *= norm.y;
     g10 *= norm.z;
@@ -484,7 +485,7 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     float n01 = dot(g01, vec2(fx.z, fy.z));
     float n11 = dot(g11, vec2(fx.w, fy.w));
     
-    vec2 fade_xy = HELPER_VisualShaderNodeCustom_fade(Pf.xy);
+    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 1.15 * n_xy + 0.5;
@@ -582,23 +583,23 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 //
 
-vec3 HELPER_VisualShaderNodeCustom_mod289_3(vec3 x) {
+vec3 HELPER_PerlinNoise3D_mod289_3(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_mod289_4(vec4 x) {
+vec4 HELPER_PerlinNoise3D_mod289_4(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-    return HELPER_VisualShaderNodeCustom_mod289_4(((x*34.0)+1.0)*x);
+vec4 HELPER_PerlinNoise3D_permute(vec4 x) {
+    return HELPER_PerlinNoise3D_mod289_4(((x*34.0)+1.0)*x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4 r) {
+vec4 HELPER_PerlinNoise3D_taylorInvSqrt(vec4 r) {
     return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec3 HELPER_VisualShaderNodeCustom_fade(vec3 t) {
+vec3 HELPER_PerlinNoise3D_fade(vec3 t) {
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -606,8 +607,8 @@ vec3 HELPER_VisualShaderNodeCustom_fade(vec3 t) {
 float perlin_noise_3d_np(vec3 P) {
     vec3 Pi0 = floor(P); // Integer part for indexing
     vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289_3(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289_3(Pi1);
+    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
+    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
     vec3 Pf0 = fract(P); // Fractional part for interpolation
     vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -615,9 +616,9 @@ float perlin_noise_3d_np(vec3 P) {
     vec4 iz0 = vec4(Pi0.z);
     vec4 iz1 = vec4(Pi1.z);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
+    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
     
     vec4 gx0 = ixy0 * (1.0 / 7.0);
     vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
@@ -644,12 +645,12 @@ float perlin_noise_3d_np(vec3 P) {
     vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
     vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
     
-    vec4 norm0 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
     g000 *= norm0.x;
     g010 *= norm0.y;
     g100 *= norm0.z;
     g110 *= norm0.w;
-    vec4 norm1 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
     g001 *= norm1.x;
     g011 *= norm1.y;
     g101 *= norm1.z;
@@ -664,7 +665,7 @@ float perlin_noise_3d_np(vec3 P) {
     float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
     float n111 = dot(g111, Pf1);
     
-    vec3 fade_xyz = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
     vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
     vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
     float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
@@ -675,8 +676,8 @@ float perlin_noise_3d_np(vec3 P) {
 float perlin_noise_3d_p(vec3 P, vec3 rep) {
     vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
     vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289_3(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289_3(Pi1);
+    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
+    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
     vec3 Pf0 = fract(P); // Fractional part for interpolation
     vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -684,9 +685,9 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
     vec4 iz0 = vec4(Pi0.z);
     vec4 iz1 = vec4(Pi1.z);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
+    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
     
     vec4 gx0 = ixy0 * (1.0 / 7.0);
     vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
@@ -713,12 +714,12 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
     vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
     vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
     
-    vec4 norm0 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
     g000 *= norm0.x;
     g010 *= norm0.y;
     g100 *= norm0.z;
     g110 *= norm0.w;
-    vec4 norm1 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
     g001 *= norm1.x;
     g011 *= norm1.y;
     g101 *= norm1.z;
@@ -733,7 +734,7 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
     float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
     float n111 = dot(g111, Pf1);
     
-    vec3 fade_xyz = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
     vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
     vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
     float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
@@ -858,23 +859,23 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 //
 
-vec3 HELPER_VisualShaderNodeCustom_mod289_3(vec3 x) {
+vec3 HELPER_PerlinNoise3D_mod289_3(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_mod289_4(vec4 x) {
+vec4 HELPER_PerlinNoise3D_mod289_4(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-    return HELPER_VisualShaderNodeCustom_mod289_4(((x*34.0)+1.0)*x);
+vec4 HELPER_PerlinNoise3D_permute(vec4 x) {
+    return HELPER_PerlinNoise3D_mod289_4(((x*34.0)+1.0)*x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4 r) {
+vec4 HELPER_PerlinNoise3D_taylorInvSqrt(vec4 r) {
     return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec3 HELPER_VisualShaderNodeCustom_fade(vec3 t) {
+vec3 HELPER_PerlinNoise3D_fade(vec3 t) {
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -882,8 +883,8 @@ vec3 HELPER_VisualShaderNodeCustom_fade(vec3 t) {
 float perlin_noise_3d_np(vec3 P) {
     vec3 Pi0 = floor(P); // Integer part for indexing
     vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289_3(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289_3(Pi1);
+    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
+    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
     vec3 Pf0 = fract(P); // Fractional part for interpolation
     vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -891,9 +892,9 @@ float perlin_noise_3d_np(vec3 P) {
     vec4 iz0 = vec4(Pi0.z);
     vec4 iz1 = vec4(Pi1.z);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
+    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
     
     vec4 gx0 = ixy0 * (1.0 / 7.0);
     vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
@@ -920,12 +921,12 @@ float perlin_noise_3d_np(vec3 P) {
     vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
     vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
     
-    vec4 norm0 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
     g000 *= norm0.x;
     g010 *= norm0.y;
     g100 *= norm0.z;
     g110 *= norm0.w;
-    vec4 norm1 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
     g001 *= norm1.x;
     g011 *= norm1.y;
     g101 *= norm1.z;
@@ -940,7 +941,7 @@ float perlin_noise_3d_np(vec3 P) {
     float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
     float n111 = dot(g111, Pf1);
     
-    vec3 fade_xyz = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
     vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
     vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
     float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
@@ -951,8 +952,8 @@ float perlin_noise_3d_np(vec3 P) {
 float perlin_noise_3d_p(vec3 P, vec3 rep) {
     vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
     vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289_3(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289_3(Pi1);
+    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
+    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
     vec3 Pf0 = fract(P); // Fractional part for interpolation
     vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -960,9 +961,9 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
     vec4 iz0 = vec4(Pi0.z);
     vec4 iz1 = vec4(Pi1.z);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
+    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
     
     vec4 gx0 = ixy0 * (1.0 / 7.0);
     vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
@@ -989,12 +990,12 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
     vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
     vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
     
-    vec4 norm0 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
     g000 *= norm0.x;
     g010 *= norm0.y;
     g100 *= norm0.z;
     g110 *= norm0.w;
-    vec4 norm1 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
     g001 *= norm1.x;
     g011 *= norm1.y;
     g101 *= norm1.z;
@@ -1009,7 +1010,7 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
     float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
     float n111 = dot(g111, Pf1);
     
-    vec3 fade_xyz = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
     vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
     vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
     float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
@@ -1118,19 +1119,19 @@ code = "shader_type canvas_item;
 // Distributed under the MIT license. See LICENSE file.
 // https://github.com/stegu/webgl-noise
 
-vec4 HELPER_VisualShaderNodeCustom_mod289(vec4 x) {
+vec4 HELPER_PerlinNoise4D_mod289(vec4 x) {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-	return HELPER_VisualShaderNodeCustom_mod289(((x*34.0)+1.0)*x);
+vec4 HELPER_PerlinNoise4D_permute(vec4 x) {
+	return HELPER_PerlinNoise4D_mod289(((x*34.0)+1.0)*x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4 r) {
+vec4 HELPER_PerlinNoise4D_taylorInvSqrt(vec4 r) {
 	return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_fade(vec4 t) {
+vec4 HELPER_PerlinNoise4D_fade(vec4 t) {
 	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -1138,8 +1139,8 @@ vec4 HELPER_VisualShaderNodeCustom_fade(vec4 t) {
 float perlin_noise_4d_np(vec4 P) {
     vec4 Pi0 = floor(P); // Integer part for indexing
     vec4 Pi1 = Pi0 + 1.0; // Integer part + 1
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289(Pi1);
+    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
+    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
     vec4 Pf0 = fract(P); // Fractional part for interpolation
     vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -1149,13 +1150,13 @@ float perlin_noise_4d_np(vec4 P) {
     vec4 iw0 = vec4(Pi0.wwww);
     vec4 iw1 = vec4(Pi1.wwww);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw1);
+    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
+    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
+    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
+    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
+    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
     
     vec4 gx00 = ixy00 * (1.0 / 7.0);
     vec4 gy00 = floor(gx00) * (1.0 / 7.0);
@@ -1218,25 +1219,25 @@ float perlin_noise_4d_np(vec4 P) {
     vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
     vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
     
-    vec4 norm00 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
     g0000 *= norm00.x;
     g0100 *= norm00.y;
     g1000 *= norm00.z;
     g1100 *= norm00.w;
     
-    vec4 norm01 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
     g0001 *= norm01.x;
     g0101 *= norm01.y;
     g1001 *= norm01.z;
     g1101 *= norm01.w;
     
-    vec4 norm10 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
     g0010 *= norm10.x;
     g0110 *= norm10.y;
     g1010 *= norm10.z;
     g1110 *= norm10.w;
     
-    vec4 norm11 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
     g0011 *= norm11.x;
     g0111 *= norm11.y;
     g1011 *= norm11.z;
@@ -1259,7 +1260,7 @@ float perlin_noise_4d_np(vec4 P) {
     float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
     float n1111 = dot(g1111, Pf1);
     
-    vec4 fade_xyzw = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
     vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
     vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
     vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
@@ -1272,8 +1273,8 @@ float perlin_noise_4d_np(vec4 P) {
 float perlin_noise_4d_p(vec4 P, vec4 rep) {
     vec4 Pi0 = mod(floor(P), rep); // Integer part modulo rep
     vec4 Pi1 = mod(Pi0 + 1.0, rep); // Integer part + 1 mod rep
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289(Pi1);
+    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
+    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
     vec4 Pf0 = fract(P); // Fractional part for interpolation
     vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -1283,13 +1284,13 @@ float perlin_noise_4d_p(vec4 P, vec4 rep) {
     vec4 iw0 = vec4(Pi0.wwww);
     vec4 iw1 = vec4(Pi1.wwww);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw1);
+    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
+    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
+    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
+    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
+    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
     
     vec4 gx00 = ixy00 * (1.0 / 7.0);
     vec4 gy00 = floor(gx00) * (1.0 / 7.0);
@@ -1352,25 +1353,25 @@ float perlin_noise_4d_p(vec4 P, vec4 rep) {
     vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
     vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
     
-    vec4 norm00 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
     g0000 *= norm00.x;
     g0100 *= norm00.y;
     g1000 *= norm00.z;
     g1100 *= norm00.w;
     
-    vec4 norm01 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
     g0001 *= norm01.x;
     g0101 *= norm01.y;
     g1001 *= norm01.z;
     g1101 *= norm01.w;
     
-    vec4 norm10 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
     g0010 *= norm10.x;
     g0110 *= norm10.y;
     g1010 *= norm10.z;
     g1110 *= norm10.w;
     
-    vec4 norm11 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
     g0011 *= norm11.x;
     g0111 *= norm11.y;
     g1011 *= norm11.z;
@@ -1393,7 +1394,7 @@ float perlin_noise_4d_p(vec4 P, vec4 rep) {
     float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
     float n1111 = dot(g1111, Pf1);
     
-    vec4 fade_xyzw = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
     vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
     vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
     vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
@@ -1509,19 +1510,19 @@ code = "shader_type canvas_item;
 // Distributed under the MIT license. See LICENSE file.
 // https://github.com/stegu/webgl-noise
 
-vec4 HELPER_VisualShaderNodeCustom_mod289(vec4 x) {
+vec4 HELPER_PerlinNoise4D_mod289(vec4 x) {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-	return HELPER_VisualShaderNodeCustom_mod289(((x*34.0)+1.0)*x);
+vec4 HELPER_PerlinNoise4D_permute(vec4 x) {
+	return HELPER_PerlinNoise4D_mod289(((x*34.0)+1.0)*x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4 r) {
+vec4 HELPER_PerlinNoise4D_taylorInvSqrt(vec4 r) {
 	return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_fade(vec4 t) {
+vec4 HELPER_PerlinNoise4D_fade(vec4 t) {
 	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -1529,8 +1530,8 @@ vec4 HELPER_VisualShaderNodeCustom_fade(vec4 t) {
 float perlin_noise_4d_np(vec4 P) {
     vec4 Pi0 = floor(P); // Integer part for indexing
     vec4 Pi1 = Pi0 + 1.0; // Integer part + 1
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289(Pi1);
+    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
+    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
     vec4 Pf0 = fract(P); // Fractional part for interpolation
     vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -1540,13 +1541,13 @@ float perlin_noise_4d_np(vec4 P) {
     vec4 iw0 = vec4(Pi0.wwww);
     vec4 iw1 = vec4(Pi1.wwww);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw1);
+    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
+    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
+    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
+    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
+    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
     
     vec4 gx00 = ixy00 * (1.0 / 7.0);
     vec4 gy00 = floor(gx00) * (1.0 / 7.0);
@@ -1609,25 +1610,25 @@ float perlin_noise_4d_np(vec4 P) {
     vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
     vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
     
-    vec4 norm00 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
     g0000 *= norm00.x;
     g0100 *= norm00.y;
     g1000 *= norm00.z;
     g1100 *= norm00.w;
     
-    vec4 norm01 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
     g0001 *= norm01.x;
     g0101 *= norm01.y;
     g1001 *= norm01.z;
     g1101 *= norm01.w;
     
-    vec4 norm10 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
     g0010 *= norm10.x;
     g0110 *= norm10.y;
     g1010 *= norm10.z;
     g1110 *= norm10.w;
     
-    vec4 norm11 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
     g0011 *= norm11.x;
     g0111 *= norm11.y;
     g1011 *= norm11.z;
@@ -1650,7 +1651,7 @@ float perlin_noise_4d_np(vec4 P) {
     float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
     float n1111 = dot(g1111, Pf1);
     
-    vec4 fade_xyzw = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
     vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
     vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
     vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
@@ -1663,8 +1664,8 @@ float perlin_noise_4d_np(vec4 P) {
 float perlin_noise_4d_p(vec4 P, vec4 rep) {
     vec4 Pi0 = mod(floor(P), rep); // Integer part modulo rep
     vec4 Pi1 = mod(Pi0 + 1.0, rep); // Integer part + 1 mod rep
-    Pi0 = HELPER_VisualShaderNodeCustom_mod289(Pi0);
-    Pi1 = HELPER_VisualShaderNodeCustom_mod289(Pi1);
+    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
+    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
     vec4 Pf0 = fract(P); // Fractional part for interpolation
     vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
     vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -1674,13 +1675,13 @@ float perlin_noise_4d_p(vec4 P, vec4 rep) {
     vec4 iw0 = vec4(Pi0.wwww);
     vec4 iw1 = vec4(Pi1.wwww);
     
-    vec4 ixy = HELPER_VisualShaderNodeCustom_permute(HELPER_VisualShaderNodeCustom_permute(ix) + iy);
-    vec4 ixy0 = HELPER_VisualShaderNodeCustom_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_VisualShaderNodeCustom_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_VisualShaderNodeCustom_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_VisualShaderNodeCustom_permute(ixy1 + iw1);
+    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
+    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
+    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
+    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
+    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
     
     vec4 gx00 = ixy00 * (1.0 / 7.0);
     vec4 gy00 = floor(gx00) * (1.0 / 7.0);
@@ -1743,25 +1744,25 @@ float perlin_noise_4d_p(vec4 P, vec4 rep) {
     vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
     vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
     
-    vec4 norm00 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
+    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
     g0000 *= norm00.x;
     g0100 *= norm00.y;
     g1000 *= norm00.z;
     g1100 *= norm00.w;
     
-    vec4 norm01 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
+    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
     g0001 *= norm01.x;
     g0101 *= norm01.y;
     g1001 *= norm01.z;
     g1101 *= norm01.w;
     
-    vec4 norm10 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
+    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
     g0010 *= norm10.x;
     g0110 *= norm10.y;
     g1010 *= norm10.z;
     g1110 *= norm10.w;
     
-    vec4 norm11 = HELPER_VisualShaderNodeCustom_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
+    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
     g0011 *= norm11.x;
     g0111 *= norm11.y;
     g1011 *= norm11.z;
@@ -1784,7 +1785,7 @@ float perlin_noise_4d_p(vec4 P, vec4 rep) {
     float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
     float n1111 = dot(g1111, Pf1);
     
-    vec4 fade_xyzw = HELPER_VisualShaderNodeCustom_fade(Pf0);
+    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
     vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
     vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
     vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
@@ -1991,22 +1992,22 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 HELPER_VisualShaderNodeCustom_mod289_3(vec3 x) {
+vec3 HELPER_CellularNoise2D_mod289_3(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec2 HELPER_VisualShaderNodeCustom_mod289_2(vec2 x) {
+vec2 HELPER_CellularNoise2D_mod289_2(vec2 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec3 HELPER_VisualShaderNodeCustom_mod7(vec3 x) {
+vec3 HELPER_CellularNoise2D_mod7(vec3 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_VisualShaderNodeCustom_permute(vec3 x) {
-    return HELPER_VisualShaderNodeCustom_mod289_3((34.0 * x + 1.0) * x);
+vec3 HELPER_CellularNoise2D_permute(vec3 x) {
+    return HELPER_CellularNoise2D_mod289_3((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -2015,26 +2016,26 @@ vec2 cellular_noise_2d(vec2 P, float jitter) {
     float K = 0.142857142857; // 1/7
     float Ko = 0.428571428571; // 3/7
 
-    vec2 Pi = HELPER_VisualShaderNodeCustom_mod289_2(floor(P));
+    vec2 Pi = HELPER_CellularNoise2D_mod289_2(floor(P));
     vec2 Pf = fract(P);
     vec3 oi = vec3(-1.0, 0.0, 1.0);
     vec3 of = vec3(-0.5, 0.5, 1.5);
-    vec3 px = HELPER_VisualShaderNodeCustom_permute(Pi.x + oi);
-    vec3 p = HELPER_VisualShaderNodeCustom_permute(px.x + Pi.y + oi); // p11, p12, p13
+    vec3 px = HELPER_CellularNoise2D_permute(Pi.x + oi);
+    vec3 p = HELPER_CellularNoise2D_permute(px.x + Pi.y + oi); // p11, p12, p13
     vec3 ox = fract(p*K) - Ko;
-    vec3 oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K - Ko;
+    vec3 oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
     vec3 dx = Pf.x + 0.5 + jitter*ox;
     vec3 dy = Pf.y - of + jitter*oy;
     vec3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
-    p = HELPER_VisualShaderNodeCustom_permute(px.y + Pi.y + oi); // p21, p22, p23
+    p = HELPER_CellularNoise2D_permute(px.y + Pi.y + oi); // p21, p22, p23
     ox = fract(p*K) - Ko;
-    oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K - Ko;
+    oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
     dx = Pf.x - 0.5 + jitter*ox;
     dy = Pf.y - of + jitter*oy;
     vec3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
-    p = HELPER_VisualShaderNodeCustom_permute(px.z + Pi.y + oi); // p31, p32, p33
+    p = HELPER_CellularNoise2D_permute(px.z + Pi.y + oi); // p31, p32, p33
     ox = fract(p*K) - Ko;
-    oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K - Ko;
+    oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
     dx = Pf.x - 1.5 + jitter*ox;
     dy = Pf.y - of + jitter*oy;
     vec3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared
@@ -2159,22 +2160,22 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec2 HELPER_VisualShaderNodeCustom_mod289_2(vec2 x) {
+vec2 HELPER_CellularNoise2D_2X2_mod289_2(vec2 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_mod289_4(vec4 x) {
+vec4 HELPER_CellularNoise2D_2X2_mod289_4(vec4 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec4 HELPER_VisualShaderNodeCustom_mod7(vec4 x) {
+vec4 HELPER_CellularNoise2D_2X2_mod7(vec4 x) {
   return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec4 HELPER_VisualShaderNodeCustom_permute(vec4 x) {
-  return HELPER_VisualShaderNodeCustom_mod289_4((34.0 * x + 1.0) * x);
+vec4 HELPER_CellularNoise2D_2X2_permute(vec4 x) {
+  return HELPER_CellularNoise2D_2X2_mod289_4((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -2187,14 +2188,14 @@ vec2 cellular_noise_2d_2x2(vec2 P, float jitter) {
     float K = 0.142857142857; // 1/7
     float K2 = 0.0714285714285; // K/2
 
-    vec2 Pi = HELPER_VisualShaderNodeCustom_mod289_2(floor(P));
+    vec2 Pi = HELPER_CellularNoise2D_2X2_mod289_2(floor(P));
     vec2 Pf = fract(P);
     vec4 Pfx = Pf.x + vec4(-0.5, -1.5, -0.5, -1.5);
     vec4 Pfy = Pf.y + vec4(-0.5, -0.5, -1.5, -1.5);
-    vec4 p = HELPER_VisualShaderNodeCustom_permute(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
-    p = HELPER_VisualShaderNodeCustom_permute(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
-    vec4 ox = HELPER_VisualShaderNodeCustom_mod7(p)*K+K2;
-    vec4 oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K+K2;
+    vec4 p = HELPER_CellularNoise2D_2X2_permute(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
+    p = HELPER_CellularNoise2D_2X2_permute(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
+    vec4 ox = HELPER_CellularNoise2D_2X2_mod7(p)*K+K2;
+    vec4 oy = HELPER_CellularNoise2D_2X2_mod7(floor(p*K))*K+K2;
     vec4 dx = Pfx + jitter*ox;
     vec4 dy = Pfy + jitter*oy;
     vec4 d = dx * dx + dy * dy; // d11, d12, d21 and d22, squared
@@ -2315,18 +2316,18 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 HELPER_VisualShaderNodeCustom_mod289(vec3 x) {
+vec3 HELPER_CelluarNoise3D_mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec3 HELPER_VisualShaderNodeCustom_mod7(vec3 x) {
+vec3 HELPER_CelluarNoise3D_mod7(vec3 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_VisualShaderNodeCustom_permute(vec3 x) {
-    return HELPER_VisualShaderNodeCustom_mod289((34.0 * x + 1.0) * x);
+vec3 HELPER_CelluarNoise3D_permute(vec3 x) {
+    return HELPER_CelluarNoise3D_mod289((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -2344,64 +2345,64 @@ vec2 cellular_noise_3d(vec3 P, float jitter) {
     float Kz = 0.166666666667; // 1/6
     float Kzo = 0.416666666667; // 1/2-1/6*2
     
-    vec3 Pi = HELPER_VisualShaderNodeCustom_mod289(floor(P));
+    vec3 Pi = HELPER_CelluarNoise3D_mod289(floor(P));
     vec3 Pf = fract(P) - 0.5;
     
     vec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);
     vec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);
     vec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);
     
-    vec3 p = HELPER_VisualShaderNodeCustom_permute(Pi.x + vec3(-1.0, 0.0, 1.0));
-    vec3 p1 = HELPER_VisualShaderNodeCustom_permute(p + Pi.y - 1.0);
-    vec3 p2 = HELPER_VisualShaderNodeCustom_permute(p + Pi.y);
-    vec3 p3 = HELPER_VisualShaderNodeCustom_permute(p + Pi.y + 1.0);
+    vec3 p = HELPER_CelluarNoise3D_permute(Pi.x + vec3(-1.0, 0.0, 1.0));
+    vec3 p1 = HELPER_CelluarNoise3D_permute(p + Pi.y - 1.0);
+    vec3 p2 = HELPER_CelluarNoise3D_permute(p + Pi.y);
+    vec3 p3 = HELPER_CelluarNoise3D_permute(p + Pi.y + 1.0);
     
-    vec3 p11 = HELPER_VisualShaderNodeCustom_permute(p1 + Pi.z - 1.0);
-    vec3 p12 = HELPER_VisualShaderNodeCustom_permute(p1 + Pi.z);
-    vec3 p13 = HELPER_VisualShaderNodeCustom_permute(p1 + Pi.z + 1.0);
+    vec3 p11 = HELPER_CelluarNoise3D_permute(p1 + Pi.z - 1.0);
+    vec3 p12 = HELPER_CelluarNoise3D_permute(p1 + Pi.z);
+    vec3 p13 = HELPER_CelluarNoise3D_permute(p1 + Pi.z + 1.0);
     
-    vec3 p21 = HELPER_VisualShaderNodeCustom_permute(p2 + Pi.z - 1.0);
-    vec3 p22 = HELPER_VisualShaderNodeCustom_permute(p2 + Pi.z);
-    vec3 p23 = HELPER_VisualShaderNodeCustom_permute(p2 + Pi.z + 1.0);
+    vec3 p21 = HELPER_CelluarNoise3D_permute(p2 + Pi.z - 1.0);
+    vec3 p22 = HELPER_CelluarNoise3D_permute(p2 + Pi.z);
+    vec3 p23 = HELPER_CelluarNoise3D_permute(p2 + Pi.z + 1.0);
     
-    vec3 p31 = HELPER_VisualShaderNodeCustom_permute(p3 + Pi.z - 1.0);
-    vec3 p32 = HELPER_VisualShaderNodeCustom_permute(p3 + Pi.z);
-    vec3 p33 = HELPER_VisualShaderNodeCustom_permute(p3 + Pi.z + 1.0);
+    vec3 p31 = HELPER_CelluarNoise3D_permute(p3 + Pi.z - 1.0);
+    vec3 p32 = HELPER_CelluarNoise3D_permute(p3 + Pi.z);
+    vec3 p33 = HELPER_CelluarNoise3D_permute(p3 + Pi.z + 1.0);
     
     vec3 ox11 = fract(p11*K) - Ko;
-    vec3 oy11 = HELPER_VisualShaderNodeCustom_mod7(floor(p11*K))*K - Ko;
+    vec3 oy11 = HELPER_CelluarNoise3D_mod7(floor(p11*K))*K - Ko;
     vec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed
     
     vec3 ox12 = fract(p12*K) - Ko;
-    vec3 oy12 = HELPER_VisualShaderNodeCustom_mod7(floor(p12*K))*K - Ko;
+    vec3 oy12 = HELPER_CelluarNoise3D_mod7(floor(p12*K))*K - Ko;
     vec3 oz12 = floor(p12*K2)*Kz - Kzo;
     
     vec3 ox13 = fract(p13*K) - Ko;
-    vec3 oy13 = HELPER_VisualShaderNodeCustom_mod7(floor(p13*K))*K - Ko;
+    vec3 oy13 = HELPER_CelluarNoise3D_mod7(floor(p13*K))*K - Ko;
     vec3 oz13 = floor(p13*K2)*Kz - Kzo;
     
     vec3 ox21 = fract(p21*K) - Ko;
-    vec3 oy21 = HELPER_VisualShaderNodeCustom_mod7(floor(p21*K))*K - Ko;
+    vec3 oy21 = HELPER_CelluarNoise3D_mod7(floor(p21*K))*K - Ko;
     vec3 oz21 = floor(p21*K2)*Kz - Kzo;
     
     vec3 ox22 = fract(p22*K) - Ko;
-    vec3 oy22 = HELPER_VisualShaderNodeCustom_mod7(floor(p22*K))*K - Ko;
+    vec3 oy22 = HELPER_CelluarNoise3D_mod7(floor(p22*K))*K - Ko;
     vec3 oz22 = floor(p22*K2)*Kz - Kzo;
     
     vec3 ox23 = fract(p23*K) - Ko;
-    vec3 oy23 = HELPER_VisualShaderNodeCustom_mod7(floor(p23*K))*K - Ko;
+    vec3 oy23 = HELPER_CelluarNoise3D_mod7(floor(p23*K))*K - Ko;
     vec3 oz23 = floor(p23*K2)*Kz - Kzo;
     
     vec3 ox31 = fract(p31*K) - Ko;
-    vec3 oy31 = HELPER_VisualShaderNodeCustom_mod7(floor(p31*K))*K - Ko;
+    vec3 oy31 = HELPER_CelluarNoise3D_mod7(floor(p31*K))*K - Ko;
     vec3 oz31 = floor(p31*K2)*Kz - Kzo;
     
     vec3 ox32 = fract(p32*K) - Ko;
-    vec3 oy32 = HELPER_VisualShaderNodeCustom_mod7(floor(p32*K))*K - Ko;
+    vec3 oy32 = HELPER_CelluarNoise3D_mod7(floor(p32*K))*K - Ko;
     vec3 oz32 = floor(p32*K2)*Kz - Kzo;
     
     vec3 ox33 = fract(p33*K) - Ko;
-    vec3 oy33 = HELPER_VisualShaderNodeCustom_mod7(floor(p33*K))*K - Ko;
+    vec3 oy33 = HELPER_CelluarNoise3D_mod7(floor(p33*K))*K - Ko;
     vec3 oz33 = floor(p33*K2)*Kz - Kzo;
     
     vec3 dx11 = Pfx + jitter*ox11;
@@ -2598,26 +2599,26 @@ code = "shader_type canvas_item;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 HELPER_VisualShaderNodeCustom_mod289_3(vec3 x) {
+vec3 HELPER_CelluarNoise3D_2x2x2_mod289_3(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 HELPER_VisualShaderNodeCustom_mod289_4(vec4 x) {
+vec4 HELPER_CelluarNoise3D_2x2x2_mod289_4(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec4 HELPER_VisualShaderNodeCustom_mod7(vec4 x) {
+vec4 HELPER_CelluarNoise3D_2x2x2_mod7(vec4 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_VisualShaderNodeCustom_permute_3(vec3 x) {
-    return HELPER_VisualShaderNodeCustom_mod289_3((34.0 * x + 1.0) * x);
+vec3 HELPER_CelluarNoise3D_2x2x2_permute_3(vec3 x) {
+    return HELPER_CelluarNoise3D_2x2x2_mod289_3((34.0 * x + 1.0) * x);
 }
 
-vec4 HELPER_VisualShaderNodeCustom_permute_4(vec4 x) {
-    return HELPER_VisualShaderNodeCustom_mod289_4((34.0 * x + 1.0) * x);
+vec4 HELPER_CelluarNoise3D_2x2x2_permute_4(vec4 x) {
+    return HELPER_CelluarNoise3D_2x2x2_mod289_4((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -2632,19 +2633,19 @@ vec2 cellular_noise_3d_2x2x2(vec3 P, float jitter) {
     float Kz = 0.166666666667; // 1/6
     float Kzo = 0.416666666667; // 1/2-1/6*2
 
-    vec3 Pi = HELPER_VisualShaderNodeCustom_mod289_3(floor(P));
+    vec3 Pi = HELPER_CelluarNoise3D_2x2x2_mod289_3(floor(P));
     vec3 Pf = fract(P);
     vec4 Pfx = Pf.x + vec4(0.0, -1.0, 0.0, -1.0);
     vec4 Pfy = Pf.y + vec4(0.0, 0.0, -1.0, -1.0);
-    vec4 p = HELPER_VisualShaderNodeCustom_permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
-    p = HELPER_VisualShaderNodeCustom_permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
-    vec4 p1 = HELPER_VisualShaderNodeCustom_permute_4(p + Pi.z); // z+0
-    vec4 p2 = HELPER_VisualShaderNodeCustom_permute_4(p + Pi.z + vec4(1.0)); // z+1
+    vec4 p = HELPER_CelluarNoise3D_2x2x2_permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
+    p = HELPER_CelluarNoise3D_2x2x2_permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
+    vec4 p1 = HELPER_CelluarNoise3D_2x2x2_permute_4(p + Pi.z); // z+0
+    vec4 p2 = HELPER_CelluarNoise3D_2x2x2_permute_4(p + Pi.z + vec4(1.0)); // z+1
     vec4 ox1 = fract(p1*K) - Ko;
-    vec4 oy1 = HELPER_VisualShaderNodeCustom_mod7(floor(p1*K))*K - Ko;
+    vec4 oy1 = HELPER_CelluarNoise3D_2x2x2_mod7(floor(p1*K))*K - Ko;
     vec4 oz1 = floor(p1*K2)*Kz - Kzo; // p1 < 289 guaranteed
     vec4 ox2 = fract(p2*K) - Ko;
-    vec4 oy2 = HELPER_VisualShaderNodeCustom_mod7(floor(p2*K))*K - Ko;
+    vec4 oy2 = HELPER_CelluarNoise3D_2x2x2_mod7(floor(p2*K))*K - Ko;
     vec4 oz2 = floor(p2*K2)*Kz - Kzo;
     vec4 dx1 = Pfx + jitter*ox1;
     vec4 dy1 = Pfy + jitter*oy1;
@@ -2765,97 +2766,429 @@ nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3
 [sub_resource type="ShaderMaterial" id=97]
 shader = SubResource( 96 )
 
-[sub_resource type="VisualShaderNodeInput" id=98]
-input_name = "uv"
+[sub_resource type="VisualShaderNodeScalarConstant" id=98]
+constant = 20.0
 
-[sub_resource type="VisualShaderNodeScalarInterp" id=99]
+[sub_resource type="VisualShaderNodeCustom" id=99]
+script = ExtResource( 7 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=100]
-constant = 10.0
+[sub_resource type="VisualShaderNodeScalarOp" id=100]
 
 [sub_resource type="VisualShaderNodeScalarOp" id=101]
+default_input_values = [ 0, 0.0, 1, 0.5 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeCustom" id=102]
+script = ExtResource( 10 )
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=103]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=104]
+
+[sub_resource type="VisualShaderNodeInput" id=105]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeScalarOp" id=106]
+default_input_values = [ 0, 0.0, 1, 0.1 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeInput" id=107]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarOp" id=108]
+operator = 1
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=109]
 output_port_for_preview = 0
-default_input_values = [ 0, 0.0, 1, 1.2 ]
+function = 12
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=110]
+constant = 1.0
+
+[sub_resource type="VisualShaderNodeCustom" id=111]
+script = ExtResource( 5 )
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=112]
+
+[sub_resource type="VisualShaderNodeScalarInterp" id=113]
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=114]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeScalarOp" id=115]
+output_port_for_preview = 0
+default_input_values = [ 0, 0.0, 1, 0.05 ]
 operator = 9
 
-[sub_resource type="VisualShaderNodeScalarOp" id=102]
-
-[sub_resource type="VisualShaderNodeCustom" id=103]
-script = ExtResource( 8 )
-
-[sub_resource type="VisualShader" id=104]
+[sub_resource type="VisualShader" id=116]
 code = "shader_type canvas_item;
 
 
-// CellularNoise2D
+// PerlinNoise3D
+
+// GLSL textureless classic 3D noise \\\"cnoise\\\",
+// with an RSL-style periodic variant \\\"pnoise\\\".
+// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
+// Version: 2011-10-11
+//
+// Many thanks to Ian McEwan of Ashima Arts for the
+// ideas for permutation and gradient selection.
+//
+// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
+// Distributed under the MIT license. See LICENSE file.
+// https://github.com/stegu/webgl-noise
+//
+
+vec3 HELPER_PerlinNoise3D_mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 HELPER_PerlinNoise3D_mod289_4(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 HELPER_PerlinNoise3D_permute(vec4 x) {
+    return HELPER_PerlinNoise3D_mod289_4(((x*34.0)+1.0)*x);
+}
+
+vec4 HELPER_PerlinNoise3D_taylorInvSqrt(vec4 r) {
+    return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 HELPER_PerlinNoise3D_fade(vec3 t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+// Classic Perlin noise
+float perlin_noise_3d_np(vec3 P) {
+    vec3 Pi0 = floor(P); // Integer part for indexing
+    vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
+    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
+    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
+    vec3 Pf0 = fract(P); // Fractional part for interpolation
+    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.z);
+    vec4 iz1 = vec4(Pi1.z);
+    
+    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
+    
+    vec4 gx0 = ixy0 * (1.0 / 7.0);
+    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+    gx0 = fract(gx0);
+    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+    vec4 sz0 = step(gz0, vec4(0.0));
+    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+    
+    vec4 gx1 = ixy1 * (1.0 / 7.0);
+    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+    gx1 = fract(gx1);
+    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+    vec4 sz1 = step(gz1, vec4(0.0));
+    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+    
+    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+    
+    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    g000 *= norm0.x;
+    g010 *= norm0.y;
+    g100 *= norm0.z;
+    g110 *= norm0.w;
+    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    g001 *= norm1.x;
+    g011 *= norm1.y;
+    g101 *= norm1.z;
+    g111 *= norm1.w;
+    
+    float n000 = dot(g000, Pf0);
+    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+    float n111 = dot(g111, Pf1);
+    
+    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
+    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+    return 1.1 * n_xyz + 0.5;
+}
+
+// Classic Perlin noise, periodic variant
+float perlin_noise_3d_p(vec3 P, vec3 rep) {
+    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
+    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
+    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
+    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
+    vec3 Pf0 = fract(P); // Fractional part for interpolation
+    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+    vec4 iy = vec4(Pi0.yy, Pi1.yy);
+    vec4 iz0 = vec4(Pi0.z);
+    vec4 iz1 = vec4(Pi1.z);
+    
+    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
+    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
+    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
+    
+    vec4 gx0 = ixy0 * (1.0 / 7.0);
+    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+    gx0 = fract(gx0);
+    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+    vec4 sz0 = step(gz0, vec4(0.0));
+    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+    
+    vec4 gx1 = ixy1 * (1.0 / 7.0);
+    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+    gx1 = fract(gx1);
+    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+    vec4 sz1 = step(gz1, vec4(0.0));
+    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+    
+    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+    
+    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+    g000 *= norm0.x;
+    g010 *= norm0.y;
+    g100 *= norm0.z;
+    g110 *= norm0.w;
+    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+    g001 *= norm1.x;
+    g011 *= norm1.y;
+    g101 *= norm1.z;
+    g111 *= norm1.w;
+    
+    float n000 = dot(g000, Pf0);
+    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+    float n111 = dot(g111, Pf1);
+    
+    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
+    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+    return 1.1 * n_xyz + 0.5;
+}
+
+// RandomNoise
+
+	float rand(vec4 co){
+		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
+		return fract(sin(f) * 437588.5453);
+	}
+	
+// CelluarNoise3D
 
 
-// Cellular noise (\"Worley noise\") in 2D in GLSL.
+// Cellular noise (\"Worley noise\") in 3D in GLSL.
 // Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
 // This code is released under the conditions of the MIT license.
 // See LICENSE file for details.
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 HELPER_VisualShaderNodeCustom_mod289_3(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec2 HELPER_VisualShaderNodeCustom_mod289_2(vec2 x) {
+vec3 HELPER_CelluarNoise3D_mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec3 HELPER_VisualShaderNodeCustom_mod7(vec3 x) {
+vec3 HELPER_CelluarNoise3D_mod7(vec3 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_VisualShaderNodeCustom_permute(vec3 x) {
-    return HELPER_VisualShaderNodeCustom_mod289_3((34.0 * x + 1.0) * x);
+vec3 HELPER_CelluarNoise3D_permute(vec3 x) {
+    return HELPER_CelluarNoise3D_mod289((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
-// Standard 3x3 search window for good F1 and F2 values
-vec2 cellular_noise_2d(vec2 P, float jitter) {
-    float K = 0.142857142857; // 1/7
-    float Ko = 0.428571428571; // 3/7
+// 3x3x3 search region for good F2 everywhere, but a lot
+// slower than the 2x2x2 version.
+// The code below is a bit scary even to its author,
+// but it has at least half decent performance on a
+// modern GPU. In any case, it beats any software
+// implementation of Worley noise hands down.
 
-    vec2 Pi = HELPER_VisualShaderNodeCustom_mod289_2(floor(P));
-    vec2 Pf = fract(P);
-    vec3 oi = vec3(-1.0, 0.0, 1.0);
-    vec3 of = vec3(-0.5, 0.5, 1.5);
-    vec3 px = HELPER_VisualShaderNodeCustom_permute(Pi.x + oi);
-    vec3 p = HELPER_VisualShaderNodeCustom_permute(px.x + Pi.y + oi); // p11, p12, p13
-    vec3 ox = fract(p*K) - Ko;
-    vec3 oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K - Ko;
-    vec3 dx = Pf.x + 0.5 + jitter*ox;
-    vec3 dy = Pf.y - of + jitter*oy;
-    vec3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
-    p = HELPER_VisualShaderNodeCustom_permute(px.y + Pi.y + oi); // p21, p22, p23
-    ox = fract(p*K) - Ko;
-    oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K - Ko;
-    dx = Pf.x - 0.5 + jitter*ox;
-    dy = Pf.y - of + jitter*oy;
-    vec3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
-    p = HELPER_VisualShaderNodeCustom_permute(px.z + Pi.y + oi); // p31, p32, p33
-    ox = fract(p*K) - Ko;
-    oy = HELPER_VisualShaderNodeCustom_mod7(floor(p*K))*K - Ko;
-    dx = Pf.x - 1.5 + jitter*ox;
-    dy = Pf.y - of + jitter*oy;
-    vec3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared
+vec2 cellular_noise_3d(vec3 P, float jitter) {
+    float K = 0.142857142857; // 1/7
+    float Ko = 0.428571428571; // 1/2-K/2
+    float K2 = 0.020408163265306; // 1/(7*7)
+    float Kz = 0.166666666667; // 1/6
+    float Kzo = 0.416666666667; // 1/2-1/6*2
+    
+    vec3 Pi = HELPER_CelluarNoise3D_mod289(floor(P));
+    vec3 Pf = fract(P) - 0.5;
+    
+    vec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);
+    vec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);
+    vec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);
+    
+    vec3 p = HELPER_CelluarNoise3D_permute(Pi.x + vec3(-1.0, 0.0, 1.0));
+    vec3 p1 = HELPER_CelluarNoise3D_permute(p + Pi.y - 1.0);
+    vec3 p2 = HELPER_CelluarNoise3D_permute(p + Pi.y);
+    vec3 p3 = HELPER_CelluarNoise3D_permute(p + Pi.y + 1.0);
+    
+    vec3 p11 = HELPER_CelluarNoise3D_permute(p1 + Pi.z - 1.0);
+    vec3 p12 = HELPER_CelluarNoise3D_permute(p1 + Pi.z);
+    vec3 p13 = HELPER_CelluarNoise3D_permute(p1 + Pi.z + 1.0);
+    
+    vec3 p21 = HELPER_CelluarNoise3D_permute(p2 + Pi.z - 1.0);
+    vec3 p22 = HELPER_CelluarNoise3D_permute(p2 + Pi.z);
+    vec3 p23 = HELPER_CelluarNoise3D_permute(p2 + Pi.z + 1.0);
+    
+    vec3 p31 = HELPER_CelluarNoise3D_permute(p3 + Pi.z - 1.0);
+    vec3 p32 = HELPER_CelluarNoise3D_permute(p3 + Pi.z);
+    vec3 p33 = HELPER_CelluarNoise3D_permute(p3 + Pi.z + 1.0);
+    
+    vec3 ox11 = fract(p11*K) - Ko;
+    vec3 oy11 = HELPER_CelluarNoise3D_mod7(floor(p11*K))*K - Ko;
+    vec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed
+    
+    vec3 ox12 = fract(p12*K) - Ko;
+    vec3 oy12 = HELPER_CelluarNoise3D_mod7(floor(p12*K))*K - Ko;
+    vec3 oz12 = floor(p12*K2)*Kz - Kzo;
+    
+    vec3 ox13 = fract(p13*K) - Ko;
+    vec3 oy13 = HELPER_CelluarNoise3D_mod7(floor(p13*K))*K - Ko;
+    vec3 oz13 = floor(p13*K2)*Kz - Kzo;
+    
+    vec3 ox21 = fract(p21*K) - Ko;
+    vec3 oy21 = HELPER_CelluarNoise3D_mod7(floor(p21*K))*K - Ko;
+    vec3 oz21 = floor(p21*K2)*Kz - Kzo;
+    
+    vec3 ox22 = fract(p22*K) - Ko;
+    vec3 oy22 = HELPER_CelluarNoise3D_mod7(floor(p22*K))*K - Ko;
+    vec3 oz22 = floor(p22*K2)*Kz - Kzo;
+    
+    vec3 ox23 = fract(p23*K) - Ko;
+    vec3 oy23 = HELPER_CelluarNoise3D_mod7(floor(p23*K))*K - Ko;
+    vec3 oz23 = floor(p23*K2)*Kz - Kzo;
+    
+    vec3 ox31 = fract(p31*K) - Ko;
+    vec3 oy31 = HELPER_CelluarNoise3D_mod7(floor(p31*K))*K - Ko;
+    vec3 oz31 = floor(p31*K2)*Kz - Kzo;
+    
+    vec3 ox32 = fract(p32*K) - Ko;
+    vec3 oy32 = HELPER_CelluarNoise3D_mod7(floor(p32*K))*K - Ko;
+    vec3 oz32 = floor(p32*K2)*Kz - Kzo;
+    
+    vec3 ox33 = fract(p33*K) - Ko;
+    vec3 oy33 = HELPER_CelluarNoise3D_mod7(floor(p33*K))*K - Ko;
+    vec3 oz33 = floor(p33*K2)*Kz - Kzo;
+    
+    vec3 dx11 = Pfx + jitter*ox11;
+    vec3 dy11 = Pfy.x + jitter*oy11;
+    vec3 dz11 = Pfz.x + jitter*oz11;
+    
+    vec3 dx12 = Pfx + jitter*ox12;
+    vec3 dy12 = Pfy.x + jitter*oy12;
+    vec3 dz12 = Pfz.y + jitter*oz12;
+    
+    vec3 dx13 = Pfx + jitter*ox13;
+    vec3 dy13 = Pfy.x + jitter*oy13;
+    vec3 dz13 = Pfz.z + jitter*oz13;
+    
+    vec3 dx21 = Pfx + jitter*ox21;
+    vec3 dy21 = Pfy.y + jitter*oy21;
+    vec3 dz21 = Pfz.x + jitter*oz21;
+    
+    vec3 dx22 = Pfx + jitter*ox22;
+    vec3 dy22 = Pfy.y + jitter*oy22;
+    vec3 dz22 = Pfz.y + jitter*oz22;
+    
+    vec3 dx23 = Pfx + jitter*ox23;
+    vec3 dy23 = Pfy.y + jitter*oy23;
+    vec3 dz23 = Pfz.z + jitter*oz23;
+    
+    vec3 dx31 = Pfx + jitter*ox31;
+    vec3 dy31 = Pfy.z + jitter*oy31;
+    vec3 dz31 = Pfz.x + jitter*oz31;
+    
+    vec3 dx32 = Pfx + jitter*ox32;
+    vec3 dy32 = Pfy.z + jitter*oy32;
+    vec3 dz32 = Pfz.y + jitter*oz32;
+    
+    vec3 dx33 = Pfx + jitter*ox33;
+    vec3 dy33 = Pfy.z + jitter*oy33;
+    vec3 dz33 = Pfz.z + jitter*oz33;
+    
+    vec3 d11 = dx11 * dx11 + dy11 * dy11 + dz11 * dz11;
+    vec3 d12 = dx12 * dx12 + dy12 * dy12 + dz12 * dz12;
+    vec3 d13 = dx13 * dx13 + dy13 * dy13 + dz13 * dz13;
+    vec3 d21 = dx21 * dx21 + dy21 * dy21 + dz21 * dz21;
+    vec3 d22 = dx22 * dx22 + dy22 * dy22 + dz22 * dz22;
+    vec3 d23 = dx23 * dx23 + dy23 * dy23 + dz23 * dz23;
+    vec3 d31 = dx31 * dx31 + dy31 * dy31 + dz31 * dz31;
+    vec3 d32 = dx32 * dx32 + dy32 * dy32 + dz32 * dz32;
+    vec3 d33 = dx33 * dx33 + dy33 * dy33 + dz33 * dz33;
+    
     // Sort out the two smallest distances (F1, F2)
-    vec3 d1a = min(d1, d2);
-    d2 = max(d1, d2); // Swap to keep candidates for F2
-    d2 = min(d2, d3); // neither F1 nor F2 are now in d3
-    d1 = min(d1a, d2); // F1 is now in d1
-    d2 = max(d1a, d2); // Swap to keep candidates for F2
-    d1.xy = (d1.x < d1.y) ? d1.xy : d1.yx; // Swap if smaller
-    d1.xz = (d1.x < d1.z) ? d1.xz : d1.zx; // F1 is in d1.x
-    d1.yz = min(d1.yz, d2.yz); // F2 is now not in d2.yz
-    d1.y = min(d1.y, d1.z); // nor in  d1.z
-    d1.y = min(d1.y, d2.x); // F2 is in d1.y, we're done.
-    return sqrt(d1.xy);
+/*// F1 only block
+    vec3 d1 = min(min(d11,d12), d13);
+    vec3 d2 = min(min(d21,d22), d23);
+    vec3 d3 = min(min(d31,d32), d33);
+    vec3 d = min(min(d1,d2), d3);
+    d.x = min(min(d.x,d.y),d.z);
+    return vec2(sqrt(d.x)); // F1 duplicated, no F2 computed
+//*/// End of F1 only block
+//*// F1 and F2 block
+    vec3 d1a = min(d11, d12);
+    d12 = max(d11, d12);
+    d11 = min(d1a, d13); // Smallest now not in d12 or d13
+    d13 = max(d1a, d13);
+    d12 = min(d12, d13); // 2nd smallest now not in d13
+    vec3 d2a = min(d21, d22);
+    d22 = max(d21, d22);
+    d21 = min(d2a, d23); // Smallest now not in d22 or d23
+    d23 = max(d2a, d23);
+    d22 = min(d22, d23); // 2nd smallest now not in d23
+    vec3 d3a = min(d31, d32);
+    d32 = max(d31, d32);
+    d31 = min(d3a, d33); // Smallest now not in d32 or d33
+    d33 = max(d3a, d33);
+    d32 = min(d32, d33); // 2nd smallest now not in d33
+    vec3 da = min(d11, d21);
+    d21 = max(d11, d21);
+    d11 = min(da, d31); // Smallest now in d11
+    d31 = max(da, d31); // 2nd smallest now not in d31
+    d11.xy = (d11.x < d11.y) ? d11.xy : d11.yx;
+    d11.xz = (d11.x < d11.z) ? d11.xz : d11.zx; // d11.x now smallest
+    d12 = min(d12, d21); // 2nd smallest now not in d21
+    d12 = min(d12, d22); // nor in d22
+    d12 = min(d12, d31); // nor in d31
+    d12 = min(d12, d32); // nor in d32
+    d11.yz = min(d11.yz,d12.xy); // nor in d12.yz
+    d11.y = min(d11.y,d12.z); // Only two more to go
+    d11.y = min(d11.y,d11.z); // Done! (Phew!)
+    return sqrt(d11.xy); // F1, F2
+//*/// End of F1 and F2 block
 }
 
 
@@ -2868,32 +3201,77 @@ void fragment() {
 // Input:2
 	vec3 n_out2p0 = vec3(UV, 0.0);
 
+// VectorDecompose:17
+	float n_out17p0 = n_out2p0.x;
+	float n_out17p1 = n_out2p0.y;
+	float n_out17p2 = n_out2p0.z;
+
+// Input:18
+	float n_out18p0 = TIME;
+
+// ScalarOp:19
+	float n_in19p1 = 0.10000;
+	float n_out19p0 = n_out18p0 * n_in19p1;
+
+// VectorCompose:24
+	vec3 n_out24p0 = vec3(n_out17p0, n_out17p1, n_out19p0);
+
+// Scalar:11
+	float n_out11p0 = 20.000000;
+
+// PerlinNoise3D:23
+	float n_out23p0;
+	{
+		n_out23p0 = perlin_noise_3d_np(n_out24p0 * vec3(n_out11p0));
+	}
+
+// RandomNoise:12
+	float n_out12p0;
+	{
+		n_out12p0 = rand(vec4(n_out2p0, n_out18p0));
+	}
+
+// ScalarOp:13
+	float n_out13p0 = n_out23p0 + n_out12p0;
+
+// ScalarOp:14
+	float n_in14p1 = 0.50000;
+	float n_out14p0 = n_out13p0 * n_in14p1;
+
+// VectorCompose:16
+	vec3 n_out16p0 = vec3(n_out17p0, n_out17p1, n_out19p0);
+
 // Scalar:6
 	float n_out6p0 = 10.000000;
 
-// CellularNoise2D:9
-	vec3 n_out9p0;
-	float n_out9p1;
-	float n_out9p2;
+// Scalar:22
+	float n_out22p0 = 1.000000;
+
+// CelluarNoise3D:15
+	vec3 n_out15p0;
+	float n_out15p1;
+	float n_out15p2;
 	{
 		
 			
-			n_out9p0 = vec3(cellular_noise_2d((n_out2p0).xy * (vec3(n_out6p0)).xy, 0.5), 0.0);
-			n_out9p1 = n_out9p0.x;n_out9p2 = n_out9p0.y;
+			n_out15p0 = vec3(cellular_noise_3d(n_out16p0 * vec3(n_out6p0), n_out22p0), 0.0);
+			n_out15p1 = n_out15p0.x;n_out15p2 = n_out15p0.y;
 			
 	}
 
-// ScalarOp:8
-	float n_out8p0 = n_out9p1 + n_out9p2;
+// ScalarOp:20
+	float n_out20p0 = n_out15p1 - n_out15p2;
+
+// ScalarFunc:21
+	float n_out21p0 = abs(n_out20p0);
 
 // ScalarOp:7
-	float n_in7p1 = 1.20000;
-	float n_out7p0 = step(n_out8p0, n_in7p1);
+	float n_in7p1 = 0.05000;
+	float n_out7p0 = step(n_out21p0, n_in7p1);
 
 // ScalarMix:4
-	float n_in4p0 = 0.00000;
 	float n_in4p1 = 1.00000;
-	float n_out4p0 = mix(n_in4p0, n_in4p1, n_out7p0);
+	float n_out4p0 = mix(n_out14p0, n_in4p1, n_out7p0);
 
 // Output:0
 	COLOR.rgb = vec3(n_out4p0);
@@ -2905,26 +3283,554 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -184, -51 )
+graph_offset = Vector2( -153, -386 )
 mode = 1
 flags/light_only = false
-nodes/fragment/0/position = Vector2( 720, 160 )
-nodes/fragment/2/node = SubResource( 98 )
-nodes/fragment/2/position = Vector2( -280, 60 )
-nodes/fragment/4/node = SubResource( 99 )
-nodes/fragment/4/position = Vector2( 540, 320 )
-nodes/fragment/6/node = SubResource( 100 )
-nodes/fragment/6/position = Vector2( -320, 160 )
-nodes/fragment/7/node = SubResource( 101 )
+nodes/fragment/0/position = Vector2( 920, 160 )
+nodes/fragment/2/node = SubResource( 107 )
+nodes/fragment/2/position = Vector2( -760, -20 )
+nodes/fragment/4/node = SubResource( 113 )
+nodes/fragment/4/position = Vector2( 780, 160 )
+nodes/fragment/6/node = SubResource( 114 )
+nodes/fragment/6/position = Vector2( -500, 120 )
+nodes/fragment/7/node = SubResource( 115 )
 nodes/fragment/7/position = Vector2( 360, -20 )
-nodes/fragment/8/node = SubResource( 102 )
-nodes/fragment/8/position = Vector2( 180, 0 )
-nodes/fragment/9/node = SubResource( 103 )
-nodes/fragment/9/position = Vector2( -60, 40 )
-nodes/fragment/connections = PoolIntArray( 7, 0, 4, 2, 4, 0, 0, 0, 8, 0, 7, 0, 9, 1, 8, 0, 9, 2, 8, 1, 2, 0, 9, 0, 6, 0, 9, 1 )
+nodes/fragment/11/node = SubResource( 98 )
+nodes/fragment/11/position = Vector2( -500, 260 )
+nodes/fragment/12/node = SubResource( 99 )
+nodes/fragment/12/position = Vector2( -40, 280 )
+nodes/fragment/13/node = SubResource( 100 )
+nodes/fragment/13/position = Vector2( 180, 220 )
+nodes/fragment/14/node = SubResource( 101 )
+nodes/fragment/14/position = Vector2( 360, 220 )
+nodes/fragment/15/node = SubResource( 102 )
+nodes/fragment/15/position = Vector2( -100, -20 )
+nodes/fragment/16/node = SubResource( 103 )
+nodes/fragment/16/position = Vector2( -335, -23.5 )
+nodes/fragment/17/node = SubResource( 104 )
+nodes/fragment/17/position = Vector2( -560, -40 )
+nodes/fragment/18/node = SubResource( 105 )
+nodes/fragment/18/position = Vector2( -820, 120 )
+nodes/fragment/19/node = SubResource( 106 )
+nodes/fragment/19/position = Vector2( -652, 157.5 )
+nodes/fragment/20/node = SubResource( 108 )
+nodes/fragment/20/position = Vector2( 0, -260 )
+nodes/fragment/21/node = SubResource( 109 )
+nodes/fragment/21/position = Vector2( 160, -260 )
+nodes/fragment/22/node = SubResource( 110 )
+nodes/fragment/22/position = Vector2( -500, 360 )
+nodes/fragment/23/node = SubResource( 111 )
+nodes/fragment/23/position = Vector2( -40, 140 )
+nodes/fragment/24/node = SubResource( 112 )
+nodes/fragment/24/position = Vector2( -240, 120 )
+nodes/fragment/connections = PoolIntArray( 7, 0, 4, 2, 4, 0, 0, 0, 12, 0, 13, 1, 2, 0, 12, 0, 13, 0, 14, 0, 14, 0, 4, 0, 16, 0, 15, 0, 17, 0, 16, 0, 17, 1, 16, 1, 2, 0, 17, 0, 6, 0, 15, 1, 18, 0, 19, 0, 19, 0, 16, 2, 15, 1, 20, 0, 15, 2, 20, 1, 20, 0, 21, 0, 22, 0, 15, 2, 23, 0, 13, 0, 24, 0, 23, 0, 17, 0, 24, 0, 17, 1, 24, 1, 11, 0, 23, 2, 19, 0, 24, 2, 21, 0, 7, 0, 18, 0, 12, 1 )
 
-[sub_resource type="ShaderMaterial" id=105]
-shader = SubResource( 104 )
+[sub_resource type="ShaderMaterial" id=117]
+shader = SubResource( 116 )
+
+[sub_resource type="VisualShaderNodeVectorInterp" id=125]
+
+[sub_resource type="VisualShaderNodeScalarOp" id=126]
+default_input_values = [ 0, 0.0, 1, 0.5 ]
+operator = 9
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=127]
+
+[sub_resource type="VisualShaderNodeCustom" id=121]
+script = ExtResource( 12 )
+
+[sub_resource type="VisualShaderNodeInput" id=122]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=123]
+constant = 20.0
+
+[sub_resource type="VisualShaderNodeInput" id=124]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeScalarOp" id=128]
+default_input_values = [ 0, 0.0, 1, 1.0 ]
+
+[sub_resource type="VisualShaderNodeScalarOp" id=129]
+default_input_values = [ 0, 0.0, 1, 0.5 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeVectorOp" id=130]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ) ]
+
+[sub_resource type="VisualShaderNodeVectorOp" id=131]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0.5 ) ]
+operator = 2
+
+[sub_resource type="VisualShader" id=119]
+code = "shader_type canvas_item;
+
+
+// SimplexNoise2DRG
+
+
+
+// Modulo 289, optimizes to code without divisions
+vec3 HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(vec3 x) {
+	return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+float HELPER_SimplexNoise2DRG_mod289(float x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+// Permutation polynomial (ring size 289 = 17*17)
+vec3 HELPER_SimplexNoise2DRG_permute_3(vec3 x) {
+	return HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(((x*34.0)+1.0)*x);
+}
+
+float HELPER_SimplexNoise2DRG_permute(float x) {
+    return HELPER_SimplexNoise2DRG_mod289(((x * 34.0) + 1.0) * x);
+}
+
+// Hashed 2-D gradients with an extra rotation.
+// (The constant 0.0243902439 is 1/41)
+vec2 HELPER_SimplexNoise2DRG_rgrad2(vec2 p, float rot) {
+/*// Map from a line to a diamond such that a shift maps to a rotation.
+	float u = HELPER_SimplexNoise2DRG_permute(HELPER_SimplexNoise2DRG_permute(p.x) + p.y) * 0.0243902439 + rot; // Rotate by shift
+	u = 4.0 * fract(u) - 2.0;
+	// (This vector could be normalized, exactly or approximately.)
+	return vec2(abs(u)-1.0, abs(abs(u+1.0)-2.0)-1.0);
+*/
+// For more isotropic gradients, sin/cos can be used instead.
+	float u = HELPER_SimplexNoise2DRG_permute(HELPER_SimplexNoise2DRG_permute(p.x) + p.y) * 0.0243902439 + rot; // Rotate by shift
+	u = fract(u) * 6.28318530718; // 2*pi
+	return vec2(cos(u), sin(u));
+}
+
+//*
+//
+// 2-D tiling simplex noise with rotating gradients and analytical derivative.
+// The first component of the 3-element return vector is the noise value,
+// and the second and third components are the x and y partial derivatives.
+//
+vec3 simplex_noise_2d_rg_p(vec2 pos, vec2 per, float rot) {
+    // Hack: offset y slightly to hide some rare artifacts
+    pos.y += 0.01;
+    // Skew to hexagonal grid
+    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
+    
+    vec2 i0 = floor(uv);
+    vec2 f0 = fract(uv);
+    // Traversal order
+    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    
+    // Unskewed grid points in (x,y) space
+    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
+    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
+    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
+    
+    // Integer grid point indices in (u,v) space
+    i1 = i0 + i1;
+    vec2 i2 = i0 + vec2(1.0, 1.0);
+    
+    // Vectors in unskewed (x,y) coordinates from
+    // each of the simplex corners to the evaluation point
+    vec2 d0 = pos - p0;
+    vec2 d1 = pos - p1;
+    vec2 d2 = pos - p2;
+    
+    // Wrap i0, i1 and i2 to the desired period before gradient hashing:
+    // wrap points in (x,y), map to (u,v)
+    vec3 xw = mod(vec3(p0.x, p1.x, p2.x), per.x);
+    vec3 yw = mod(vec3(p0.y, p1.y, p2.y), per.y);
+    vec3 iuw = xw + 0.5 * yw;
+    vec3 ivw = yw;
+    
+    // Create gradients from indices
+    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
+    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
+    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
+    
+    // Gradients dot vectors to corresponding corners
+    // (The derivatives of this are simply the gradients)
+    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
+    
+    // Radial weights from corners
+    // 0.8 is the square of 2/sqrt(5), the distance from
+    // a grid point to the nearest simplex boundary
+    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
+    
+    // Partial derivatives for analytical gradient computation
+    vec3 dtdx = -2.0 * vec3(d0.x, d1.x, d2.x);
+    vec3 dtdy = -2.0 * vec3(d0.y, d1.y, d2.y);
+    
+    // Set influence of each surflet to zero outside radius sqrt(0.8)
+    if (t.x < 0.0) {
+        dtdx.x = 0.0;
+        dtdy.x = 0.0;
+        t.x = 0.0;
+    }
+    if (t.y < 0.0) {
+        dtdx.y = 0.0;
+        dtdy.y = 0.0;
+        t.y = 0.0;
+    }
+    if (t.z < 0.0) {
+        dtdx.z = 0.0;
+        dtdy.z = 0.0;
+        t.z = 0.0;
+    }
+    
+    // Fourth power of t (and third power for derivative)
+    vec3 t2 = t * t;
+    vec3 t4 = t2 * t2;
+    vec3 t3 = t2 * t;
+    
+    // Final noise value is:
+    // sum of ((radial weights) times (gradient dot vector from corner))
+    float n = dot(t4, w);
+    
+    // Final analytical derivative (gradient of a sum of scalar products)
+    vec2 dt0 = vec2(dtdx.x, dtdy.x) * 4.0 * t3.x;
+    vec2 dn0 = t4.x * g0 + dt0 * w.x;
+    vec2 dt1 = vec2(dtdx.y, dtdy.y) * 4.0 * t3.y;
+    vec2 dn1 = t4.y * g1 + dt1 * w.y;
+    vec2 dt2 = vec2(dtdx.z, dtdy.z) * 4.0 * t3.z;
+    vec2 dn2 = t4.z * g2 + dt2 * w.z;
+    
+    return 11.0*vec3(n, dn0 + dn1 + dn2);
+}
+
+/*/
+//
+// 2-D tiling simplex noise with rotating gradients,
+// but without the analytical derivative.
+//
+float simplex_noise_2d_rg_p(vec2 pos, vec2 per, float rot) {
+    // Offset y slightly to hide some rare artifacts
+    pos.y += 0.001;
+    // Skew to hexagonal grid
+    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
+    
+    vec2 i0 = floor(uv);
+    vec2 f0 = fract(uv);
+    // Traversal order
+    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    
+    // Unskewed grid points in (x,y) space
+    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
+    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
+    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
+    
+    // Integer grid point indices in (u,v) space
+    i1 = i0 + i1;
+    vec2 i2 = i0 + vec2(1.0, 1.0);
+    
+    // Vectors in unskewed (x,y) coordinates from
+    // each of the simplex corners to the evaluation point
+    vec2 d0 = pos - p0;
+    vec2 d1 = pos - p1;
+    vec2 d2 = pos - p2;
+    
+    // Wrap i0, i1 and i2 to the desired period before gradient hashing:
+    // wrap points in (x,y), map to (u,v)
+    vec3 xw = mod(vec3(p0.x, p1.x, p2.x), per.x);
+    vec3 yw = mod(vec3(p0.y, p1.y, p2.y), per.y);
+    vec3 iuw = xw + 0.5 * yw;
+    vec3 ivw = yw;
+    
+    // Create gradients from indices
+    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
+    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
+    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
+    
+    // Gradients dot vectors to corresponding corners
+    // (The derivatives of this are simply the gradients)
+    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
+    
+    // Radial weights from corners
+    // 0.8 is the square of 2/sqrt(5), the distance from
+    // a grid point to the nearest simplex boundary
+    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
+    
+    // Set influence of each surflet to zero outside radius sqrt(0.8)
+    t = max(t, vec3(0.0));
+    
+    // Fourth power of t
+    vec3 t2 = t * t;
+    vec3 t4 = t2 * t2;
+    
+    // Final noise value is:
+    // sum of ((radial weights) times (gradient dot vector from corner))
+    float n = dot(t4, w);
+    
+    // Rescale to cover the range [-1,1] reasonably well
+    return 11.0*n;
+}
+
+//*/
+
+//*
+//
+// 2-D non-tiling simplex noise with rotating gradients and analytical derivative.
+// The first component of the 3-element return vector is the noise value,
+// and the second and third components are the x and y partial derivatives.
+//
+vec3 simplex_noise_2d_rg_np(vec2 pos, float rot) {
+    // Offset y slightly to hide some rare artifacts
+    pos.y += 0.001;
+    // Skew to hexagonal grid
+    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
+    
+    vec2 i0 = floor(uv);
+    vec2 f0 = fract(uv);
+    // Traversal order
+    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    
+    // Unskewed grid points in (x,y) space
+    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
+    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
+    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
+    
+    // Integer grid point indices in (u,v) space
+    i1 = i0 + i1;
+    vec2 i2 = i0 + vec2(1.0, 1.0);
+    
+    // Vectors in unskewed (x,y) coordinates from
+    // each of the simplex corners to the evaluation point
+    vec2 d0 = pos - p0;
+    vec2 d1 = pos - p1;
+    vec2 d2 = pos - p2;
+    
+    vec3 x = vec3(p0.x, p1.x, p2.x);
+    vec3 y = vec3(p0.y, p1.y, p2.y);
+    vec3 iuw = x + 0.5 * y;
+    vec3 ivw = y;
+    
+    // Avoid precision issues in permutation
+    iuw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(iuw);
+    ivw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(ivw);
+    
+    // Create gradients from indices
+    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
+    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
+    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
+    
+    // Gradients dot vectors to corresponding corners
+    // (The derivatives of this are simply the gradients)
+    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
+    
+    // Radial weights from corners
+    // 0.8 is the square of 2/sqrt(5), the distance from
+    // a grid point to the nearest simplex boundary
+    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
+    
+    // Partial derivatives for analytical gradient computation
+    vec3 dtdx = -2.0 * vec3(d0.x, d1.x, d2.x);
+    vec3 dtdy = -2.0 * vec3(d0.y, d1.y, d2.y);
+    
+    // Set influence of each surflet to zero outside radius sqrt(0.8)
+    if (t.x < 0.0) {
+        dtdx.x = 0.0;
+        dtdy.x = 0.0;
+        t.x = 0.0;
+    }
+    if (t.y < 0.0) {
+        dtdx.y = 0.0;
+        dtdy.y = 0.0;
+        t.y = 0.0;
+    }
+    if (t.z < 0.0) {
+        dtdx.z = 0.0;
+        dtdy.z = 0.0;
+        t.z = 0.0;
+    }
+    
+    // Fourth power of t (and third power for derivative)
+    vec3 t2 = t * t;
+    vec3 t4 = t2 * t2;
+    vec3 t3 = t2 * t;
+    
+    // Final noise value is:
+    // sum of ((radial weights) times (gradient dot vector from corner))
+    float n = dot(t4, w);
+    
+    // Final analytical derivative (gradient of a sum of scalar products)
+    vec2 dt0 = vec2(dtdx.x, dtdy.x) * 4.0 * t3.x;
+    vec2 dn0 = t4.x * g0 + dt0 * w.x;
+    vec2 dt1 = vec2(dtdx.y, dtdy.y) * 4.0 * t3.y;
+    vec2 dn1 = t4.y * g1 + dt1 * w.y;
+    vec2 dt2 = vec2(dtdx.z, dtdy.z) * 4.0 * t3.z;
+    vec2 dn2 = t4.z * g2 + dt2 * w.z;
+    
+    return 11.0*vec3(n, dn0 + dn1 + dn2);
+}
+
+/*/
+
+//
+// 2-D non-tiling simplex noise with rotating gradients,
+// without the analytical derivative.
+//
+float simplex_noise_2d_rg_np(vec2 pos, float rot) {
+    // Offset y slightly to hide some rare artifacts
+    pos.y += 0.001;
+    // Skew to hexagonal grid
+    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
+    
+    vec2 i0 = floor(uv);
+    vec2 f0 = fract(uv);
+    // Traversal order
+    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    
+    // Unskewed grid points in (x,y) space
+    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
+    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
+    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
+    
+    // Integer grid point indices in (u,v) space
+    i1 = i0 + i1;
+    vec2 i2 = i0 + vec2(1.0, 1.0);
+    
+    // Vectors in unskewed (x,y) coordinates from
+    // each of the simplex corners to the evaluation point
+    vec2 d0 = pos - p0;
+    vec2 d1 = pos - p1;
+    vec2 d2 = pos - p2;
+    
+    // Wrap i0, i1 and i2 to the desired period before gradient hashing:
+    // wrap points in (x,y), map to (u,v)
+    vec3 x = vec3(p0.x, p1.x, p2.x);
+    vec3 y = vec3(p0.y, p1.y, p2.y);
+    vec3 iuw = x + 0.5 * y;
+    vec3 ivw = y;
+    
+    // Avoid precision issues in permutation
+    iuw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(iuw);
+    ivw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(ivw);
+    
+    // Create gradients from indices
+    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
+    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
+    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
+    
+    // Gradients dot vectors to corresponding corners
+    // (The derivatives of this are simply the gradients)
+    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
+    
+    // Radial weights from corners
+    // 0.8 is the square of 2/sqrt(5), the distance from
+    // a grid point to the nearest simplex boundary
+    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
+    
+    // Set influence of each surflet to zero outside radius sqrt(0.8)
+    t = max(t, vec3(0.0));
+    
+    // Fourth power of t
+    vec3 t2 = t * t;
+    vec3 t4 = t2 * t2;
+    
+    // Final noise value is:
+    // sum of ((radial weights) times (gradient dot vector from corner))
+    float n = dot(t4, w);
+    
+    // Rescale to cover the range [-1,1] reasonably well
+    return 11.0*n;
+}
+
+//*/
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Scalar:4
+	float n_out4p0 = 20.000000;
+
+// Input:5
+	float n_out5p0 = TIME;
+
+// SimplexNoise2DRG:2
+	float n_out2p0;
+	vec3 n_out2p1;
+	{
+		
+			 vec3 result = simplex_noise_2d_rg_np(((n_out3p0).xy).xy * (vec3(n_out4p0)).xy.xy, n_out5p0);
+			n_out2p0 = result.x;
+			n_out2p1 = vec3(result.xy, 0.0);
+			
+	}
+
+// VectorOp:8
+	vec3 n_in8p1 = vec3(1.00000, 1.00000, 1.00000);
+	vec3 n_out8p0 = n_out2p1 + n_in8p1;
+
+// VectorOp:9
+	vec3 n_in9p1 = vec3(0.50000, 0.50000, 0.50000);
+	vec3 n_out9p0 = n_out8p0 * n_in9p1;
+
+// ScalarOp:6
+	float n_in6p1 = 1.00000;
+	float n_out6p0 = n_out2p0 + n_in6p1;
+
+// ScalarOp:7
+	float n_in7p1 = 0.50000;
+	float n_out7p0 = n_out6p0 * n_in7p1;
+
+// VectorDecompose:12
+	float n_out12p0 = n_out3p0.x;
+	float n_out12p1 = n_out3p0.y;
+	float n_out12p2 = n_out3p0.z;
+
+// ScalarOp:11
+	float n_in11p1 = 0.50000;
+	float n_out11p0 = step(n_out12p0, n_in11p1);
+
+// VectorMix:10
+	vec3 n_out10p0 = mix(n_out9p0, vec3(n_out7p0), vec3(n_out11p0));
+
+// Output:0
+	COLOR.rgb = n_out10p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -434, 31.5 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 840, 180 )
+nodes/fragment/2/node = SubResource( 121 )
+nodes/fragment/2/position = Vector2( -40, 160 )
+nodes/fragment/3/node = SubResource( 122 )
+nodes/fragment/3/position = Vector2( -280, 100 )
+nodes/fragment/4/node = SubResource( 123 )
+nodes/fragment/4/position = Vector2( -280, 300 )
+nodes/fragment/5/node = SubResource( 124 )
+nodes/fragment/5/position = Vector2( -280, 400 )
+nodes/fragment/6/node = SubResource( 128 )
+nodes/fragment/6/position = Vector2( 237, 42.5 )
+nodes/fragment/7/node = SubResource( 129 )
+nodes/fragment/7/position = Vector2( 400, 40 )
+nodes/fragment/8/node = SubResource( 130 )
+nodes/fragment/8/position = Vector2( 240, 200 )
+nodes/fragment/9/node = SubResource( 131 )
+nodes/fragment/9/position = Vector2( 408, 261.5 )
+nodes/fragment/10/node = SubResource( 125 )
+nodes/fragment/10/position = Vector2( 620, 100 )
+nodes/fragment/11/node = SubResource( 126 )
+nodes/fragment/11/position = Vector2( 400, -100 )
+nodes/fragment/12/node = SubResource( 127 )
+nodes/fragment/12/position = Vector2( -40, 0 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 2, 0, 4, 0, 2, 2, 2, 0, 6, 0, 6, 0, 7, 0, 2, 1, 8, 0, 8, 0, 9, 0, 7, 0, 10, 1, 9, 0, 10, 0, 10, 0, 0, 0, 11, 0, 10, 2, 12, 0, 11, 0, 3, 0, 12, 0, 5, 0, 2, 3 )
+
+[sub_resource type="ShaderMaterial" id=120]
+shader = SubResource( 119 )
 
 [node name="Node2D" type="Node2D"]
 
@@ -3187,7 +4093,7 @@ __meta__ = {
 }
 
 [node name="Combined noises" type="ColorRect" parent="."]
-material = SubResource( 105 )
+material = SubResource( 117 )
 margin_left = 678.797
 margin_top = 139.998
 margin_right = 739.797
@@ -3203,6 +4109,28 @@ margin_right = 64.9797
 margin_bottom = 96.4388
 text = "Combined
    noises"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Simplex noise 2D" type="ColorRect" parent="."]
+material = SubResource( 120 )
+margin_left = 290.272
+margin_top = 263.252
+margin_right = 351.272
+margin_bottom = 324.252
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Simplex noise 2D"]
+margin_left = -12.8375
+margin_top = 65.4054
+margin_right = 77.1625
+margin_bottom = 113.405
+text = "Simplex noise
+ (2D, rotating
+    gradient)"
 __meta__ = {
 "_edit_use_anchors_": false
 }
