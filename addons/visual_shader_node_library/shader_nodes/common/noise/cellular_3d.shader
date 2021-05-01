@@ -7,18 +7,18 @@ shader_type spatial;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 mod289(vec3 x) {
+vec3 HELPER_mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec3 mod7(vec3 x) {
+vec3 HELPER_mod7(vec3 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 permute(vec3 x) {
-    return mod289((34.0 * x + 1.0) * x);
+vec3 HELPER_permute(vec3 x) {
+    return HELPER_mod289((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -36,64 +36,64 @@ vec2 cellular_noise_3d(vec3 P, float jitter) {
     float Kz = 0.166666666667; // 1/6
     float Kzo = 0.416666666667; // 1/2-1/6*2
     
-    vec3 Pi = mod289(floor(P));
+    vec3 Pi = HELPER_mod289(floor(P));
     vec3 Pf = fract(P) - 0.5;
     
     vec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);
     vec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);
     vec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);
     
-    vec3 p = permute(Pi.x + vec3(-1.0, 0.0, 1.0));
-    vec3 p1 = permute(p + Pi.y - 1.0);
-    vec3 p2 = permute(p + Pi.y);
-    vec3 p3 = permute(p + Pi.y + 1.0);
+    vec3 p = HELPER_permute(Pi.x + vec3(-1.0, 0.0, 1.0));
+    vec3 p1 = HELPER_permute(p + Pi.y - 1.0);
+    vec3 p2 = HELPER_permute(p + Pi.y);
+    vec3 p3 = HELPER_permute(p + Pi.y + 1.0);
     
-    vec3 p11 = permute(p1 + Pi.z - 1.0);
-    vec3 p12 = permute(p1 + Pi.z);
-    vec3 p13 = permute(p1 + Pi.z + 1.0);
+    vec3 p11 = HELPER_permute(p1 + Pi.z - 1.0);
+    vec3 p12 = HELPER_permute(p1 + Pi.z);
+    vec3 p13 = HELPER_permute(p1 + Pi.z + 1.0);
     
-    vec3 p21 = permute(p2 + Pi.z - 1.0);
-    vec3 p22 = permute(p2 + Pi.z);
-    vec3 p23 = permute(p2 + Pi.z + 1.0);
+    vec3 p21 = HELPER_permute(p2 + Pi.z - 1.0);
+    vec3 p22 = HELPER_permute(p2 + Pi.z);
+    vec3 p23 = HELPER_permute(p2 + Pi.z + 1.0);
     
-    vec3 p31 = permute(p3 + Pi.z - 1.0);
-    vec3 p32 = permute(p3 + Pi.z);
-    vec3 p33 = permute(p3 + Pi.z + 1.0);
+    vec3 p31 = HELPER_permute(p3 + Pi.z - 1.0);
+    vec3 p32 = HELPER_permute(p3 + Pi.z);
+    vec3 p33 = HELPER_permute(p3 + Pi.z + 1.0);
     
     vec3 ox11 = fract(p11*K) - Ko;
-    vec3 oy11 = mod7(floor(p11*K))*K - Ko;
+    vec3 oy11 = HELPER_mod7(floor(p11*K))*K - Ko;
     vec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed
     
     vec3 ox12 = fract(p12*K) - Ko;
-    vec3 oy12 = mod7(floor(p12*K))*K - Ko;
+    vec3 oy12 = HELPER_mod7(floor(p12*K))*K - Ko;
     vec3 oz12 = floor(p12*K2)*Kz - Kzo;
     
     vec3 ox13 = fract(p13*K) - Ko;
-    vec3 oy13 = mod7(floor(p13*K))*K - Ko;
+    vec3 oy13 = HELPER_mod7(floor(p13*K))*K - Ko;
     vec3 oz13 = floor(p13*K2)*Kz - Kzo;
     
     vec3 ox21 = fract(p21*K) - Ko;
-    vec3 oy21 = mod7(floor(p21*K))*K - Ko;
+    vec3 oy21 = HELPER_mod7(floor(p21*K))*K - Ko;
     vec3 oz21 = floor(p21*K2)*Kz - Kzo;
     
     vec3 ox22 = fract(p22*K) - Ko;
-    vec3 oy22 = mod7(floor(p22*K))*K - Ko;
+    vec3 oy22 = HELPER_mod7(floor(p22*K))*K - Ko;
     vec3 oz22 = floor(p22*K2)*Kz - Kzo;
     
     vec3 ox23 = fract(p23*K) - Ko;
-    vec3 oy23 = mod7(floor(p23*K))*K - Ko;
+    vec3 oy23 = HELPER_mod7(floor(p23*K))*K - Ko;
     vec3 oz23 = floor(p23*K2)*Kz - Kzo;
     
     vec3 ox31 = fract(p31*K) - Ko;
-    vec3 oy31 = mod7(floor(p31*K))*K - Ko;
+    vec3 oy31 = HELPER_mod7(floor(p31*K))*K - Ko;
     vec3 oz31 = floor(p31*K2)*Kz - Kzo;
     
     vec3 ox32 = fract(p32*K) - Ko;
-    vec3 oy32 = mod7(floor(p32*K))*K - Ko;
+    vec3 oy32 = HELPER_mod7(floor(p32*K))*K - Ko;
     vec3 oz32 = floor(p32*K2)*Kz - Kzo;
     
     vec3 ox33 = fract(p33*K) - Ko;
-    vec3 oy33 = mod7(floor(p33*K))*K - Ko;
+    vec3 oy33 = HELPER_mod7(floor(p33*K))*K - Ko;
     vec3 oz33 = floor(p33*K2)*Kz - Kzo;
     
     vec3 dx11 = Pfx + jitter*ox11;

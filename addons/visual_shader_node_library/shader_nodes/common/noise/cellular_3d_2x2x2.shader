@@ -7,26 +7,26 @@ shader_type spatial;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 mod289_3(vec3 x) {
+vec3 HELPER_mod289_3(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 mod289_4(vec4 x) {
+vec4 HELPER_mod289_4(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec4 mod7(vec4 x) {
+vec4 HELPER_mod7(vec4 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 permute_3(vec3 x) {
-    return mod289_3((34.0 * x + 1.0) * x);
+vec3 HELPER_permute_3(vec3 x) {
+    return HELPER_mod289_3((34.0 * x + 1.0) * x);
 }
 
-vec4 permute_4(vec4 x) {
-    return mod289_4((34.0 * x + 1.0) * x);
+vec4 HELPER_permute_4(vec4 x) {
+    return HELPER_mod289_4((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -41,19 +41,19 @@ vec2 cellular_noise_3d_2x2x2(vec3 P, float jitter) {
     float Kz = 0.166666666667; // 1/6
     float Kzo = 0.416666666667; // 1/2-1/6*2
 
-    vec3 Pi = mod289_3(floor(P));
+    vec3 Pi = HELPER_mod289_3(floor(P));
     vec3 Pf = fract(P);
     vec4 Pfx = Pf.x + vec4(0.0, -1.0, 0.0, -1.0);
     vec4 Pfy = Pf.y + vec4(0.0, 0.0, -1.0, -1.0);
-    vec4 p = permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
-    p = permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
-    vec4 p1 = permute_4(p + Pi.z); // z+0
-    vec4 p2 = permute_4(p + Pi.z + vec4(1.0)); // z+1
+    vec4 p = HELPER_permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
+    p = HELPER_permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
+    vec4 p1 = HELPER_permute_4(p + Pi.z); // z+0
+    vec4 p2 = HELPER_permute_4(p + Pi.z + vec4(1.0)); // z+1
     vec4 ox1 = fract(p1*K) - Ko;
-    vec4 oy1 = mod7(floor(p1*K))*K - Ko;
+    vec4 oy1 = HELPER_mod7(floor(p1*K))*K - Ko;
     vec4 oz1 = floor(p1*K2)*Kz - Kzo; // p1 < 289 guaranteed
     vec4 ox2 = fract(p2*K) - Ko;
-    vec4 oy2 = mod7(floor(p2*K))*K - Ko;
+    vec4 oy2 = HELPER_mod7(floor(p2*K))*K - Ko;
     vec4 oz2 = floor(p2*K2)*Kz - Kzo;
     vec4 dx1 = Pfx + jitter*ox1;
     vec4 dy1 = Pfy + jitter*oy1;

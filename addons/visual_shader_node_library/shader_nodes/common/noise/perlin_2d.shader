@@ -13,19 +13,19 @@ shader_type spatial;
 // https://github.com/stegu/webgl-noise
 //
 
-vec4 mod289(vec4 x) {
+vec4 HELPER_mod289(vec4 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 permute(vec4 x) {
-    return mod289(((x * 34.0) + 1.0) * x);
+vec4 HELPER_permute(vec4 x) {
+    return HELPER_mod289(((x * 34.0) + 1.0) * x);
 }
 
-vec4 taylorInvSqrt(vec4 r) {
+vec4 HELPER_taylorInvSqrt(vec4 r) {
     return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-vec2 fade(vec2 t) {
+vec2 HELPER_fade(vec2 t) {
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
@@ -33,13 +33,13 @@ vec2 fade(vec2 t) {
 float perlin_noise_2d_np(vec2 P) {
     vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = mod289(Pi); // To avoid truncation effects in permutation
+    Pi = HELPER_mod289(Pi); // To avoid truncation effects in permutation
     vec4 ix = Pi.xzxz;
     vec4 iy = Pi.yyww;
     vec4 fx = Pf.xzxz;
     vec4 fy = Pf.yyww;
 
-    vec4 i = permute(permute(ix) + iy);
+    vec4 i = HELPER_permute(HELPER_permute(ix) + iy);
 
     vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
     vec4 gy = abs(gx) - 0.5 ;
@@ -51,7 +51,7 @@ float perlin_noise_2d_np(vec2 P) {
     vec2 g01 = vec2(gx.z,gy.z);
     vec2 g11 = vec2(gx.w,gy.w);
     
-    vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    vec4 norm = HELPER_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
     g00 *= norm.x;
     g01 *= norm.y;
     g10 *= norm.z;
@@ -62,7 +62,7 @@ float perlin_noise_2d_np(vec2 P) {
     float n01 = dot(g01, vec2(fx.z, fy.z));
     float n11 = dot(g11, vec2(fx.w, fy.w));
     
-    vec2 fade_xy = fade(Pf.xy);
+    vec2 fade_xy = HELPER_fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 1.15 * n_xy + 0.5;
@@ -73,13 +73,13 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
     Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
-    Pi = mod289(Pi); // To avoid truncation effects in permutation
+    Pi = HELPER_mod289(Pi); // To avoid truncation effects in permutation
     vec4 ix = Pi.xzxz;
     vec4 iy = Pi.yyww;
     vec4 fx = Pf.xzxz;
     vec4 fy = Pf.yyww;
     
-    vec4 i = permute(permute(ix) + iy);
+    vec4 i = HELPER_permute(HELPER_permute(ix) + iy);
     
     vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
     vec4 gy = abs(gx) - 0.5 ;
@@ -91,7 +91,7 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     vec2 g01 = vec2(gx.z,gy.z);
     vec2 g11 = vec2(gx.w,gy.w);
     
-    vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+    vec4 norm = HELPER_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
     g00 *= norm.x;
     g01 *= norm.y;
     g10 *= norm.z;
@@ -102,7 +102,7 @@ float perlin_noise_2d_p(vec2 P, vec2 rep) {
     float n01 = dot(g01, vec2(fx.z, fy.z));
     float n11 = dot(g11, vec2(fx.w, fy.w));
     
-    vec2 fade_xy = fade(Pf.xy);
+    vec2 fade_xy = HELPER_fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 1.15 * n_xy + 0.5;

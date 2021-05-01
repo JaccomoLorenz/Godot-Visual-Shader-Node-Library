@@ -7,22 +7,22 @@ shader_type spatial;
 // https://github.com/stegu/webgl-noise
 
 // Modulo 289 without a division (only multiplications)
-vec3 mod289_3(vec3 x) {
+vec3 HELPER_mod289_3(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec2 mod289_2(vec2 x) {
+vec2 HELPER_mod289_2(vec2 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
 // Modulo 7 without a division
-vec3 mod7(vec3 x) {
+vec3 HELPER_mod7(vec3 x) {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + x) mod 289
-vec3 permute(vec3 x) {
-    return mod289_3((34.0 * x + 1.0) * x);
+vec3 HELPER_permute(vec3 x) {
+    return HELPER_mod289_3((34.0 * x + 1.0) * x);
 }
 
 // Cellular noise, returning F1 and F2 in a vec2.
@@ -31,26 +31,26 @@ vec2 cellular_noise_2d(vec2 P, float jitter) {
     float K = 0.142857142857; // 1/7
     float Ko = 0.428571428571; // 3/7
 
-    vec2 Pi = mod289_2(floor(P));
+    vec2 Pi = HELPER_mod289_2(floor(P));
     vec2 Pf = fract(P);
     vec3 oi = vec3(-1.0, 0.0, 1.0);
     vec3 of = vec3(-0.5, 0.5, 1.5);
-    vec3 px = permute(Pi.x + oi);
-    vec3 p = permute(px.x + Pi.y + oi); // p11, p12, p13
+    vec3 px = HELPER_permute(Pi.x + oi);
+    vec3 p = HELPER_permute(px.x + Pi.y + oi); // p11, p12, p13
     vec3 ox = fract(p*K) - Ko;
-    vec3 oy = mod7(floor(p*K))*K - Ko;
+    vec3 oy = HELPER_mod7(floor(p*K))*K - Ko;
     vec3 dx = Pf.x + 0.5 + jitter*ox;
     vec3 dy = Pf.y - of + jitter*oy;
     vec3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
-    p = permute(px.y + Pi.y + oi); // p21, p22, p23
+    p = HELPER_permute(px.y + Pi.y + oi); // p21, p22, p23
     ox = fract(p*K) - Ko;
-    oy = mod7(floor(p*K))*K - Ko;
+    oy = HELPER_mod7(floor(p*K))*K - Ko;
     dx = Pf.x - 0.5 + jitter*ox;
     dy = Pf.y - of + jitter*oy;
     vec3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
-    p = permute(px.z + Pi.y + oi); // p31, p32, p33
+    p = HELPER_permute(px.z + Pi.y + oi); // p31, p32, p33
     ox = fract(p*K) - Ko;
-    oy = mod7(floor(p*K))*K - Ko;
+    oy = HELPER_mod7(floor(p*K))*K - Ko;
     dx = Pf.x - 1.5 + jitter*ox;
     dy = Pf.y - of + jitter*oy;
     vec3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared

@@ -68,6 +68,7 @@ func _get_output_port_type(port):
 func _get_global_code(mode):
 	var code = preload("cellular_2d_2x2.shader").code
 	code = code.replace("shader_type spatial;", "")
+	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code
 
 func _get_code(input_vars, output_vars, mode, type):

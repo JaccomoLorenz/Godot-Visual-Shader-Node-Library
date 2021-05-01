@@ -56,6 +56,7 @@ func _get_output_port_type(port):
 func _get_global_code(mode):
 	var code = preload("perlin_4d.shader").code
 	code = code.replace("shader_type spatial;", "")
+	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code
 
 func get_input_vector_code(xyz_var, w_var, default):
