@@ -125,6 +125,21 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSDFIntersectRound",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRoundIntersect.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSDFMergeRound",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRoundMerge.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSDFPatternBrick",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFBrickPattern.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeScreenSpaceRefraction",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd"
@@ -133,6 +148,11 @@ _global_script_classes=[ {
 "class": "VisualShaderNodeSimplexNoise2DWithRotatingGradient",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_2d_rg.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeStepMixS",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/step_mix_s.gd"
 } ]
 _global_script_class_icons={
 "VisualShaderNodeCellularNoise2D": "",
@@ -158,8 +178,12 @@ _global_script_class_icons={
 "VisualShaderNodeRefraction": "",
 "VisualShaderNodeRotation2D": "",
 "VisualShaderNodeRotation3D": "",
+"VisualShaderNodeSDFIntersectRound": "",
+"VisualShaderNodeSDFMergeRound": "",
+"VisualShaderNodeSDFPatternBrick": "",
 "VisualShaderNodeScreenSpaceRefraction": "",
-"VisualShaderNodeSimplexNoise2DWithRotatingGradient": ""
+"VisualShaderNodeSimplexNoise2DWithRotatingGradient": "",
+"VisualShaderNodeStepMixS": ""
 }
 
 [application]
