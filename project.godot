@@ -75,6 +75,11 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/flowmap_add_uv.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeFromPolar2D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/from_polar_2d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeObjectWorldPosition",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/object_world_position.gd"
@@ -125,6 +130,11 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSDFIntersectChampfer",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFChampferIntersect.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeSDFIntersectRound",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRoundIntersect.gd"
@@ -140,6 +150,11 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFBrickPattern.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSDFPatternTiles",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFTilesPattern.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeScreenSpaceRefraction",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd"
@@ -153,6 +168,11 @@ _global_script_classes=[ {
 "class": "VisualShaderNodeStepMixS",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/step_mix_s.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeToPolar2D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/to_polar_2d.gd"
 } ]
 _global_script_class_icons={
 "VisualShaderNodeCellularNoise2D": "",
@@ -168,6 +188,7 @@ _global_script_class_icons={
 "VisualShaderNodeEmissionMultiply": "",
 "VisualShaderNodeFlowMap": "",
 "VisualShaderNodeFlowMapAddUV": "",
+"VisualShaderNodeFromPolar2D": "",
 "VisualShaderNodeObjectWorldPosition": "",
 "VisualShaderNodePerlinNoise2D": "",
 "VisualShaderNodePerlinNoise3D": "",
@@ -178,12 +199,15 @@ _global_script_class_icons={
 "VisualShaderNodeRefraction": "",
 "VisualShaderNodeRotation2D": "",
 "VisualShaderNodeRotation3D": "",
+"VisualShaderNodeSDFIntersectChampfer": "",
 "VisualShaderNodeSDFIntersectRound": "",
 "VisualShaderNodeSDFMergeRound": "",
 "VisualShaderNodeSDFPatternBrick": "",
+"VisualShaderNodeSDFPatternTiles": "",
 "VisualShaderNodeScreenSpaceRefraction": "",
 "VisualShaderNodeSimplexNoise2DWithRotatingGradient": "",
-"VisualShaderNodeStepMixS": ""
+"VisualShaderNodeStepMixS": "",
+"VisualShaderNodeToPolar2D": ""
 }
 
 [application]
