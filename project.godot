@@ -133,6 +133,16 @@ _global_script_classes=[ {
 "class": "VisualShaderNodeSimplexNoise2DWithRotatingGradient",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_2d_rg.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSimplexNoise3D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_3d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSimplexNoise4D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_4d.gd"
 } ]
 _global_script_class_icons={
 "VisualShaderNodeCellularNoise2D": "",
@@ -159,7 +169,9 @@ _global_script_class_icons={
 "VisualShaderNodeRotation2D": "",
 "VisualShaderNodeRotation3D": "",
 "VisualShaderNodeScreenSpaceRefraction": "",
-"VisualShaderNodeSimplexNoise2DWithRotatingGradient": ""
+"VisualShaderNodeSimplexNoise2DWithRotatingGradient": "",
+"VisualShaderNodeSimplexNoise3D": "",
+"VisualShaderNodeSimplexNoise4D": ""
 }
 
 [application]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=143 format=2]
+[gd_scene load_steps=169 format=2]
 
 [ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
@@ -12,6 +12,8 @@
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d.gd" type="Script" id=10]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d_2x2x2.gd" type="Script" id=11]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_2d_rg.gd" type="Script" id=12]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_3d.gd" type="Script" id=13]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_4d.gd" type="Script" id=14]
 
 [sub_resource type="VisualShaderNodeCustom" id=1]
 script = ExtResource( 3 )
@@ -3328,13 +3330,13 @@ nodes/fragment/connections = PoolIntArray( 7, 0, 4, 2, 4, 0, 0, 0, 12, 0, 13, 1,
 [sub_resource type="ShaderMaterial" id=117]
 shader = SubResource( 116 )
 
-[sub_resource type="VisualShaderNodeVectorInterp" id=125]
+[sub_resource type="VisualShaderNodeVectorInterp" id=118]
 
-[sub_resource type="VisualShaderNodeScalarOp" id=126]
+[sub_resource type="VisualShaderNodeScalarOp" id=119]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 9
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=127]
+[sub_resource type="VisualShaderNodeVectorDecompose" id=120]
 
 [sub_resource type="VisualShaderNodeCustom" id=121]
 script = ExtResource( 12 )
@@ -3348,21 +3350,21 @@ constant = 20.0
 [sub_resource type="VisualShaderNodeInput" id=124]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeScalarOp" id=128]
+[sub_resource type="VisualShaderNodeScalarOp" id=125]
 default_input_values = [ 0, 0.0, 1, 1.0 ]
 
-[sub_resource type="VisualShaderNodeScalarOp" id=129]
+[sub_resource type="VisualShaderNodeScalarOp" id=126]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeVectorOp" id=130]
+[sub_resource type="VisualShaderNodeVectorOp" id=127]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ) ]
 
-[sub_resource type="VisualShaderNodeVectorOp" id=131]
+[sub_resource type="VisualShaderNodeVectorOp" id=128]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0.5 ) ]
 operator = 2
 
-[sub_resource type="VisualShader" id=119]
+[sub_resource type="VisualShader" id=129]
 code = "shader_type canvas_item;
 
 
@@ -3801,7 +3803,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -434, 31.5 )
+graph_offset = Vector2( -447, -51 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 840, 180 )
@@ -3813,24 +3815,500 @@ nodes/fragment/4/node = SubResource( 123 )
 nodes/fragment/4/position = Vector2( -280, 300 )
 nodes/fragment/5/node = SubResource( 124 )
 nodes/fragment/5/position = Vector2( -280, 400 )
-nodes/fragment/6/node = SubResource( 128 )
+nodes/fragment/6/node = SubResource( 125 )
 nodes/fragment/6/position = Vector2( 237, 42.5 )
-nodes/fragment/7/node = SubResource( 129 )
+nodes/fragment/7/node = SubResource( 126 )
 nodes/fragment/7/position = Vector2( 400, 40 )
-nodes/fragment/8/node = SubResource( 130 )
+nodes/fragment/8/node = SubResource( 127 )
 nodes/fragment/8/position = Vector2( 240, 200 )
-nodes/fragment/9/node = SubResource( 131 )
+nodes/fragment/9/node = SubResource( 128 )
 nodes/fragment/9/position = Vector2( 408, 261.5 )
-nodes/fragment/10/node = SubResource( 125 )
+nodes/fragment/10/node = SubResource( 118 )
 nodes/fragment/10/position = Vector2( 620, 100 )
-nodes/fragment/11/node = SubResource( 126 )
+nodes/fragment/11/node = SubResource( 119 )
 nodes/fragment/11/position = Vector2( 400, -100 )
-nodes/fragment/12/node = SubResource( 127 )
+nodes/fragment/12/node = SubResource( 120 )
 nodes/fragment/12/position = Vector2( -40, 0 )
 nodes/fragment/connections = PoolIntArray( 3, 0, 2, 0, 4, 0, 2, 2, 2, 0, 6, 0, 6, 0, 7, 0, 2, 1, 8, 0, 8, 0, 9, 0, 7, 0, 10, 1, 9, 0, 10, 0, 10, 0, 0, 0, 11, 0, 10, 2, 12, 0, 11, 0, 3, 0, 12, 0, 5, 0, 2, 3 )
 
-[sub_resource type="ShaderMaterial" id=120]
-shader = SubResource( 119 )
+[sub_resource type="ShaderMaterial" id=130]
+shader = SubResource( 129 )
+
+[sub_resource type="VisualShaderNodeVectorOp" id=135]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ) ]
+
+[sub_resource type="VisualShaderNodeVectorOp" id=136]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0.5 ) ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=137]
+
+[sub_resource type="VisualShaderNodeScalarOp" id=138]
+default_input_values = [ 0, 0.5, 1, 0.5 ]
+operator = 9
+
+[sub_resource type="VisualShaderNodeInput" id=132]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeCustom" id=139]
+script = ExtResource( 13 )
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=140]
+constant = 15.0
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=141]
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=142]
+
+[sub_resource type="VisualShaderNodeInput" id=143]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeScalarOp" id=144]
+default_input_values = [ 0, 0.0, 1, 0.1 ]
+operator = 2
+
+[sub_resource type="VisualShader" id=133]
+code = "shader_type canvas_item;
+
+
+// SimplexNoise3D
+
+
+// Description : Array and textureless GLSL 2D/3D/4D simplex 
+//               noise functions.
+//      Author : Ian McEwan, Ashima Arts.
+//  Maintainer : stegu
+//     Lastmod : 20110822 (ijm)
+//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+//               Distributed under the MIT License. See LICENSE file.
+//               https://github.com/ashima/webgl-noise
+//               https://github.com/stegu/webgl-noise
+// 
+
+vec3 HELPER_SimplexNoise3D_mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 HELPER_SimplexNoise3D_mod289_4(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 HELPER_SimplexNoise3D_permute(vec4 x) {
+    return HELPER_SimplexNoise3D_mod289_4(((x*34.0)+1.0)*x);
+}
+
+vec4 HELPER_SimplexNoise3D_taylorInvSqrt(vec4 r) {
+    return 2.79284291400159 - 0.85373472095314 * r;
+}
+
+float simplex_noise_3d(vec3 v, out vec3 gradient) {
+    vec2 C = vec2(1.0/6.0, 1.0/3.0) ;
+    vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+    
+    // First corner
+    vec3 i  = floor(v + dot(v, vec3(C.y)) );
+    vec3 x0 =   v - i + dot(i, vec3(C.x)) ;
+    
+    // Other corners
+    vec3 g = step(x0.yzx, x0.xyz);
+    vec3 l = 1.0 - g;
+    vec3 i1 = min( g.xyz, l.zxy );
+    vec3 i2 = max( g.xyz, l.zxy );
+    
+    //   x0 = x0 - 0.0 + 0.0 * C.xxx;
+    //   x1 = x0 - i1  + 1.0 * C.xxx;
+    //   x2 = x0 - i2  + 2.0 * C.xxx;
+    //   x3 = x0 - 1.0 + 3.0 * C.xxx;
+    vec3 x1 = x0 - i1 + vec3(C.x);
+    vec3 x2 = x0 - i2 + vec3(C.y); // 2.0*C.x = 1/3 = C.y
+    vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+    
+    // Permutations
+    i = HELPER_SimplexNoise3D_mod289_3(i); 
+    vec4 p = HELPER_SimplexNoise3D_permute( HELPER_SimplexNoise3D_permute( HELPER_SimplexNoise3D_permute( 
+    		 i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+    	   + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+    	   + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+    
+    // Gradients: 7x7 points over a square, mapped onto an octahedron.
+    // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
+    float n_ = 0.142857142857; // 1.0/7.0
+    vec3  ns = n_ * D.wyz - D.xzx;
+    
+    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)
+    
+    vec4 x_ = floor(j * ns.z);
+    vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
+    
+    vec4 x = x_ *ns.x + vec4(ns.y);
+    vec4 y = y_ *ns.x + vec4(ns.y);
+    vec4 h = 1.0 - abs(x) - abs(y);
+    
+    vec4 b0 = vec4( x.xy, y.xy );
+    vec4 b1 = vec4( x.zw, y.zw );
+    
+    //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;
+    //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;
+    vec4 s0 = floor(b0)*2.0 + 1.0;
+    vec4 s1 = floor(b1)*2.0 + 1.0;
+    vec4 sh = -step(h, vec4(0.0));
+    
+    vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy ;
+    vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww ;
+    
+    vec3 p0 = vec3(a0.xy,h.x);
+    vec3 p1 = vec3(a0.zw,h.y);
+    vec3 p2 = vec3(a1.xy,h.z);
+    vec3 p3 = vec3(a1.zw,h.w);
+    
+    //Normalise gradients
+    vec4 norm = HELPER_SimplexNoise3D_taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    
+    // Mix final noise value
+    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), vec4(0.0));
+    vec4 m2 = m * m;
+    vec4 m4 = m2 * m2;
+    vec4 pdotx = vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3));
+    
+    // Determine noise gradient
+    vec4 temp = m2 * m * pdotx;
+    gradient = -8.0 * (temp.x * x0 + temp.y * x1 + temp.z * x2 + temp.w * x3);
+    gradient += m4.x * p0 + m4.y * p1 + m4.z * p2 + m4.w * p3;
+    gradient *= 42.0;
+    
+    return 22.0 * dot(m4, pdotx);
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// VectorDecompose:6
+	float n_out6p0 = n_out3p0.x;
+	float n_out6p1 = n_out3p0.y;
+	float n_out6p2 = n_out3p0.z;
+
+// Input:8
+	float n_out8p0 = TIME;
+
+// ScalarOp:9
+	float n_in9p1 = 0.10000;
+	float n_out9p0 = n_out8p0 * n_in9p1;
+
+// VectorCompose:7
+	vec3 n_out7p0 = vec3(n_out6p0, n_out6p1, n_out9p0);
+
+// Scalar:5
+	float n_out5p0 = 15.000001;
+
+// SimplexNoise3D:4
+	float n_out4p0;
+	vec3 n_out4p1;
+	{
+		
+				n_out4p0 = simplex_noise_3d(n_out7p0 * vec3(n_out5p0), n_out4p1);
+			
+	}
+
+// ScalarOp:13
+	float n_in13p0 = 0.50000;
+	float n_out13p0 = step(n_in13p0, n_out6p0);
+
+// VectorScalarMix:12
+	vec3 n_out12p0 = mix(vec3(n_out4p0), n_out4p1, n_out13p0);
+
+// VectorOp:10
+	vec3 n_in10p1 = vec3(1.00000, 1.00000, 1.00000);
+	vec3 n_out10p0 = n_out12p0 + n_in10p1;
+
+// VectorOp:11
+	vec3 n_in11p1 = vec3(0.50000, 0.50000, 0.50000);
+	vec3 n_out11p0 = n_out10p0 * n_in11p1;
+
+// Output:0
+	COLOR.rgb = n_out11p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -438, 36 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 900, 100 )
+nodes/fragment/3/node = SubResource( 132 )
+nodes/fragment/3/position = Vector2( -640, 120 )
+nodes/fragment/4/node = SubResource( 139 )
+nodes/fragment/4/position = Vector2( 20, 120 )
+nodes/fragment/5/node = SubResource( 140 )
+nodes/fragment/5/position = Vector2( -232, 234 )
+nodes/fragment/6/node = SubResource( 141 )
+nodes/fragment/6/position = Vector2( -480, 80 )
+nodes/fragment/7/node = SubResource( 142 )
+nodes/fragment/7/position = Vector2( -200, 80 )
+nodes/fragment/8/node = SubResource( 143 )
+nodes/fragment/8/position = Vector2( -660, 200 )
+nodes/fragment/9/node = SubResource( 144 )
+nodes/fragment/9/position = Vector2( -480, 200 )
+nodes/fragment/10/node = SubResource( 135 )
+nodes/fragment/10/position = Vector2( 460, 100 )
+nodes/fragment/11/node = SubResource( 136 )
+nodes/fragment/11/position = Vector2( 660, 100 )
+nodes/fragment/12/node = SubResource( 137 )
+nodes/fragment/12/position = Vector2( 260, 140 )
+nodes/fragment/13/node = SubResource( 138 )
+nodes/fragment/13/position = Vector2( 20, -40 )
+nodes/fragment/connections = PoolIntArray( 5, 0, 4, 1, 3, 0, 6, 0, 6, 0, 7, 0, 6, 1, 7, 1, 7, 0, 4, 0, 8, 0, 9, 0, 9, 0, 7, 2, 10, 0, 11, 0, 11, 0, 0, 0, 4, 0, 12, 0, 4, 1, 12, 1, 12, 0, 10, 0, 13, 0, 12, 2, 6, 0, 13, 1 )
+
+[sub_resource type="ShaderMaterial" id=134]
+shader = SubResource( 133 )
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=147]
+constant = 10.0
+
+[sub_resource type="VisualShaderNodeCustom" id=148]
+script = ExtResource( 14 )
+
+[sub_resource type="VisualShaderNodeScalarOp" id=149]
+default_input_values = [ 0, 0.0, 1, 1.0 ]
+
+[sub_resource type="VisualShaderNodeScalarOp" id=150]
+default_input_values = [ 0, 0.0, 1, 0.5 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeInput" id=151]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeInput" id=152]
+input_name = "screen_uv"
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=153]
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id=154]
+
+[sub_resource type="VisualShaderNodeVectorCompose" id=155]
+
+[sub_resource type="VisualShader" id=145]
+code = "shader_type canvas_item;
+
+
+// SimplexNoise4D
+
+
+// Description : Array and textureless GLSL 2D/3D/4D simplex 
+//               noise functions.
+//      Author : Ian McEwan, Ashima Arts.
+//  Maintainer : stegu
+//     Lastmod : 20110822 (ijm)
+//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+//               Distributed under the MIT License. See LICENSE file.
+//               https://github.com/ashima/webgl-noise
+//               https://github.com/stegu/webgl-noise
+// 
+
+vec4 HELPER_SimplexNoise4D_mod289_4(vec4 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+float HELPER_SimplexNoise4D_mod289(float x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 HELPER_SimplexNoise4D_permute_4(vec4 x) {
+    return HELPER_SimplexNoise4D_mod289_4(((x * 34.0) + 1.0) * x);
+}
+
+float HELPER_SimplexNoise4D_permute(float x) {
+    return HELPER_SimplexNoise4D_mod289(((x * 34.0) + 1.0) * x);
+}
+
+vec4 HELPER_SimplexNoise4D_taylorInvSqrt_4(vec4 r) {
+    return 2.79284291400159 - 1.85373472095314 * r;
+}
+
+float HELPER_SimplexNoise4D_taylorInvSqrt(float r) {
+    return 2.79284291400159 - 1.85373472095314 * r;
+}
+
+vec4 HELPER_SimplexNoise4D_grad4(float j, vec4 ip) {
+    vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);
+    vec4 p, s;
+
+    p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;
+    p.w = 1.5 - dot(abs(p.xyz), ones.xyz);
+    s = vec4(lessThan(p, vec4(0.0)));
+    p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www; 
+
+    return p;
+}
+
+float simplex_noise_4d(vec4 v) {
+    vec4 C = vec4( 0.138196601125011,  // (5 - sqrt(5))/20  G4
+                    0.276393202250021,  // 2 * G4
+                    0.414589803375032,  // 3 * G4
+                   -0.447213595499958); // -1 + 4 * G4
+    
+    // First corner
+    vec4 i  = floor(v + dot(v, vec4(0.309016994374947451)) ); //// (sqrt(5) - 1)/4
+    vec4 x0 = v -   i + dot(i, C.xxxx);
+    
+    // Other corners
+    
+    // Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)
+    vec4 i0;
+    vec3 isX = step( x0.yzw, x0.xxx );
+    vec3 isYZ = step( x0.zww, x0.yyz );
+    //  i0.x = dot( isX, vec3( 1.0 ) );
+    i0.x = isX.x + isX.y + isX.z;
+    i0.yzw = 1.0 - isX;
+    //  i0.y += dot( isYZ.xy, vec2( 1.0 ) );
+    i0.y += isYZ.x + isYZ.y;
+    i0.zw += 1.0 - isYZ.xy;
+    i0.z += isYZ.z;
+    i0.w += 1.0 - isYZ.z;
+    
+    // i0 now contains the unique values 0,1,2,3 in each channel
+    vec4 i3 = clamp( i0, 0.0, 1.0 );
+    vec4 i2 = clamp( i0-1.0, 0.0, 1.0 );
+    vec4 i1 = clamp( i0-2.0, 0.0, 1.0 );
+    
+    //  x0 = x0 - 0.0 + 0.0 * C.xxxx
+    //  x1 = x0 - i1  + 1.0 * C.xxxx
+    //  x2 = x0 - i2  + 2.0 * C.xxxx
+    //  x3 = x0 - i3  + 3.0 * C.xxxx
+    //  x4 = x0 - 1.0 + 4.0 * C.xxxx
+    vec4 x1 = x0 - i1 + C.xxxx;
+    vec4 x2 = x0 - i2 + C.yyyy;
+    vec4 x3 = x0 - i3 + C.zzzz;
+    vec4 x4 = x0 + C.wwww;
+    
+    // Permutations
+    i = HELPER_SimplexNoise4D_mod289_4(i);
+    float j0 = HELPER_SimplexNoise4D_permute( HELPER_SimplexNoise4D_permute( HELPER_SimplexNoise4D_permute( HELPER_SimplexNoise4D_permute(i.w) + i.z) + i.y) + i.x);
+    vec4 j1 = HELPER_SimplexNoise4D_permute_4( HELPER_SimplexNoise4D_permute_4( HELPER_SimplexNoise4D_permute_4( HELPER_SimplexNoise4D_permute_4 (
+                i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))
+                + i.z + vec4(i1.z, i2.z, i3.z, 1.0 ))
+                + i.y + vec4(i1.y, i2.y, i3.y, 1.0 ))
+                + i.x + vec4(i1.x, i2.x, i3.x, 1.0 ));
+    
+    // Gradients: 7x7x6 points over a cube, mapped onto a 4-cross polytope
+    // 7*7*6 = 294, which is close to the ring size 17*17 = 289.
+    vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;
+    
+    vec4 p0 = HELPER_SimplexNoise4D_grad4(j0,   ip);
+    vec4 p1 = HELPER_SimplexNoise4D_grad4(j1.x, ip);
+    vec4 p2 = HELPER_SimplexNoise4D_grad4(j1.y, ip);
+    vec4 p3 = HELPER_SimplexNoise4D_grad4(j1.z, ip);
+    vec4 p4 = HELPER_SimplexNoise4D_grad4(j1.w, ip);
+    
+    // Normalise gradients
+    vec4 norm = HELPER_SimplexNoise4D_taylorInvSqrt_4(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    p4 *= HELPER_SimplexNoise4D_taylorInvSqrt(dot(p4,p4));
+    
+    // Mix contributions from the five corners
+    vec3 m0 = max(0.6 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), vec3(0.0));
+    vec2 m1 = max(0.6 - vec2(dot(x3,x3), dot(x4,x4)), vec2(0.0));
+    m0 = m0 * m0;
+    m1 = m1 * m1;
+    return 33.0 * (dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))
+                + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) ) ;
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:5
+	vec3 n_out5p0 = vec3(UV, 0.0);
+
+// VectorDecompose:7
+	float n_out7p0 = n_out5p0.x;
+	float n_out7p1 = n_out5p0.y;
+	float n_out7p2 = n_out5p0.z;
+
+// Input:6
+	vec3 n_out6p0 = vec3(SCREEN_UV, 0.0);
+
+// VectorDecompose:8
+	float n_out8p0 = n_out6p0.x;
+	float n_out8p1 = n_out6p0.y;
+	float n_out8p2 = n_out6p0.z;
+
+// VectorCompose:9
+	vec3 n_out9p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
+
+// Scalar:10
+	float n_out10p0 = 10.000000;
+
+// SimplexNoise4D:2
+	float n_out2p0;
+	{
+		n_out2p0 = simplex_noise_4d(vec4(n_out9p0, n_out8p1) * vec4(vec3(n_out10p0), n_out10p0));
+	}
+
+// ScalarOp:3
+	float n_in3p1 = 1.00000;
+	float n_out3p0 = n_out2p0 + n_in3p1;
+
+// ScalarOp:4
+	float n_in4p1 = 0.50000;
+	float n_out4p0 = n_out3p0 * n_in4p1;
+
+// Output:0
+	COLOR.rgb = vec3(n_out4p0);
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -923, 135 )
+mode = 1
+flags/light_only = false
+nodes/fragment/2/node = SubResource( 148 )
+nodes/fragment/2/position = Vector2( -180, 140 )
+nodes/fragment/3/node = SubResource( 149 )
+nodes/fragment/3/position = Vector2( 40, 140 )
+nodes/fragment/4/node = SubResource( 150 )
+nodes/fragment/4/position = Vector2( 220, 140 )
+nodes/fragment/5/node = SubResource( 151 )
+nodes/fragment/5/position = Vector2( -900, 80 )
+nodes/fragment/6/node = SubResource( 152 )
+nodes/fragment/6/position = Vector2( -940, 200 )
+nodes/fragment/7/node = SubResource( 153 )
+nodes/fragment/7/position = Vector2( -700, 40 )
+nodes/fragment/8/node = SubResource( 154 )
+nodes/fragment/8/position = Vector2( -700, 180 )
+nodes/fragment/9/node = SubResource( 155 )
+nodes/fragment/9/position = Vector2( -420, 40 )
+nodes/fragment/10/node = SubResource( 147 )
+nodes/fragment/10/position = Vector2( -431, 329 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 3, 0, 3, 0, 4, 0, 4, 0, 0, 0, 9, 0, 2, 0, 7, 0, 9, 0, 7, 1, 9, 1, 8, 0, 9, 2, 8, 1, 2, 1, 5, 0, 7, 0, 6, 0, 8, 0, 10, 0, 2, 3, 10, 0, 2, 2 )
+
+[sub_resource type="ShaderMaterial" id=146]
+shader = SubResource( 145 )
 
 [node name="Node2D" type="Node2D"]
 
@@ -4114,7 +4592,7 @@ __meta__ = {
 }
 
 [node name="Simplex noise 2D" type="ColorRect" parent="."]
-material = SubResource( 120 )
+material = SubResource( 130 )
 margin_left = 290.272
 margin_top = 263.252
 margin_right = 351.272
@@ -4131,6 +4609,48 @@ margin_bottom = 113.405
 text = "Simplex noise
  (2D, rotating
     gradient)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Simplex noise 3D" type="ColorRect" parent="."]
+material = SubResource( 134 )
+margin_left = 419.847
+margin_top = 263.334
+margin_right = 480.847
+margin_bottom = 324.334
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Simplex noise 3D"]
+margin_left = -12.8375
+margin_top = 65.4054
+margin_right = 77.1625
+margin_bottom = 113.405
+text = "Simplex noise
+        (3D)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Simplex noise 4D" type="ColorRect" parent="."]
+material = SubResource( 146 )
+margin_left = 551.736
+margin_top = 264.456
+margin_right = 612.736
+margin_bottom = 325.456
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Simplex noise 4D"]
+margin_left = -12.8375
+margin_top = 65.4054
+margin_right = 77.1625
+margin_bottom = 113.405
+text = "Simplex noise
+        (4D)"
 __meta__ = {
 "_edit_use_anchors_": false
 }
