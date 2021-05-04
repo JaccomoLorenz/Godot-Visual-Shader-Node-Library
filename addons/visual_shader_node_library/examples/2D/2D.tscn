@@ -1,4 +1,4 @@
-[gd_scene load_steps=169 format=2]
+[gd_scene load_steps=152 format=2]
 
 [ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
@@ -202,10 +202,8 @@ shader = SubResource( 11 )
 [sub_resource type="VisualShaderNodeInput" id=13]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=14]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeCustom" id=15]
+[sub_resource type="VisualShaderNodeCustom" id=165]
+default_input_values = [ 2, Vector3( 10, 10, 1 ) ]
 script = ExtResource( 6 )
 
 [sub_resource type="VisualShader" id=16]
@@ -333,13 +331,11 @@ void fragment() {
 // Input:3
 	vec3 n_out3p0 = vec3(UV, 0.0);
 
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
 // PerlinNoise2D:6
+	vec3 n_in6p2 = vec3(10.00000, 10.00000, 1.00000);
 	float n_out6p0;
 	{
-		n_out6p0 = perlin_noise_2d_np(((n_out3p0).xy).xy * (vec3(n_out5p0)).xy.xy);
+		n_out6p0 = perlin_noise_2d_np(((n_out3p0).xy).xy * (n_in6p2).xy.xy);
 	}
 
 // Output:0
@@ -352,31 +348,27 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -477.933, 7 )
+graph_offset = Vector2( -462.74, 48.78 )
 mode = 1
 flags/light_only = false
 nodes/fragment/3/node = SubResource( 13 )
-nodes/fragment/3/position = Vector2( -120, 140 )
-nodes/fragment/5/node = SubResource( 14 )
-nodes/fragment/5/position = Vector2( -120, 300 )
-nodes/fragment/6/node = SubResource( 15 )
-nodes/fragment/6/position = Vector2( 140, 140 )
-nodes/fragment/connections = PoolIntArray( 6, 0, 0, 0, 3, 0, 6, 0, 5, 0, 6, 2 )
+nodes/fragment/3/position = Vector2( -40, 160 )
+nodes/fragment/6/node = SubResource( 165 )
+nodes/fragment/6/position = Vector2( 180, 160 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 6, 0, 6, 0, 0, 0 )
 
 [sub_resource type="ShaderMaterial" id=17]
 shader = SubResource( 16 )
 
-[sub_resource type="VisualShaderNodeCustom" id=18]
-script = ExtResource( 6 )
-
 [sub_resource type="VisualShaderNodeInput" id=19]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=20]
-constant = 10.0
-
 [sub_resource type="VisualShaderNodeVec3Constant" id=21]
 constant = Vector3( 5, 2, 0 )
+
+[sub_resource type="VisualShaderNodeCustom" id=169]
+default_input_values = [ 2, Vector3( 10, 10, 10 ) ]
+script = ExtResource( 6 )
 
 [sub_resource type="VisualShader" id=22]
 code = "shader_type canvas_item;
@@ -506,17 +498,15 @@ void fragment() {
 // Vector:5
 	vec3 n_out5p0 = vec3(5.000000, 2.000000, 0.000000);
 
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// PerlinNoise2D:2
-	float n_out2p0;
+// PerlinNoise2D:6
+	vec3 n_in6p2 = vec3(10.00000, 10.00000, 10.00000);
+	float n_out6p0;
 	{
-		n_out2p0 = perlin_noise_2d_p(((n_out3p0).xy).xy * (vec3(n_out4p0)).xy.xy, (n_out5p0).xy);
+		n_out6p0 = perlin_noise_2d_p(((n_out3p0).xy).xy * (n_in6p2).xy.xy, (n_out5p0).xy);
 	}
 
 // Output:0
-	COLOR.rgb = vec3(n_out2p0);
+	COLOR.rgb = vec3(n_out6p0);
 
 }
 
@@ -525,33 +515,27 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -477.933, 7 )
+graph_offset = Vector2( -644.74, -24.22 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 260, 120 )
-nodes/fragment/2/node = SubResource( 18 )
-nodes/fragment/2/position = Vector2( -20, 140 )
 nodes/fragment/3/node = SubResource( 19 )
-nodes/fragment/3/position = Vector2( -340, 80 )
-nodes/fragment/4/node = SubResource( 20 )
-nodes/fragment/4/position = Vector2( -380, 160 )
+nodes/fragment/3/position = Vector2( -140, 60 )
 nodes/fragment/5/node = SubResource( 21 )
-nodes/fragment/5/position = Vector2( -460, 240 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 2, 0, 4, 0, 2, 2, 5, 0, 2, 1 )
+nodes/fragment/5/position = Vector2( -320, 160 )
+nodes/fragment/6/node = SubResource( 169 )
+nodes/fragment/6/position = Vector2( 40, 120 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 6, 0, 5, 0, 6, 1, 6, 0, 0, 0 )
 
 [sub_resource type="ShaderMaterial" id=23]
 shader = SubResource( 22 )
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=24]
-constant = Vector3( 12, 12, 3 )
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=25]
-constant = Vector3( 5, 5, 1 )
-
-[sub_resource type="VisualShaderNodeCustom" id=26]
+[sub_resource type="VisualShaderNodeCustom" id=166]
+default_input_values = [ 2, Vector3( 5, 5, 1 ) ]
 script = ExtResource( 5 )
 
-[sub_resource type="VisualShaderNodeCustom" id=27]
+[sub_resource type="VisualShaderNodeCustom" id=167]
+default_input_values = [ 2, Vector3( 12, 12, 3 ) ]
 script = ExtResource( 5 )
 
 [sub_resource type="VisualShaderNodeVectorCompose" id=28]
@@ -764,22 +748,18 @@ void fragment() {
 // VectorCompose:6
 	vec3 n_out6p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
 
-// Vector:17
-	vec3 n_out17p0 = vec3(5.000000, 5.000000, 1.000000);
-
 // PerlinNoise3D:18
+	vec3 n_in18p2 = vec3(5.00000, 5.00000, 1.00000);
 	float n_out18p0;
 	{
-		n_out18p0 = perlin_noise_3d_np(n_out6p0 * n_out17p0);
+		n_out18p0 = perlin_noise_3d_np(n_out6p0 * n_in18p2);
 	}
 
-// Vector:16
-	vec3 n_out16p0 = vec3(12.000000, 12.000000, 3.000000);
-
 // PerlinNoise3D:19
+	vec3 n_in19p2 = vec3(12.00000, 12.00000, 3.00000);
 	float n_out19p0;
 	{
-		n_out19p0 = perlin_noise_3d_np(n_out6p0 * n_out16p0);
+		n_out19p0 = perlin_noise_3d_np(n_out6p0 * n_in19p2);
 	}
 
 // VectorCompose:3
@@ -796,7 +776,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -477.933, 7 )
+graph_offset = Vector2( -422.74, -78.22 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 580, 100 )
@@ -810,27 +790,17 @@ nodes/fragment/7/node = SubResource( 31 )
 nodes/fragment/7/position = Vector2( -380, 80 )
 nodes/fragment/8/node = SubResource( 32 )
 nodes/fragment/8/position = Vector2( -380, 220 )
-nodes/fragment/16/node = SubResource( 24 )
-nodes/fragment/16/position = Vector2( -300, 300 )
-nodes/fragment/17/node = SubResource( 25 )
-nodes/fragment/17/position = Vector2( -300, -60 )
-nodes/fragment/18/node = SubResource( 26 )
-nodes/fragment/18/position = Vector2( 140, 40 )
-nodes/fragment/19/node = SubResource( 27 )
-nodes/fragment/19/position = Vector2( 140, 180 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 0, 0, 7, 0, 6, 0, 7, 1, 6, 1, 8, 0, 6, 2, 4, 0, 7, 0, 18, 0, 3, 0, 6, 0, 18, 0, 17, 0, 18, 2, 19, 0, 3, 2, 16, 0, 19, 2, 6, 0, 19, 0 )
+nodes/fragment/18/node = SubResource( 166 )
+nodes/fragment/18/position = Vector2( 142.26, 51.78 )
+nodes/fragment/19/node = SubResource( 167 )
+nodes/fragment/19/position = Vector2( 140, 200 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 0, 0, 7, 0, 6, 0, 7, 1, 6, 1, 8, 0, 6, 2, 4, 0, 7, 0, 19, 0, 3, 2, 18, 0, 3, 0, 6, 0, 18, 0, 6, 0, 19, 0 )
 
 [sub_resource type="ShaderMaterial" id=34]
 shader = SubResource( 33 )
 
-[sub_resource type="VisualShaderNodeCustom" id=35]
-script = ExtResource( 5 )
-
 [sub_resource type="VisualShaderNodeVec3Constant" id=36]
 constant = Vector3( 2, 2, 5 )
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=37]
-constant = 10.0
 
 [sub_resource type="VisualShaderNodeVectorCompose" id=38]
 
@@ -841,6 +811,10 @@ input_name = "time"
 
 [sub_resource type="VisualShaderNodeInput" id=41]
 input_name = "uv"
+
+[sub_resource type="VisualShaderNodeCustom" id=170]
+default_input_values = [ 2, Vector3( 10, 10, 10 ) ]
+script = ExtResource( 5 )
 
 [sub_resource type="VisualShader" id=42]
 code = "shader_type canvas_item;
@@ -1043,17 +1017,15 @@ void fragment() {
 // Vector:3
 	vec3 n_out3p0 = vec3(2.000000, 2.000000, 5.000000);
 
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// PerlinNoise3D:2
-	float n_out2p0;
+// PerlinNoise3D:9
+	vec3 n_in9p2 = vec3(10.00000, 10.00000, 10.00000);
+	float n_out9p0;
 	{
-		n_out2p0 = perlin_noise_3d_p(n_out5p0 * vec3(n_out4p0), n_out3p0);
+		n_out9p0 = perlin_noise_3d_p(n_out5p0 * n_in9p2, n_out3p0);
 	}
 
 // Output:0
-	COLOR.rgb = vec3(n_out2p0);
+	COLOR.rgb = vec3(n_out9p0);
 
 }
 
@@ -1062,15 +1034,12 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -549.933, 24 )
+graph_offset = Vector2( -559.74, -90.22 )
 mode = 1
 flags/light_only = false
-nodes/fragment/2/node = SubResource( 35 )
-nodes/fragment/2/position = Vector2( 100, 160 )
+nodes/fragment/0/position = Vector2( 260, 80 )
 nodes/fragment/3/node = SubResource( 36 )
 nodes/fragment/3/position = Vector2( -360, 180 )
-nodes/fragment/4/node = SubResource( 37 )
-nodes/fragment/4/position = Vector2( -274.933, 327 )
 nodes/fragment/5/node = SubResource( 38 )
 nodes/fragment/5/position = Vector2( -140, 20 )
 nodes/fragment/6/node = SubResource( 39 )
@@ -1079,19 +1048,15 @@ nodes/fragment/7/node = SubResource( 40 )
 nodes/fragment/7/position = Vector2( -380, 100 )
 nodes/fragment/8/node = SubResource( 41 )
 nodes/fragment/8/position = Vector2( -600, -40 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 2, 1, 4, 0, 2, 2, 5, 0, 2, 0, 6, 0, 5, 0, 6, 1, 5, 1, 7, 0, 5, 2, 8, 0, 6, 0 )
+nodes/fragment/9/node = SubResource( 170 )
+nodes/fragment/9/position = Vector2( 80, 80 )
+nodes/fragment/connections = PoolIntArray( 6, 0, 5, 0, 6, 1, 5, 1, 7, 0, 5, 2, 8, 0, 6, 0, 5, 0, 9, 0, 3, 0, 9, 1, 9, 0, 0, 0 )
 
 [sub_resource type="ShaderMaterial" id=43]
 shader = SubResource( 42 )
 
-[sub_resource type="VisualShaderNodeCustom" id=44]
-script = ExtResource( 4 )
-
 [sub_resource type="VisualShaderNodeInput" id=45]
 input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=46]
-constant = 10.0
 
 [sub_resource type="VisualShaderNodeInput" id=47]
 input_name = "screen_uv"
@@ -1101,6 +1066,10 @@ input_name = "screen_uv"
 [sub_resource type="VisualShaderNodeVectorDecompose" id=49]
 
 [sub_resource type="VisualShaderNodeVectorDecompose" id=50]
+
+[sub_resource type="VisualShaderNodeCustom" id=168]
+default_input_values = [ 4, Vector3( 10, 10, 10 ), 5, 10.0 ]
+script = ExtResource( 4 )
 
 [sub_resource type="VisualShader" id=51]
 code = "shader_type canvas_item;
@@ -1431,17 +1400,16 @@ void fragment() {
 // VectorCompose:6
 	vec3 n_out6p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
 
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// PerlinNoise4D:2
-	float n_out2p0;
+// PerlinNoise4D:9
+	vec3 n_in9p4 = vec3(10.00000, 10.00000, 10.00000);
+	float n_in9p5 = 10.00000;
+	float n_out9p0;
 	{
-		n_out2p0 = perlin_noise_4d_np(vec4(n_out6p0, n_out8p1) * vec4(vec3(n_out4p0), n_out4p0));
+		n_out9p0 = perlin_noise_4d_np(vec4(n_out6p0, n_out8p1) * vec4(n_in9p4, n_in9p5));
 	}
 
 // Output:0
-	COLOR.rgb = vec3(n_out2p0);
+	COLOR.rgb = vec3(n_out9p0);
 
 }
 
@@ -1450,15 +1418,11 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -606, -85 )
+graph_offset = Vector2( -553.74, -6.22002 )
 mode = 1
 flags/light_only = false
-nodes/fragment/2/node = SubResource( 44 )
-nodes/fragment/2/position = Vector2( 160, 140 )
 nodes/fragment/3/node = SubResource( 45 )
 nodes/fragment/3/position = Vector2( -520, 40 )
-nodes/fragment/4/node = SubResource( 46 )
-nodes/fragment/4/position = Vector2( -260, 340 )
 nodes/fragment/5/node = SubResource( 47 )
 nodes/fragment/5/position = Vector2( -580, 160 )
 nodes/fragment/6/node = SubResource( 48 )
@@ -1467,12 +1431,15 @@ nodes/fragment/7/node = SubResource( 49 )
 nodes/fragment/7/position = Vector2( -340, 40 )
 nodes/fragment/8/node = SubResource( 50 )
 nodes/fragment/8/position = Vector2( -340, 160 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 4, 0, 2, 4, 4, 0, 2, 5, 6, 0, 2, 0, 3, 0, 7, 0, 7, 0, 6, 0, 7, 1, 6, 1, 5, 0, 8, 0, 8, 0, 6, 2, 8, 1, 2, 1 )
+nodes/fragment/9/node = SubResource( 168 )
+nodes/fragment/9/position = Vector2( 180, 120 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 7, 0, 7, 0, 6, 0, 7, 1, 6, 1, 5, 0, 8, 0, 8, 0, 6, 2, 9, 0, 0, 0, 6, 0, 9, 0, 8, 1, 9, 1 )
 
 [sub_resource type="ShaderMaterial" id=52]
 shader = SubResource( 51 )
 
-[sub_resource type="VisualShaderNodeCustom" id=53]
+[sub_resource type="VisualShaderNodeCustom" id=171]
+default_input_values = [ 4, Vector3( 10, 10, 10 ), 5, 10.0 ]
 script = ExtResource( 4 )
 
 [sub_resource type="VisualShaderNodeVectorDecompose" id=54]
@@ -1483,9 +1450,6 @@ script = ExtResource( 4 )
 
 [sub_resource type="VisualShaderNodeScalarConstant" id=57]
 constant = 2.0
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=58]
-constant = 10.0
 
 [sub_resource type="VisualShaderNodeInput" id=59]
 input_name = "uv"
@@ -1825,17 +1789,16 @@ void fragment() {
 // Scalar:6
 	float n_out6p0 = 2.000000;
 
-// Scalar:7
-	float n_out7p0 = 10.000000;
-
-// PerlinNoise4D:2
-	float n_out2p0;
+// PerlinNoise4D:10
+	vec3 n_in10p4 = vec3(10.00000, 10.00000, 10.00000);
+	float n_in10p5 = 10.00000;
+	float n_out10p0;
 	{
-		n_out2p0 = perlin_noise_4d_p(vec4(n_out5p0, n_out4p1) * vec4(vec3(n_out7p0), n_out7p0), vec4(vec3(n_out6p0), n_out6p0));
+		n_out10p0 = perlin_noise_4d_p(vec4(n_out5p0, n_out4p1) * vec4(n_in10p4, n_in10p5), vec4(vec3(n_out6p0), n_out6p0));
 	}
 
 // Output:0
-	COLOR.rgb = vec3(n_out2p0);
+	COLOR.rgb = vec3(n_out10p0);
 
 }
 
@@ -1844,25 +1807,25 @@ void light() {
 
 }
 "
+graph_offset = Vector2( -774.74, -32 )
 mode = 1
 flags/light_only = false
-nodes/fragment/2/node = SubResource( 53 )
-nodes/fragment/2/position = Vector2( 80, 120 )
+nodes/fragment/0/position = Vector2( 100, 60 )
 nodes/fragment/3/node = SubResource( 54 )
 nodes/fragment/3/position = Vector2( -520, 60 )
 nodes/fragment/4/node = SubResource( 55 )
 nodes/fragment/4/position = Vector2( -520, 200 )
 nodes/fragment/5/node = SubResource( 56 )
-nodes/fragment/5/position = Vector2( -160, 60 )
+nodes/fragment/5/position = Vector2( -300, 60 )
 nodes/fragment/6/node = SubResource( 57 )
-nodes/fragment/6/position = Vector2( -220, 240 )
-nodes/fragment/7/node = SubResource( 58 )
-nodes/fragment/7/position = Vector2( -220, 300 )
+nodes/fragment/6/position = Vector2( -300, 200 )
 nodes/fragment/8/node = SubResource( 59 )
 nodes/fragment/8/position = Vector2( -720, 60 )
 nodes/fragment/9/node = SubResource( 60 )
 nodes/fragment/9/position = Vector2( -780, 200 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 5, 0, 3, 1, 5, 1, 4, 0, 5, 2, 4, 1, 2, 1, 5, 0, 2, 0, 6, 0, 2, 2, 6, 0, 2, 3, 7, 0, 2, 4, 7, 0, 2, 5, 8, 0, 3, 0, 9, 0, 4, 0 )
+nodes/fragment/10/node = SubResource( 171 )
+nodes/fragment/10/position = Vector2( -100, 60 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 5, 0, 3, 1, 5, 1, 4, 0, 5, 2, 8, 0, 3, 0, 9, 0, 4, 0, 6, 0, 10, 2, 6, 0, 10, 3, 5, 0, 10, 0, 4, 1, 10, 1, 10, 0, 0, 0 )
 
 [sub_resource type="ShaderMaterial" id=62]
 shader = SubResource( 61 )
@@ -1873,16 +1836,16 @@ input_name = "uv"
 [sub_resource type="VisualShaderNodeInput" id=64]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeCustom" id=65]
-script = ExtResource( 7 )
+[sub_resource type="VisualShaderNodeScalarInterp" id=65]
 
-[sub_resource type="VisualShaderNodeScalarInterp" id=66]
+[sub_resource type="VisualShaderNodeVectorDecompose" id=66]
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=67]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=68]
+[sub_resource type="VisualShaderNodeScalarOp" id=67]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 9
+
+[sub_resource type="VisualShaderNodeCustom" id=155]
+script = ExtResource( 7 )
 
 [sub_resource type="VisualShader" id=69]
 code = "shader_type canvas_item;
@@ -1891,7 +1854,7 @@ code = "shader_type canvas_item;
 // RandomNoise
 
 	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
 		return fract(sin(f) * 437588.5453);
 	}
 	
@@ -1921,14 +1884,14 @@ void fragment() {
 	float n_in6p1 = 1.00000;
 	float n_out6p0 = mix(n_out4p0, n_in6p1, n_out8p0);
 
-// RandomNoise:5
-	float n_out5p0;
+// RandomNoise:9
+	float n_out9p0;
 	{
-		n_out5p0 = rand(vec4(n_out3p0, n_out6p0));
+		n_out9p0 = rand(vec4(n_out3p0, n_out6p0));
 	}
 
 // Output:0
-	COLOR.rgb = vec3(n_out5p0);
+	COLOR.rgb = vec3(n_out9p0);
 
 }
 
@@ -1937,39 +1900,33 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -649.333, 47 )
+graph_offset = Vector2( -573, 87 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 280, 120 )
 nodes/fragment/3/node = SubResource( 63 )
-nodes/fragment/3/position = Vector2( -1080, 120 )
+nodes/fragment/3/position = Vector2( -520, 120 )
 nodes/fragment/4/node = SubResource( 64 )
 nodes/fragment/4/position = Vector2( -320, 200 )
-nodes/fragment/5/node = SubResource( 65 )
-nodes/fragment/5/position = Vector2( 80, 120 )
-nodes/fragment/6/node = SubResource( 66 )
+nodes/fragment/6/node = SubResource( 65 )
 nodes/fragment/6/position = Vector2( -120, 240 )
-nodes/fragment/7/node = SubResource( 67 )
-nodes/fragment/7/position = Vector2( -900, 220 )
-nodes/fragment/8/node = SubResource( 68 )
-nodes/fragment/8/position = Vector2( -620, 220 )
-nodes/fragment/connections = PoolIntArray( 5, 0, 0, 0, 3, 0, 5, 0, 4, 0, 6, 0, 6, 0, 5, 1, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 6, 2 )
+nodes/fragment/7/node = SubResource( 66 )
+nodes/fragment/7/position = Vector2( -540, 300 )
+nodes/fragment/8/node = SubResource( 67 )
+nodes/fragment/8/position = Vector2( -320, 280 )
+nodes/fragment/9/node = SubResource( 155 )
+nodes/fragment/9/position = Vector2( 40, 120 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 6, 2, 9, 0, 0, 0, 3, 0, 9, 0, 6, 0, 9, 1 )
 
 [sub_resource type="ShaderMaterial" id=70]
 shader = SubResource( 69 )
 
+[sub_resource type="VisualShaderNodeCustom" id=159]
+default_input_values = [ 1, Vector3( 10, 10, 1 ), 2, 1.0 ]
+script = ExtResource( 8 )
+
 [sub_resource type="VisualShaderNodeInput" id=71]
 input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=72]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=73]
-constant = 1.0
-
-[sub_resource type="VisualShaderNodeCustom" id=74]
-output_port_for_preview = 2
-script = ExtResource( 8 )
 
 [sub_resource type="VisualShaderNodeVectorDecompose" id=75]
 
@@ -2065,21 +2022,17 @@ void fragment() {
 // Input:3
 	vec3 n_out3p0 = vec3(UV, 0.0);
 
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// Scalar:5
-	float n_out5p0 = 1.000000;
-
-// CellularNoise2D:6
-	vec3 n_out6p0;
-	float n_out6p1;
-	float n_out6p2;
+// CellularNoise2D:10
+	vec3 n_in10p1 = vec3(10.00000, 10.00000, 1.00000);
+	float n_in10p2 = 1.00000;
+	vec3 n_out10p0;
+	float n_out10p1;
+	float n_out10p2;
 	{
 		
-			
-			n_out6p0 = vec3(cellular_noise_2d((n_out3p0).xy * (vec3(n_out4p0)).xy, n_out5p0), 0.0);
-			n_out6p1 = n_out6p0.x;n_out6p2 = n_out6p0.y;
+			n_out10p0 = vec3(cellular_noise_2d((n_out3p0).xy * (n_in10p1).xy, n_in10p2), 0.0);
+			n_out10p1 = n_out10p0.x;
+			n_out10p2 = n_out10p0.y;
 			
 	}
 
@@ -2093,7 +2046,7 @@ void fragment() {
 	float n_out8p0 = step(n_out7p0, n_in8p1);
 
 // ScalarMix:9
-	float n_out9p0 = mix(n_out6p2, n_out6p1, n_out8p0);
+	float n_out9p0 = mix(n_out10p2, n_out10p1, n_out8p0);
 
 // Output:0
 	COLOR.rgb = vec3(n_out9p0);
@@ -2105,25 +2058,21 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -212, -7.75 )
+graph_offset = Vector2( -400.74, -58.22 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 580, 120 )
 nodes/fragment/3/node = SubResource( 71 )
 nodes/fragment/3/position = Vector2( -280, 40 )
-nodes/fragment/4/node = SubResource( 72 )
-nodes/fragment/4/position = Vector2( -280, 120 )
-nodes/fragment/5/node = SubResource( 73 )
-nodes/fragment/5/position = Vector2( -280, 200 )
-nodes/fragment/6/node = SubResource( 74 )
-nodes/fragment/6/position = Vector2( 60, 120 )
 nodes/fragment/7/node = SubResource( 75 )
 nodes/fragment/7/position = Vector2( -120, -40 )
 nodes/fragment/8/node = SubResource( 76 )
 nodes/fragment/8/position = Vector2( 100, -40 )
 nodes/fragment/9/node = SubResource( 77 )
 nodes/fragment/9/position = Vector2( 360, 40 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 6, 0, 4, 0, 6, 1, 5, 0, 6, 2, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 9, 2, 9, 0, 0, 0, 6, 1, 9, 1, 6, 2, 9, 0 )
+nodes/fragment/10/node = SubResource( 159 )
+nodes/fragment/10/position = Vector2( 40, 140 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 9, 2, 9, 0, 0, 0, 10, 1, 9, 1, 10, 2, 9, 0, 3, 0, 10, 0 )
 
 [sub_resource type="ShaderMaterial" id=79]
 shader = SubResource( 78 )
@@ -2133,19 +2082,14 @@ shader = SubResource( 78 )
 [sub_resource type="VisualShaderNodeInput" id=81]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=82]
-constant = 10.0
-
 [sub_resource type="VisualShaderNodeVectorDecompose" id=83]
 
 [sub_resource type="VisualShaderNodeScalarOp" id=84]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 9
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=85]
-constant = 1.0
-
-[sub_resource type="VisualShaderNodeCustom" id=86]
+[sub_resource type="VisualShaderNodeCustom" id=160]
+default_input_values = [ 1, Vector3( 10, 10, 1 ), 2, 1.0 ]
 script = ExtResource( 9 )
 
 [sub_resource type="VisualShader" id=87]
@@ -2229,21 +2173,17 @@ void fragment() {
 // Input:4
 	vec3 n_out4p0 = vec3(UV, 0.0);
 
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// Scalar:8
-	float n_out8p0 = 1.000000;
-
-// CellularNoise2D_2X2:9
-	vec3 n_out9p0;
-	float n_out9p1;
-	float n_out9p2;
+// CellularNoise2D_2X2:8
+	vec3 n_in8p1 = vec3(10.00000, 10.00000, 1.00000);
+	float n_in8p2 = 1.00000;
+	vec3 n_out8p0;
+	float n_out8p1;
+	float n_out8p2;
 	{
 		
-			
-			n_out9p0 = vec3(cellular_noise_2d_2x2((n_out4p0).xy * (vec3(n_out5p0)).xy, n_out8p0), 0.0);
-			n_out9p1 = n_out9p0.x;n_out9p2 = n_out9p0.y;
+			n_out8p0 = vec3(cellular_noise_2d_2x2((n_out4p0).xy * (n_in8p1).xy, n_in8p2), 0.0);
+			n_out8p1 = n_out8p0.x;
+			n_out8p2 = n_out8p0.y;
 			
 	}
 
@@ -2257,7 +2197,7 @@ void fragment() {
 	float n_out7p0 = step(n_out6p0, n_in7p1);
 
 // ScalarMix:3
-	float n_out3p0 = mix(n_out9p2, n_out9p1, n_out7p0);
+	float n_out3p0 = mix(n_out8p2, n_out8p1, n_out7p0);
 
 // Output:0
 	COLOR.rgb = vec3(n_out3p0);
@@ -2269,7 +2209,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -92, -40 )
+graph_offset = Vector2( -400.74, -58.22 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 840, 60 )
@@ -2277,32 +2217,25 @@ nodes/fragment/3/node = SubResource( 80 )
 nodes/fragment/3/position = Vector2( 660, 60 )
 nodes/fragment/4/node = SubResource( 81 )
 nodes/fragment/4/position = Vector2( 40, 0 )
-nodes/fragment/5/node = SubResource( 82 )
-nodes/fragment/5/position = Vector2( 40, 100 )
 nodes/fragment/6/node = SubResource( 83 )
 nodes/fragment/6/position = Vector2( 240, -40 )
 nodes/fragment/7/node = SubResource( 84 )
 nodes/fragment/7/position = Vector2( 440, -60 )
-nodes/fragment/8/node = SubResource( 85 )
-nodes/fragment/8/position = Vector2( 40, 200 )
-nodes/fragment/9/node = SubResource( 86 )
-nodes/fragment/9/position = Vector2( 360, 100 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 4, 0, 9, 0, 5, 0, 9, 1, 8, 0, 9, 2, 9, 1, 3, 1, 9, 2, 3, 0, 3, 0, 0, 0 )
+nodes/fragment/8/node = SubResource( 160 )
+nodes/fragment/8/position = Vector2( 360, 100 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 4, 0, 8, 0, 8, 1, 3, 1, 8, 2, 3, 0 )
 
 [sub_resource type="ShaderMaterial" id=88]
 shader = SubResource( 87 )
 
 [sub_resource type="VisualShaderNodeVectorCompose" id=89]
 
-[sub_resource type="VisualShaderNodeCustom" id=90]
-script = ExtResource( 10 )
-
 [sub_resource type="VisualShaderNodeInput" id=91]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeScalarOp" id=92]
-default_input_values = [ 0, 0.0, 1, 0.1 ]
-operator = 2
+[sub_resource type="VisualShaderNodeCustom" id=161]
+default_input_values = [ 1, Vector3( 10, 10, 1 ), 2, 1.0 ]
+script = ExtResource( 10 )
 
 [sub_resource type="VisualShader" id=93]
 code = "shader_type canvas_item;
@@ -2513,28 +2446,20 @@ void fragment() {
 // Input:12
 	float n_out12p0 = TIME;
 
-// ScalarOp:13
-	float n_in13p1 = 0.10000;
-	float n_out13p0 = n_out12p0 * n_in13p1;
-
 // VectorCompose:10
-	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out13p0);
+	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out12p0);
 
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// Scalar:8
-	float n_out8p0 = 1.000000;
-
-// CelluarNoise3D:11
-	vec3 n_out11p0;
-	float n_out11p1;
-	float n_out11p2;
+// CelluarNoise3D:13
+	vec3 n_in13p1 = vec3(10.00000, 10.00000, 1.00000);
+	float n_in13p2 = 1.00000;
+	vec3 n_out13p0;
+	float n_out13p1;
+	float n_out13p2;
 	{
 		
-			
-			n_out11p0 = vec3(cellular_noise_3d(n_out10p0 * vec3(n_out5p0), n_out8p0), 0.0);
-			n_out11p1 = n_out11p0.x;n_out11p2 = n_out11p0.y;
+			n_out13p0 = vec3(cellular_noise_3d(n_out10p0 * n_in13p1, n_in13p2), 0.0);
+			n_out13p1 = n_out13p0.x;
+			n_out13p2 = n_out13p0.y;
 			
 	}
 
@@ -2543,7 +2468,7 @@ void fragment() {
 	float n_out7p0 = step(n_out6p0, n_in7p1);
 
 // ScalarMix:3
-	float n_out3p0 = mix(n_out11p2, n_out11p1, n_out7p0);
+	float n_out3p0 = mix(n_out13p2, n_out13p1, n_out7p0);
 
 // Output:0
 	COLOR.rgb = vec3(n_out3p0);
@@ -2555,7 +2480,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -345, -75 )
+graph_offset = Vector2( -231.74, -106.22 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 840, 60 )
@@ -2563,28 +2488,23 @@ nodes/fragment/3/node = SubResource( 80 )
 nodes/fragment/3/position = Vector2( 660, 60 )
 nodes/fragment/4/node = SubResource( 81 )
 nodes/fragment/4/position = Vector2( -140, -20 )
-nodes/fragment/5/node = SubResource( 82 )
-nodes/fragment/5/position = Vector2( -160, 200 )
 nodes/fragment/6/node = SubResource( 83 )
 nodes/fragment/6/position = Vector2( 40, -60 )
 nodes/fragment/7/node = SubResource( 84 )
 nodes/fragment/7/position = Vector2( 440, -60 )
-nodes/fragment/8/node = SubResource( 85 )
-nodes/fragment/8/position = Vector2( -160, 280 )
 nodes/fragment/10/node = SubResource( 89 )
 nodes/fragment/10/position = Vector2( 140, 80 )
-nodes/fragment/11/node = SubResource( 90 )
-nodes/fragment/11/position = Vector2( 400, 100 )
 nodes/fragment/12/node = SubResource( 91 )
-nodes/fragment/12/position = Vector2( -300, 80 )
-nodes/fragment/13/node = SubResource( 92 )
-nodes/fragment/13/position = Vector2( -80, 60 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 11, 1, 3, 1, 10, 0, 11, 0, 5, 0, 11, 1, 8, 0, 11, 2, 12, 0, 13, 0, 13, 0, 10, 2, 11, 2, 3, 0 )
+nodes/fragment/12/position = Vector2( -80, 100 )
+nodes/fragment/13/node = SubResource( 161 )
+nodes/fragment/13/position = Vector2( 400, 80 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 12, 0, 10, 2, 13, 1, 3, 1, 13, 2, 3, 0, 10, 0, 13, 0 )
 
 [sub_resource type="ShaderMaterial" id=94]
 shader = SubResource( 93 )
 
-[sub_resource type="VisualShaderNodeCustom" id=95]
+[sub_resource type="VisualShaderNodeCustom" id=162]
+default_input_values = [ 1, Vector3( 10, 10, 1 ), 2, 1.0 ]
 script = ExtResource( 11 )
 
 [sub_resource type="VisualShader" id=96]
@@ -2697,28 +2617,20 @@ void fragment() {
 // Input:12
 	float n_out12p0 = TIME;
 
-// ScalarOp:13
-	float n_in13p1 = 0.10000;
-	float n_out13p0 = n_out12p0 * n_in13p1;
-
 // VectorCompose:10
-	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out13p0);
+	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out12p0);
 
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// Scalar:8
-	float n_out8p0 = 1.000000;
-
-// CelluarNoise3D_2x2x2:14
-	vec3 n_out14p0;
-	float n_out14p1;
-	float n_out14p2;
+// CelluarNoise3D_2x2x2:13
+	vec3 n_in13p1 = vec3(10.00000, 10.00000, 1.00000);
+	float n_in13p2 = 1.00000;
+	vec3 n_out13p0;
+	float n_out13p1;
+	float n_out13p2;
 	{
 		
-			
-			n_out14p0 = vec3(cellular_noise_3d_2x2x2(n_out10p0 * vec3(n_out5p0), n_out8p0), 0.0);
-			n_out14p1 = n_out14p0.x;n_out14p2 = n_out14p0.y;
+			n_out13p0 = vec3(cellular_noise_3d_2x2x2(n_out10p0 * n_in13p1, n_in13p2), 0.0);
+			n_out13p1 = n_out13p0.x;
+			n_out13p2 = n_out13p0.y;
 			
 	}
 
@@ -2727,7 +2639,7 @@ void fragment() {
 	float n_out7p0 = step(n_out6p0, n_in7p1);
 
 // ScalarMix:3
-	float n_out3p0 = mix(n_out14p2, n_out14p1, n_out7p0);
+	float n_out3p0 = mix(n_out13p2, n_out13p1, n_out7p0);
 
 // Output:0
 	COLOR.rgb = vec3(n_out3p0);
@@ -2739,7 +2651,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -212, -118 )
+graph_offset = Vector2( -253.74, -121.22 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 840, 60 )
@@ -2747,29 +2659,20 @@ nodes/fragment/3/node = SubResource( 80 )
 nodes/fragment/3/position = Vector2( 660, 60 )
 nodes/fragment/4/node = SubResource( 81 )
 nodes/fragment/4/position = Vector2( -140, -20 )
-nodes/fragment/5/node = SubResource( 82 )
-nodes/fragment/5/position = Vector2( -160, 200 )
 nodes/fragment/6/node = SubResource( 83 )
 nodes/fragment/6/position = Vector2( 40, -60 )
 nodes/fragment/7/node = SubResource( 84 )
 nodes/fragment/7/position = Vector2( 440, -60 )
-nodes/fragment/8/node = SubResource( 85 )
-nodes/fragment/8/position = Vector2( -160, 280 )
 nodes/fragment/10/node = SubResource( 89 )
 nodes/fragment/10/position = Vector2( 140, 80 )
 nodes/fragment/12/node = SubResource( 91 )
-nodes/fragment/12/position = Vector2( -300, 80 )
-nodes/fragment/13/node = SubResource( 92 )
-nodes/fragment/13/position = Vector2( -80, 60 )
-nodes/fragment/14/node = SubResource( 95 )
-nodes/fragment/14/position = Vector2( 360, 140 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 12, 0, 13, 0, 13, 0, 10, 2, 14, 1, 3, 1, 14, 2, 3, 0, 10, 0, 14, 0, 5, 0, 14, 1, 8, 0, 14, 2 )
+nodes/fragment/12/position = Vector2( -100, 60 )
+nodes/fragment/13/node = SubResource( 162 )
+nodes/fragment/13/position = Vector2( 380, 80 )
+nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 12, 0, 10, 2, 13, 1, 3, 1, 13, 2, 3, 0, 10, 0, 13, 0 )
 
 [sub_resource type="ShaderMaterial" id=97]
 shader = SubResource( 96 )
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=98]
-constant = 20.0
 
 [sub_resource type="VisualShaderNodeCustom" id=99]
 script = ExtResource( 7 )
@@ -2779,9 +2682,6 @@ script = ExtResource( 7 )
 [sub_resource type="VisualShaderNodeScalarOp" id=101]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 2
-
-[sub_resource type="VisualShaderNodeCustom" id=102]
-script = ExtResource( 10 )
 
 [sub_resource type="VisualShaderNodeVectorCompose" id=103]
 
@@ -2804,13 +2704,15 @@ operator = 1
 output_port_for_preview = 0
 function = 12
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=110]
-constant = 1.0
-
-[sub_resource type="VisualShaderNodeCustom" id=111]
-script = ExtResource( 5 )
-
 [sub_resource type="VisualShaderNodeVectorCompose" id=112]
+
+[sub_resource type="VisualShaderNodeCustom" id=164]
+default_input_values = [ 1, Vector3( 10, 10, 1 ), 2, 1.0 ]
+script = ExtResource( 10 )
+
+[sub_resource type="VisualShaderNodeCustom" id=172]
+default_input_values = [ 2, Vector3( 20, 20, 20 ) ]
+script = ExtResource( 5 )
 
 [sub_resource type="VisualShaderNodeScalarInterp" id=113]
 
@@ -3002,7 +2904,7 @@ float perlin_noise_3d_p(vec3 P, vec3 rep) {
 // RandomNoise
 
 	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
 		return fract(sin(f) * 437588.5453);
 	}
 	
@@ -3218,13 +3120,11 @@ void fragment() {
 // VectorCompose:24
 	vec3 n_out24p0 = vec3(n_out17p0, n_out17p1, n_out19p0);
 
-// Scalar:11
-	float n_out11p0 = 20.000000;
-
-// PerlinNoise3D:23
-	float n_out23p0;
+// PerlinNoise3D:27
+	vec3 n_in27p2 = vec3(20.00000, 20.00000, 20.00000);
+	float n_out27p0;
 	{
-		n_out23p0 = perlin_noise_3d_np(n_out24p0 * vec3(n_out11p0));
+		n_out27p0 = perlin_noise_3d_np(n_out24p0 * n_in27p2);
 	}
 
 // RandomNoise:12
@@ -3234,35 +3134,31 @@ void fragment() {
 	}
 
 // ScalarOp:13
-	float n_out13p0 = n_out23p0 + n_out12p0;
+	float n_out13p0 = n_out27p0 + n_out12p0;
 
 // ScalarOp:14
 	float n_in14p1 = 0.50000;
 	float n_out14p0 = n_out13p0 * n_in14p1;
 
 // VectorCompose:16
-	vec3 n_out16p0 = vec3(n_out17p0, n_out17p1, n_out19p0);
+	vec3 n_out16p0 = vec3(n_out17p0, n_out17p1, n_out18p0);
 
-// Scalar:6
-	float n_out6p0 = 10.000000;
-
-// Scalar:22
-	float n_out22p0 = 1.000000;
-
-// CelluarNoise3D:15
-	vec3 n_out15p0;
-	float n_out15p1;
-	float n_out15p2;
+// CelluarNoise3D:26
+	vec3 n_in26p1 = vec3(10.00000, 10.00000, 1.00000);
+	float n_in26p2 = 1.00000;
+	vec3 n_out26p0;
+	float n_out26p1;
+	float n_out26p2;
 	{
 		
-			
-			n_out15p0 = vec3(cellular_noise_3d(n_out16p0 * vec3(n_out6p0), n_out22p0), 0.0);
-			n_out15p1 = n_out15p0.x;n_out15p2 = n_out15p0.y;
+			n_out26p0 = vec3(cellular_noise_3d(n_out16p0 * n_in26p1, n_in26p2), 0.0);
+			n_out26p1 = n_out26p0.x;
+			n_out26p2 = n_out26p0.y;
 			
 	}
 
 // ScalarOp:20
-	float n_out20p0 = n_out15p1 - n_out15p2;
+	float n_out20p0 = n_out26p1 - n_out26p2;
 
 // ScalarFunc:21
 	float n_out21p0 = abs(n_out20p0);
@@ -3285,7 +3181,7 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -153, -386 )
+graph_offset = Vector2( -774.74, -32 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 920, 160 )
@@ -3297,16 +3193,12 @@ nodes/fragment/6/node = SubResource( 114 )
 nodes/fragment/6/position = Vector2( -500, 120 )
 nodes/fragment/7/node = SubResource( 115 )
 nodes/fragment/7/position = Vector2( 360, -20 )
-nodes/fragment/11/node = SubResource( 98 )
-nodes/fragment/11/position = Vector2( -500, 260 )
 nodes/fragment/12/node = SubResource( 99 )
 nodes/fragment/12/position = Vector2( -40, 280 )
 nodes/fragment/13/node = SubResource( 100 )
 nodes/fragment/13/position = Vector2( 180, 220 )
 nodes/fragment/14/node = SubResource( 101 )
 nodes/fragment/14/position = Vector2( 360, 220 )
-nodes/fragment/15/node = SubResource( 102 )
-nodes/fragment/15/position = Vector2( -100, -20 )
 nodes/fragment/16/node = SubResource( 103 )
 nodes/fragment/16/position = Vector2( -335, -23.5 )
 nodes/fragment/17/node = SubResource( 104 )
@@ -3319,13 +3211,13 @@ nodes/fragment/20/node = SubResource( 108 )
 nodes/fragment/20/position = Vector2( 0, -260 )
 nodes/fragment/21/node = SubResource( 109 )
 nodes/fragment/21/position = Vector2( 160, -260 )
-nodes/fragment/22/node = SubResource( 110 )
-nodes/fragment/22/position = Vector2( -500, 360 )
-nodes/fragment/23/node = SubResource( 111 )
-nodes/fragment/23/position = Vector2( -40, 140 )
 nodes/fragment/24/node = SubResource( 112 )
-nodes/fragment/24/position = Vector2( -240, 120 )
-nodes/fragment/connections = PoolIntArray( 7, 0, 4, 2, 4, 0, 0, 0, 12, 0, 13, 1, 2, 0, 12, 0, 13, 0, 14, 0, 14, 0, 4, 0, 16, 0, 15, 0, 17, 0, 16, 0, 17, 1, 16, 1, 2, 0, 17, 0, 6, 0, 15, 1, 18, 0, 19, 0, 19, 0, 16, 2, 15, 1, 20, 0, 15, 2, 20, 1, 20, 0, 21, 0, 22, 0, 15, 2, 23, 0, 13, 0, 24, 0, 23, 0, 17, 0, 24, 0, 17, 1, 24, 1, 11, 0, 23, 2, 19, 0, 24, 2, 21, 0, 7, 0, 18, 0, 12, 1 )
+nodes/fragment/24/position = Vector2( -260, 120 )
+nodes/fragment/26/node = SubResource( 164 )
+nodes/fragment/26/position = Vector2( -80, -40 )
+nodes/fragment/27/node = SubResource( 172 )
+nodes/fragment/27/position = Vector2( -40, 140 )
+nodes/fragment/connections = PoolIntArray( 7, 0, 4, 2, 4, 0, 0, 0, 12, 0, 13, 1, 2, 0, 12, 0, 13, 0, 14, 0, 14, 0, 4, 0, 17, 0, 16, 0, 17, 1, 16, 1, 2, 0, 17, 0, 18, 0, 19, 0, 20, 0, 21, 0, 17, 0, 24, 0, 17, 1, 24, 1, 19, 0, 24, 2, 21, 0, 7, 0, 18, 0, 12, 1, 26, 1, 20, 0, 26, 2, 20, 1, 16, 0, 26, 0, 18, 0, 16, 2, 24, 0, 27, 0, 27, 0, 13, 0 )
 
 [sub_resource type="ShaderMaterial" id=117]
 shader = SubResource( 116 )
@@ -3339,13 +3231,11 @@ operator = 9
 [sub_resource type="VisualShaderNodeVectorDecompose" id=120]
 
 [sub_resource type="VisualShaderNodeCustom" id=121]
+default_input_values = [ 2, Vector3( 10, 10, 10 ), 3, 0.0 ]
 script = ExtResource( 12 )
 
 [sub_resource type="VisualShaderNodeInput" id=122]
 input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=123]
-constant = 20.0
 
 [sub_resource type="VisualShaderNodeInput" id=124]
 input_name = "time"
@@ -3748,18 +3638,16 @@ void fragment() {
 // Input:3
 	vec3 n_out3p0 = vec3(UV, 0.0);
 
-// Scalar:4
-	float n_out4p0 = 20.000000;
-
 // Input:5
 	float n_out5p0 = TIME;
 
 // SimplexNoise2DRG:2
+	vec3 n_in2p2 = vec3(10.00000, 10.00000, 10.00000);
 	float n_out2p0;
 	vec3 n_out2p1;
 	{
 		
-			 vec3 result = simplex_noise_2d_rg_np(((n_out3p0).xy).xy * (vec3(n_out4p0)).xy.xy, n_out5p0);
+			 vec3 result = simplex_noise_2d_rg_np(((n_out3p0).xy).xy * (n_in2p2).xy.xy, n_out5p0);
 			n_out2p0 = result.x;
 			n_out2p1 = vec3(result.xy, 0.0);
 			
@@ -3803,71 +3691,67 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -447, -51 )
+graph_offset = Vector2( -471.24, -134.5 )
 mode = 1
 flags/light_only = false
-nodes/fragment/0/position = Vector2( 840, 180 )
+nodes/fragment/0/position = Vector2( 780, 100 )
 nodes/fragment/2/node = SubResource( 121 )
 nodes/fragment/2/position = Vector2( -40, 160 )
 nodes/fragment/3/node = SubResource( 122 )
 nodes/fragment/3/position = Vector2( -280, 100 )
-nodes/fragment/4/node = SubResource( 123 )
-nodes/fragment/4/position = Vector2( -280, 300 )
 nodes/fragment/5/node = SubResource( 124 )
-nodes/fragment/5/position = Vector2( -280, 400 )
+nodes/fragment/5/position = Vector2( -260, 220 )
 nodes/fragment/6/node = SubResource( 125 )
 nodes/fragment/6/position = Vector2( 237, 42.5 )
 nodes/fragment/7/node = SubResource( 126 )
 nodes/fragment/7/position = Vector2( 400, 40 )
 nodes/fragment/8/node = SubResource( 127 )
-nodes/fragment/8/position = Vector2( 240, 200 )
+nodes/fragment/8/position = Vector2( 240, 160 )
 nodes/fragment/9/node = SubResource( 128 )
-nodes/fragment/9/position = Vector2( 408, 261.5 )
+nodes/fragment/9/position = Vector2( 400, 160 )
 nodes/fragment/10/node = SubResource( 118 )
 nodes/fragment/10/position = Vector2( 620, 100 )
 nodes/fragment/11/node = SubResource( 119 )
 nodes/fragment/11/position = Vector2( 400, -100 )
 nodes/fragment/12/node = SubResource( 120 )
-nodes/fragment/12/position = Vector2( -40, 0 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 2, 0, 4, 0, 2, 2, 2, 0, 6, 0, 6, 0, 7, 0, 2, 1, 8, 0, 8, 0, 9, 0, 7, 0, 10, 1, 9, 0, 10, 0, 10, 0, 0, 0, 11, 0, 10, 2, 12, 0, 11, 0, 3, 0, 12, 0, 5, 0, 2, 3 )
+nodes/fragment/12/position = Vector2( -40, -100 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 2, 0, 2, 0, 6, 0, 6, 0, 7, 0, 2, 1, 8, 0, 8, 0, 9, 0, 7, 0, 10, 1, 9, 0, 10, 0, 10, 0, 0, 0, 11, 0, 10, 2, 12, 0, 11, 0, 3, 0, 12, 0, 5, 0, 2, 3 )
 
 [sub_resource type="ShaderMaterial" id=130]
 shader = SubResource( 129 )
 
-[sub_resource type="VisualShaderNodeVectorOp" id=135]
+[sub_resource type="VisualShaderNodeVectorOp" id=131]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ) ]
 
-[sub_resource type="VisualShaderNodeVectorOp" id=136]
+[sub_resource type="VisualShaderNodeVectorOp" id=132]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0.5 ) ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeVectorScalarMix" id=137]
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=133]
 
-[sub_resource type="VisualShaderNodeScalarOp" id=138]
+[sub_resource type="VisualShaderNodeScalarOp" id=134]
 default_input_values = [ 0, 0.5, 1, 0.5 ]
 operator = 9
 
-[sub_resource type="VisualShaderNodeInput" id=132]
+[sub_resource type="VisualShaderNodeInput" id=135]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeCustom" id=139]
+[sub_resource type="VisualShaderNodeCustom" id=136]
+default_input_values = [ 1, Vector3( 10, 10, 10 ) ]
 script = ExtResource( 13 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=140]
-constant = 15.0
+[sub_resource type="VisualShaderNodeVectorDecompose" id=138]
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=141]
+[sub_resource type="VisualShaderNodeVectorCompose" id=139]
 
-[sub_resource type="VisualShaderNodeVectorCompose" id=142]
-
-[sub_resource type="VisualShaderNodeInput" id=143]
+[sub_resource type="VisualShaderNodeInput" id=140]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeScalarOp" id=144]
+[sub_resource type="VisualShaderNodeScalarOp" id=141]
 default_input_values = [ 0, 0.0, 1, 0.1 ]
 operator = 2
 
-[sub_resource type="VisualShader" id=133]
+[sub_resource type="VisualShader" id=142]
 code = "shader_type canvas_item;
 
 
@@ -4008,15 +3892,13 @@ void fragment() {
 // VectorCompose:7
 	vec3 n_out7p0 = vec3(n_out6p0, n_out6p1, n_out9p0);
 
-// Scalar:5
-	float n_out5p0 = 15.000001;
-
 // SimplexNoise3D:4
+	vec3 n_in4p1 = vec3(10.00000, 10.00000, 10.00000);
 	float n_out4p0;
 	vec3 n_out4p1;
 	{
 		
-				n_out4p0 = simplex_noise_3d(n_out7p0 * vec3(n_out5p0), n_out4p1);
+				n_out4p0 = simplex_noise_3d(n_out7p0 * n_in4p1, n_out4p1);
 			
 	}
 
@@ -4045,63 +3927,59 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -438, 36 )
+graph_offset = Vector2( -853.74, 19 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 900, 100 )
-nodes/fragment/3/node = SubResource( 132 )
+nodes/fragment/3/node = SubResource( 135 )
 nodes/fragment/3/position = Vector2( -640, 120 )
-nodes/fragment/4/node = SubResource( 139 )
-nodes/fragment/4/position = Vector2( 20, 120 )
-nodes/fragment/5/node = SubResource( 140 )
-nodes/fragment/5/position = Vector2( -232, 234 )
-nodes/fragment/6/node = SubResource( 141 )
+nodes/fragment/4/node = SubResource( 136 )
+nodes/fragment/4/position = Vector2( -40, 140 )
+nodes/fragment/6/node = SubResource( 138 )
 nodes/fragment/6/position = Vector2( -480, 80 )
-nodes/fragment/7/node = SubResource( 142 )
-nodes/fragment/7/position = Vector2( -200, 80 )
-nodes/fragment/8/node = SubResource( 143 )
+nodes/fragment/7/node = SubResource( 139 )
+nodes/fragment/7/position = Vector2( -260, 80 )
+nodes/fragment/8/node = SubResource( 140 )
 nodes/fragment/8/position = Vector2( -660, 200 )
-nodes/fragment/9/node = SubResource( 144 )
+nodes/fragment/9/node = SubResource( 141 )
 nodes/fragment/9/position = Vector2( -480, 200 )
-nodes/fragment/10/node = SubResource( 135 )
+nodes/fragment/10/node = SubResource( 131 )
 nodes/fragment/10/position = Vector2( 460, 100 )
-nodes/fragment/11/node = SubResource( 136 )
+nodes/fragment/11/node = SubResource( 132 )
 nodes/fragment/11/position = Vector2( 660, 100 )
-nodes/fragment/12/node = SubResource( 137 )
+nodes/fragment/12/node = SubResource( 133 )
 nodes/fragment/12/position = Vector2( 260, 140 )
-nodes/fragment/13/node = SubResource( 138 )
+nodes/fragment/13/node = SubResource( 134 )
 nodes/fragment/13/position = Vector2( 20, -40 )
-nodes/fragment/connections = PoolIntArray( 5, 0, 4, 1, 3, 0, 6, 0, 6, 0, 7, 0, 6, 1, 7, 1, 7, 0, 4, 0, 8, 0, 9, 0, 9, 0, 7, 2, 10, 0, 11, 0, 11, 0, 0, 0, 4, 0, 12, 0, 4, 1, 12, 1, 12, 0, 10, 0, 13, 0, 12, 2, 6, 0, 13, 1 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 6, 0, 6, 0, 7, 0, 6, 1, 7, 1, 7, 0, 4, 0, 8, 0, 9, 0, 9, 0, 7, 2, 10, 0, 11, 0, 11, 0, 0, 0, 4, 0, 12, 0, 4, 1, 12, 1, 12, 0, 10, 0, 13, 0, 12, 2, 6, 0, 13, 1 )
 
-[sub_resource type="ShaderMaterial" id=134]
-shader = SubResource( 133 )
+[sub_resource type="ShaderMaterial" id=143]
+shader = SubResource( 142 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=147]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeCustom" id=148]
+[sub_resource type="VisualShaderNodeCustom" id=145]
+default_input_values = [ 2, Vector3( 10, 10, 10 ), 3, 10.0 ]
 script = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeScalarOp" id=149]
+[sub_resource type="VisualShaderNodeScalarOp" id=146]
 default_input_values = [ 0, 0.0, 1, 1.0 ]
 
-[sub_resource type="VisualShaderNodeScalarOp" id=150]
+[sub_resource type="VisualShaderNodeScalarOp" id=147]
 default_input_values = [ 0, 0.0, 1, 0.5 ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeInput" id=151]
+[sub_resource type="VisualShaderNodeInput" id=148]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeInput" id=152]
+[sub_resource type="VisualShaderNodeInput" id=149]
 input_name = "screen_uv"
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=153]
+[sub_resource type="VisualShaderNodeVectorDecompose" id=150]
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=154]
+[sub_resource type="VisualShaderNodeVectorDecompose" id=151]
 
-[sub_resource type="VisualShaderNodeVectorCompose" id=155]
+[sub_resource type="VisualShaderNodeVectorCompose" id=152]
 
-[sub_resource type="VisualShader" id=145]
+[sub_resource type="VisualShader" id=153]
 code = "shader_type canvas_item;
 
 
@@ -4257,13 +4135,12 @@ void fragment() {
 // VectorCompose:9
 	vec3 n_out9p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
 
-// Scalar:10
-	float n_out10p0 = 10.000000;
-
 // SimplexNoise4D:2
+	vec3 n_in2p2 = vec3(10.00000, 10.00000, 10.00000);
+	float n_in2p3 = 10.00000;
 	float n_out2p0;
 	{
-		n_out2p0 = simplex_noise_4d(vec4(n_out9p0, n_out8p1) * vec4(vec3(n_out10p0), n_out10p0));
+		n_out2p0 = simplex_noise_4d(vec4(n_out9p0, n_out8p1) * vec4(n_in2p2, n_in2p3));
 	}
 
 // ScalarOp:3
@@ -4284,31 +4161,29 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -923, 135 )
+graph_offset = Vector2( -853.74, 19 )
 mode = 1
 flags/light_only = false
-nodes/fragment/2/node = SubResource( 148 )
+nodes/fragment/2/node = SubResource( 145 )
 nodes/fragment/2/position = Vector2( -180, 140 )
-nodes/fragment/3/node = SubResource( 149 )
+nodes/fragment/3/node = SubResource( 146 )
 nodes/fragment/3/position = Vector2( 40, 140 )
-nodes/fragment/4/node = SubResource( 150 )
+nodes/fragment/4/node = SubResource( 147 )
 nodes/fragment/4/position = Vector2( 220, 140 )
-nodes/fragment/5/node = SubResource( 151 )
+nodes/fragment/5/node = SubResource( 148 )
 nodes/fragment/5/position = Vector2( -900, 80 )
-nodes/fragment/6/node = SubResource( 152 )
+nodes/fragment/6/node = SubResource( 149 )
 nodes/fragment/6/position = Vector2( -940, 200 )
-nodes/fragment/7/node = SubResource( 153 )
+nodes/fragment/7/node = SubResource( 150 )
 nodes/fragment/7/position = Vector2( -700, 40 )
-nodes/fragment/8/node = SubResource( 154 )
+nodes/fragment/8/node = SubResource( 151 )
 nodes/fragment/8/position = Vector2( -700, 180 )
-nodes/fragment/9/node = SubResource( 155 )
+nodes/fragment/9/node = SubResource( 152 )
 nodes/fragment/9/position = Vector2( -420, 40 )
-nodes/fragment/10/node = SubResource( 147 )
-nodes/fragment/10/position = Vector2( -431, 329 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 3, 0, 3, 0, 4, 0, 4, 0, 0, 0, 9, 0, 2, 0, 7, 0, 9, 0, 7, 1, 9, 1, 8, 0, 9, 2, 8, 1, 2, 1, 5, 0, 7, 0, 6, 0, 8, 0, 10, 0, 2, 3, 10, 0, 2, 2 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 3, 0, 3, 0, 4, 0, 4, 0, 0, 0, 9, 0, 2, 0, 7, 0, 9, 0, 7, 1, 9, 1, 8, 0, 9, 2, 8, 1, 2, 1, 5, 0, 7, 0, 6, 0, 8, 0 )
 
-[sub_resource type="ShaderMaterial" id=146]
-shader = SubResource( 145 )
+[sub_resource type="ShaderMaterial" id=154]
+shader = SubResource( 153 )
 
 [node name="Node2D" type="Node2D"]
 
@@ -4614,7 +4489,7 @@ __meta__ = {
 }
 
 [node name="Simplex noise 3D" type="ColorRect" parent="."]
-material = SubResource( 134 )
+material = SubResource( 143 )
 margin_left = 419.847
 margin_top = 263.334
 margin_right = 480.847
@@ -4635,7 +4510,7 @@ __meta__ = {
 }
 
 [node name="Simplex noise 4D" type="ColorRect" parent="."]
-material = SubResource( 146 )
+material = SubResource( 154 )
 margin_left = 551.736
 margin_top = 264.456
 margin_right = 612.736
