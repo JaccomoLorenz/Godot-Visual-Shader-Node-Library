@@ -150,6 +150,11 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFBrickPattern.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSDFPatternHexTiles",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFHexagonPattern.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeSDFPatternTiles",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/sdf/SDFTilesPattern.gd"
@@ -203,6 +208,7 @@ _global_script_class_icons={
 "VisualShaderNodeSDFIntersectRound": "",
 "VisualShaderNodeSDFMergeRound": "",
 "VisualShaderNodeSDFPatternBrick": "",
+"VisualShaderNodeSDFPatternHexTiles": "",
 "VisualShaderNodeSDFPatternTiles": "",
 "VisualShaderNodeScreenSpaceRefraction": "",
 "VisualShaderNodeSimplexNoise2DWithRotatingGradient": "",
