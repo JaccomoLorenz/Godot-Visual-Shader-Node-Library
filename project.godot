@@ -10,6 +10,26 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise2D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise2D_2X2",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d_2x2.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise3D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeCellularNoise3D_2x2x2",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d_2x2x2.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeDeepParallax",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/deep_parallax.gd"
@@ -60,9 +80,29 @@ _global_script_classes=[ {
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/object_world_position.gd"
 }, {
 "base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodePerlinNoise2D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_2d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodePerlinNoise3D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_3d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodePerlinNoise4D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_4d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeProximityFade",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/proximity_fade.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeRandomNoise",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/random.gd"
 }, {
 "base": "VisualShaderNodeCustom",
 "class": "VisualShaderNodeReadNormalMap",
@@ -88,8 +128,27 @@ _global_script_classes=[ {
 "class": "VisualShaderNodeScreenSpaceRefraction",
 "language": "GDScript",
 "path": "res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSimplexNoise2DWithRotatingGradient",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_2d_rg.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSimplexNoise3D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_3d.gd"
+}, {
+"base": "VisualShaderNodeCustom",
+"class": "VisualShaderNodeSimplexNoise4D",
+"language": "GDScript",
+"path": "res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_4d.gd"
 } ]
 _global_script_class_icons={
+"VisualShaderNodeCellularNoise2D": "",
+"VisualShaderNodeCellularNoise2D_2X2": "",
+"VisualShaderNodeCellularNoise3D": "",
+"VisualShaderNodeCellularNoise3D_2x2x2": "",
 "VisualShaderNodeDeepParallax": "",
 "VisualShaderNodeDepth": "",
 "VisualShaderNodeDepthWorldPosition": "",
@@ -100,12 +159,19 @@ _global_script_class_icons={
 "VisualShaderNodeFlowMap": "",
 "VisualShaderNodeFlowMapAddUV": "",
 "VisualShaderNodeObjectWorldPosition": "",
+"VisualShaderNodePerlinNoise2D": "",
+"VisualShaderNodePerlinNoise3D": "",
+"VisualShaderNodePerlinNoise4D": "",
 "VisualShaderNodeProximityFade": "",
+"VisualShaderNodeRandomNoise": "",
 "VisualShaderNodeReadNormalMap": "",
 "VisualShaderNodeRefraction": "",
 "VisualShaderNodeRotation2D": "",
 "VisualShaderNodeRotation3D": "",
-"VisualShaderNodeScreenSpaceRefraction": ""
+"VisualShaderNodeScreenSpaceRefraction": "",
+"VisualShaderNodeSimplexNoise2DWithRotatingGradient": "",
+"VisualShaderNodeSimplexNoise3D": "",
+"VisualShaderNodeSimplexNoise4D": ""
 }
 
 [application]
@@ -116,4 +182,5 @@ config/icon="res://addons/visual_shader_node_library/icon.png"
 
 [rendering]
 
+quality/driver/driver_name="GLES2"
 environment/default_environment="res://addons/visual_shader_node_library/examples/3D/default_env.tres"
