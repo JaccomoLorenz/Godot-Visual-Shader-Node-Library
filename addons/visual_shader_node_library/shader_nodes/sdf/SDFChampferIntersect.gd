@@ -12,7 +12,7 @@ func _get_subcategory():
 	return "Operations"
 
 func _get_description():
-	return ""
+	return "Intersection of two SDF shapes, with champfered corners"
 
 func _get_return_icon_type():
 	return VisualShaderNode.PORT_TYPE_SCALAR
@@ -38,13 +38,17 @@ func _get_output_port_name(port):
 func _get_output_port_type(port):
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode):
-	return ""
-
 func _get_code(input_vars, output_vars, mode, type):
 	return """
-		float i1 = %s;
-		float i2 = %s;
-		float cc = %s + (i1 + i2) * 0.70710678118;
-		%s = max(max(i1, i2), cc);
-	""" % [input_vars[0], input_vars[1], input_vars[2], output_vars[0]]
+		float cc = {c} + ({i1} + {i2}) * 0.70710678118;
+		{res} = max(max({i1}, {i2}), cc);
+	""".format({
+		"i1": input_vars[0],
+		"i2": input_vars[1],
+		"c": input_vars[2],
+		"res": output_vars[0]
+	})
+
+func _init():
+	if not get_input_port_default_value(2):
+		set_input_port_default_value(2, 0.05)

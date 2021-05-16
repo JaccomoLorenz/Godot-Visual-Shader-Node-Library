@@ -77,14 +77,17 @@ func _get_code(input_vars, output_vars, mode, type):
 		
 	var a = input_vars[Inputs.A]
 	
-	if not a:
-		a = "vec3(1.0,1.0,1.0)"
-	
 	var b = input_vars[Inputs.B]
-	
-	if not b:
-		b = "vec3(0.0,0.0,0.0)"
 
 	return """
 		%s = mix(%s, %s, %s);
 	""" % [output_vars[0], a, b, step]
+
+
+func _init():
+	if not get_input_port_default_value(Inputs.A):
+		set_input_port_default_value(Inputs.A, Vector3(1.0,1.0,1.0))
+	if not get_input_port_default_value(Inputs.B):
+		set_input_port_default_value(Inputs.B, Vector3(0.0,0.0,0.0))
+	if not get_input_port_default_value(Inputs.THRESHOLD):
+		set_input_port_default_value(Inputs.THRESHOLD, 0.0)
