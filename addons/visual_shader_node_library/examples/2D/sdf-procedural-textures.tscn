@@ -1,3901 +1,64 @@
-[gd_scene load_steps=226 format=2]
+[gd_scene load_steps=83 format=2]
 
-[ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFExtractBorder.gd" type="Script" id=1]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFCircle.gd" type="Script" id=2]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_2d.gd" type="Script" id=3]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_4d.gd" type="Script" id=4]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_3d.gd" type="Script" id=5]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/perlin_2d.gd" type="Script" id=6]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/random.gd" type="Script" id=7]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d.gd" type="Script" id=8]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d_2x2.gd" type="Script" id=9]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d.gd" type="Script" id=10]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_3d_2x2x2.gd" type="Script" id=11]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_2d_rg.gd" type="Script" id=12]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFBrickPattern.gd" type="Script" id=13]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRoundIntersect.gd" type="Script" id=14]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/step_mix_s.gd" type="Script" id=15]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFTilesPattern.gd" type="Script" id=16]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFChampferIntersect.gd" type="Script" id=17]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/to_polar_2d.gd" type="Script" id=18]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/from_polar_2d.gd" type="Script" id=19]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFHexagonPattern.gd" type="Script" id=21]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRectangle.gd" type="Script" id=22]
 
-[sub_resource type="VisualShaderNodeCustom" id=1]
-script = ExtResource( 3 )
-
-[sub_resource type="VisualShaderNodeInput" id=2]
-input_name = "vertex"
-
-[sub_resource type="VisualShaderNodeInput" id=3]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=4]
-constant = 45.0
-
-[sub_resource type="VisualShaderNodeScalarFunc" id=5]
-function = 27
-
-[sub_resource type="VisualShader" id=6]
-code = "shader_type canvas_item;
-
-
-// Rotation2D
-
-void rotation_2d(float angle, vec3 pivot, in vec3 position_in,  out vec3 position_out) {
-	mat2 rotation_matrix = mat2( vec2(cos(angle), -sin(angle)), vec2(sin(angle), cos(angle)));
-	position_in -= pivot;
-	position_out.xy = rotation_matrix * position_in.xy;
-	position_out.z = position_in.z;
-	position_out += pivot;
-	
-}
-
-void vertex() {
-// Input:4
-	float n_out4p0 = TIME;
-
-// Input:3
-	vec3 n_out3p0 = vec3(VERTEX, 0.0);
-
-// Rotation2D:2
-	vec3 n_out2p0;
-	{
-		rotation_2d(n_out4p0, vec3(0.0, 0.0, 0.0), n_out3p0, n_out2p0);
-	}
-
-// Output:0
-	VERTEX = n_out2p0.xy;
-
-}
-
-void fragment() {
-// Output:0
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -120, -34.5 )
-mode = 1
-flags/light_only = false
-nodes/vertex/0/position = Vector2( 260, 140 )
-nodes/vertex/2/node = SubResource( 1 )
-nodes/vertex/2/position = Vector2( 20, 140 )
-nodes/vertex/3/node = SubResource( 2 )
-nodes/vertex/3/position = Vector2( -200, 240 )
-nodes/vertex/4/node = SubResource( 3 )
-nodes/vertex/4/position = Vector2( -200, 60 )
-nodes/vertex/5/node = SubResource( 4 )
-nodes/vertex/5/position = Vector2( -420, 160 )
-nodes/vertex/6/node = SubResource( 5 )
-nodes/vertex/6/position = Vector2( -220, 160 )
-nodes/vertex/connections = PoolIntArray( 3, 0, 2, 2, 2, 0, 0, 0, 5, 0, 6, 0, 4, 0, 2, 0 )
-
-[sub_resource type="ShaderMaterial" id=7]
-shader = SubResource( 6 )
-
-[sub_resource type="VisualShaderNodeCustom" id=8]
-default_input_values = [ 1, 0.0 ]
-script = ExtResource( 2 )
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=9]
-constant = Vector3( 1, 1, 1 )
-
-[sub_resource type="VisualShaderNodeGlobalExpression" id=10]
-size = Vector2( 464, 132 )
-expression = "/*Rotation3D can also be used in Canvas Item*/
-
-"
-
-[sub_resource type="VisualShader" id=11]
-code = "shader_type canvas_item;
-
-
-// Rotation3D
-
-mat4 rotation_matrix_3d(vec3 axis, float angle){
-    axis = normalize(axis);
-    float s = sin(angle);
-    float c = cos(angle);
-    float oc = 1.0 - c;
-
-    return mat4(vec4(oc * axis.x * axis.x + c,			oc * axis.x * axis.y - axis.z * s,	oc * axis.z * axis.x + axis.y * s,	0.0),
-                vec4(oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c,			oc * axis.y * axis.z - axis.x * s,	0.0),
-                vec4(oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, 	oc * axis.z * axis.z + c,			0.0),
-                vec4(0.0,								0.0, 								0.0,								1.0));
-}
-
-void rotation_3d_normal(vec3 axis, float angle, in vec3 normal_in, out vec3 normal_out) {
-	normal_out = (rotation_matrix_3d(axis, angle) * vec4(normal_in, 0.0)).xyz;
-}
-
-void rotation_3d(vec3 axis, float angle, vec3 pivot, in vec3 position_in, out vec3 position_out) {
-	position_in.xyz -= pivot;
-	vec4 position = vec4(position_in, 1.0);
-	position_out = (rotation_matrix_3d(axis, angle) * position).xyz;
-	position_out += pivot;
-}
-// GlobalExpression:0
-	/*Rotation3D can also be used in Canvas Item*/
-	
-	
-
-void vertex() {
-// Vector:8
-	vec3 n_out8p0 = vec3(1.000000, 1.000000, 1.000000);
-
-// Input:4
-	float n_out4p0 = TIME;
-
-// Input:3
-	vec3 n_out3p0 = vec3(VERTEX, 0.0);
-
-// Rotation3D:7
-	vec3 n_out7p0;
-	vec3 n_out7p1;
-	{
-		rotation_3d(n_out8p0, n_out4p0, vec3(0.0, 0.0, 0.0), n_out3p0, n_out7p0);n_out7p1 = vec3(0.0, 0.0, 0.0);
-	}
-
-// Output:0
-	VERTEX = n_out7p0.xy;
-
-}
-
-void fragment() {
-// Output:0
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -519, -103 )
-mode = 1
-flags/light_only = false
-nodes/vertex/0/position = Vector2( 260, 140 )
-nodes/vertex/3/node = SubResource( 2 )
-nodes/vertex/3/position = Vector2( -200, 240 )
-nodes/vertex/4/node = SubResource( 3 )
-nodes/vertex/4/position = Vector2( -200, 100 )
-nodes/vertex/5/node = SubResource( 4 )
-nodes/vertex/5/position = Vector2( -420, 160 )
-nodes/vertex/6/node = SubResource( 5 )
-nodes/vertex/6/position = Vector2( -220, 160 )
-nodes/vertex/7/node = SubResource( 8 )
-nodes/vertex/7/position = Vector2( 40, 140 )
-nodes/vertex/8/node = SubResource( 9 )
-nodes/vertex/8/position = Vector2( -340, 0 )
-nodes/vertex/9/node = SubResource( 10 )
-nodes/vertex/9/position = Vector2( 20, -40 )
-nodes/vertex/9/size = Vector2( 464, 132 )
-nodes/vertex/9/input_ports = ""
-nodes/vertex/9/output_ports = ""
-nodes/vertex/9/expression = "/*Rotation3D can also be used in Canvas Item*/
-
-"
-nodes/vertex/connections = PoolIntArray( 5, 0, 6, 0, 7, 0, 0, 0, 3, 0, 7, 3, 4, 0, 7, 1, 8, 0, 7, 0 )
-
-[sub_resource type="ShaderMaterial" id=12]
-shader = SubResource( 11 )
-
-[sub_resource type="VisualShaderNodeInput" id=13]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=14]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeCustom" id=15]
-script = ExtResource( 6 )
-
-[sub_resource type="VisualShader" id=16]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise2D
-
-
-// GLSL textureless classic 2D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-08-22
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-//
-
-vec4 HELPER_PerlinNoise2D_mod289(vec4 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise2D_permute(vec4 x) {
-    return HELPER_PerlinNoise2D_mod289(((x * 34.0) + 1.0) * x);
-}
-
-vec4 HELPER_PerlinNoise2D_taylorInvSqrt(vec4 r) {
-    return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec2 HELPER_PerlinNoise2D_fade(vec2 t) {
-    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_2d_np(vec2 P) {
-    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
-    vec4 ix = Pi.xzxz;
-    vec4 iy = Pi.yyww;
-    vec4 fx = Pf.xzxz;
-    vec4 fy = Pf.yyww;
-
-    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
-
-    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
-    vec4 gy = abs(gx) - 0.5 ;
-    vec4 tx = floor(gx + 0.5);
-    gx = gx - tx;
-
-    vec2 g00 = vec2(gx.x,gy.x);
-    vec2 g10 = vec2(gx.y,gy.y);
-    vec2 g01 = vec2(gx.z,gy.z);
-    vec2 g11 = vec2(gx.w,gy.w);
-    
-    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
-    g00 *= norm.x;
-    g01 *= norm.y;
-    g10 *= norm.z;
-    g11 *= norm.w;
-    
-    float n00 = dot(g00, vec2(fx.x, fy.x));
-    float n10 = dot(g10, vec2(fx.y, fy.y));
-    float n01 = dot(g01, vec2(fx.z, fy.z));
-    float n11 = dot(g11, vec2(fx.w, fy.w));
-    
-    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
-    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-    return 1.15 * n_xy + 0.5;
-}
-
-// Classic Perlin noise, periodic variant
-float perlin_noise_2d_p(vec2 P, vec2 rep) {
-    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
-    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
-    vec4 ix = Pi.xzxz;
-    vec4 iy = Pi.yyww;
-    vec4 fx = Pf.xzxz;
-    vec4 fy = Pf.yyww;
-    
-    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
-    
-    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
-    vec4 gy = abs(gx) - 0.5 ;
-    vec4 tx = floor(gx + 0.5);
-    gx = gx - tx;
-    
-    vec2 g00 = vec2(gx.x,gy.x);
-    vec2 g10 = vec2(gx.y,gy.y);
-    vec2 g01 = vec2(gx.z,gy.z);
-    vec2 g11 = vec2(gx.w,gy.w);
-    
-    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
-    g00 *= norm.x;
-    g01 *= norm.y;
-    g10 *= norm.z;
-    g11 *= norm.w;
-
-    float n00 = dot(g00, vec2(fx.x, fy.x));
-    float n10 = dot(g10, vec2(fx.y, fy.y));
-    float n01 = dot(g01, vec2(fx.z, fy.z));
-    float n11 = dot(g11, vec2(fx.w, fy.w));
-    
-    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
-    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-    return 1.15 * n_xy + 0.5;
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// PerlinNoise2D:6
-	float n_out6p0;
-	{
-		n_out6p0 = perlin_noise_2d_np(((n_out3p0).xy).xy * (vec3(n_out5p0)).xy.xy);
-	}
-
-// Output:0
-	COLOR.rgb = vec3(n_out6p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -477.933, 7 )
-mode = 1
-flags/light_only = false
-nodes/fragment/3/node = SubResource( 13 )
-nodes/fragment/3/position = Vector2( -120, 140 )
-nodes/fragment/5/node = SubResource( 14 )
-nodes/fragment/5/position = Vector2( -120, 300 )
-nodes/fragment/6/node = SubResource( 15 )
-nodes/fragment/6/position = Vector2( 140, 140 )
-nodes/fragment/connections = PoolIntArray( 6, 0, 0, 0, 3, 0, 6, 0, 5, 0, 6, 2 )
-
-[sub_resource type="ShaderMaterial" id=17]
-shader = SubResource( 16 )
-
-[sub_resource type="VisualShaderNodeCustom" id=18]
-script = ExtResource( 6 )
-
-[sub_resource type="VisualShaderNodeInput" id=19]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=20]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=21]
-constant = Vector3( 5, 2, 0 )
-
-[sub_resource type="VisualShader" id=22]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise2D
-
-
-// GLSL textureless classic 2D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-08-22
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-//
-
-vec4 HELPER_PerlinNoise2D_mod289(vec4 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise2D_permute(vec4 x) {
-    return HELPER_PerlinNoise2D_mod289(((x * 34.0) + 1.0) * x);
-}
-
-vec4 HELPER_PerlinNoise2D_taylorInvSqrt(vec4 r) {
-    return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec2 HELPER_PerlinNoise2D_fade(vec2 t) {
-    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_2d_np(vec2 P) {
-    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
-    vec4 ix = Pi.xzxz;
-    vec4 iy = Pi.yyww;
-    vec4 fx = Pf.xzxz;
-    vec4 fy = Pf.yyww;
-
-    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
-
-    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
-    vec4 gy = abs(gx) - 0.5 ;
-    vec4 tx = floor(gx + 0.5);
-    gx = gx - tx;
-
-    vec2 g00 = vec2(gx.x,gy.x);
-    vec2 g10 = vec2(gx.y,gy.y);
-    vec2 g01 = vec2(gx.z,gy.z);
-    vec2 g11 = vec2(gx.w,gy.w);
-    
-    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
-    g00 *= norm.x;
-    g01 *= norm.y;
-    g10 *= norm.z;
-    g11 *= norm.w;
-    
-    float n00 = dot(g00, vec2(fx.x, fy.x));
-    float n10 = dot(g10, vec2(fx.y, fy.y));
-    float n01 = dot(g01, vec2(fx.z, fy.z));
-    float n11 = dot(g11, vec2(fx.w, fy.w));
-    
-    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
-    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-    return 1.15 * n_xy + 0.5;
-}
-
-// Classic Perlin noise, periodic variant
-float perlin_noise_2d_p(vec2 P, vec2 rep) {
-    vec4 Pi = floor(vec4(P, P)) + vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 Pf = fract(vec4(P, P)) - vec4(0.0, 0.0, 1.0, 1.0);
-    Pi = mod(Pi, vec4(rep, rep)); // To create noise with explicit period
-    Pi = HELPER_PerlinNoise2D_mod289(Pi); // To avoid truncation effects in permutation
-    vec4 ix = Pi.xzxz;
-    vec4 iy = Pi.yyww;
-    vec4 fx = Pf.xzxz;
-    vec4 fy = Pf.yyww;
-    
-    vec4 i = HELPER_PerlinNoise2D_permute(HELPER_PerlinNoise2D_permute(ix) + iy);
-    
-    vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
-    vec4 gy = abs(gx) - 0.5 ;
-    vec4 tx = floor(gx + 0.5);
-    gx = gx - tx;
-    
-    vec2 g00 = vec2(gx.x,gy.x);
-    vec2 g10 = vec2(gx.y,gy.y);
-    vec2 g01 = vec2(gx.z,gy.z);
-    vec2 g11 = vec2(gx.w,gy.w);
-    
-    vec4 norm = HELPER_PerlinNoise2D_taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
-    g00 *= norm.x;
-    g01 *= norm.y;
-    g10 *= norm.z;
-    g11 *= norm.w;
-
-    float n00 = dot(g00, vec2(fx.x, fy.x));
-    float n10 = dot(g10, vec2(fx.y, fy.y));
-    float n01 = dot(g01, vec2(fx.z, fy.z));
-    float n11 = dot(g11, vec2(fx.w, fy.w));
-    
-    vec2 fade_xy = HELPER_PerlinNoise2D_fade(Pf.xy);
-    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-    return 1.15 * n_xy + 0.5;
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// Vector:5
-	vec3 n_out5p0 = vec3(5.000000, 2.000000, 0.000000);
-
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// PerlinNoise2D:2
-	float n_out2p0;
-	{
-		n_out2p0 = perlin_noise_2d_p(((n_out3p0).xy).xy * (vec3(n_out4p0)).xy.xy, (n_out5p0).xy);
-	}
-
-// Output:0
-	COLOR.rgb = vec3(n_out2p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -477.933, 7 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 260, 120 )
-nodes/fragment/2/node = SubResource( 18 )
-nodes/fragment/2/position = Vector2( -20, 140 )
-nodes/fragment/3/node = SubResource( 19 )
-nodes/fragment/3/position = Vector2( -340, 80 )
-nodes/fragment/4/node = SubResource( 20 )
-nodes/fragment/4/position = Vector2( -380, 160 )
-nodes/fragment/5/node = SubResource( 21 )
-nodes/fragment/5/position = Vector2( -460, 240 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 2, 0, 4, 0, 2, 2, 5, 0, 2, 1 )
-
-[sub_resource type="ShaderMaterial" id=23]
-shader = SubResource( 22 )
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=24]
-constant = Vector3( 12, 12, 3 )
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=25]
-constant = Vector3( 5, 5, 1 )
-
-[sub_resource type="VisualShaderNodeCustom" id=26]
-script = ExtResource( 5 )
-
-[sub_resource type="VisualShaderNodeCustom" id=27]
-script = ExtResource( 5 )
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=28]
-
-[sub_resource type="VisualShaderNodeInput" id=29]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=30]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=31]
-
-[sub_resource type="VisualShaderNodeInput" id=32]
-input_name = "time"
-
-[sub_resource type="VisualShader" id=33]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise3D
-
-// GLSL textureless classic 3D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-10-11
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-//
-
-vec3 HELPER_PerlinNoise3D_mod289_3(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise3D_mod289_4(vec4 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise3D_permute(vec4 x) {
-    return HELPER_PerlinNoise3D_mod289_4(((x*34.0)+1.0)*x);
-}
-
-vec4 HELPER_PerlinNoise3D_taylorInvSqrt(vec4 r) {
-    return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec3 HELPER_PerlinNoise3D_fade(vec3 t) {
-    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_3d_np(vec3 P) {
-    vec3 Pi0 = floor(P); // Integer part for indexing
-    vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
-    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
-    vec3 Pf0 = fract(P); // Fractional part for interpolation
-    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.z);
-    vec4 iz1 = vec4(Pi1.z);
-    
-    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
-    
-    vec4 gx0 = ixy0 * (1.0 / 7.0);
-    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-    gx0 = fract(gx0);
-    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-    vec4 sz0 = step(gz0, vec4(0.0));
-    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-    
-    vec4 gx1 = ixy1 * (1.0 / 7.0);
-    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-    gx1 = fract(gx1);
-    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-    vec4 sz1 = step(gz1, vec4(0.0));
-    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-    
-    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-    
-    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
-    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
-    
-    float n000 = dot(g000, Pf0);
-    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-    float n111 = dot(g111, Pf1);
-    
-    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
-    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-    return 1.1 * n_xyz + 0.5;
-}
-
-// Classic Perlin noise, periodic variant
-float perlin_noise_3d_p(vec3 P, vec3 rep) {
-    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
-    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
-    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
-    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
-    vec3 Pf0 = fract(P); // Fractional part for interpolation
-    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.z);
-    vec4 iz1 = vec4(Pi1.z);
-    
-    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
-    
-    vec4 gx0 = ixy0 * (1.0 / 7.0);
-    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-    gx0 = fract(gx0);
-    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-    vec4 sz0 = step(gz0, vec4(0.0));
-    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-    
-    vec4 gx1 = ixy1 * (1.0 / 7.0);
-    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-    gx1 = fract(gx1);
-    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-    vec4 sz1 = step(gz1, vec4(0.0));
-    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-    
-    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-    
-    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
-    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
-    
-    float n000 = dot(g000, Pf0);
-    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-    float n111 = dot(g111, Pf1);
-    
-    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
-    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-    return 1.1 * n_xyz + 0.5;
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:4
-	vec3 n_out4p0 = vec3(UV, 0.0);
-
-// VectorDecompose:7
-	float n_out7p0 = n_out4p0.x;
-	float n_out7p1 = n_out4p0.y;
-	float n_out7p2 = n_out4p0.z;
-
-// Input:8
-	float n_out8p0 = TIME;
-
-// VectorCompose:6
-	vec3 n_out6p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
-
-// Vector:17
-	vec3 n_out17p0 = vec3(5.000000, 5.000000, 1.000000);
-
-// PerlinNoise3D:18
-	float n_out18p0;
-	{
-		n_out18p0 = perlin_noise_3d_np(n_out6p0 * n_out17p0);
-	}
-
-// Vector:16
-	vec3 n_out16p0 = vec3(12.000000, 12.000000, 3.000000);
-
-// PerlinNoise3D:19
-	float n_out19p0;
-	{
-		n_out19p0 = perlin_noise_3d_np(n_out6p0 * n_out16p0);
-	}
-
-// VectorCompose:3
-	float n_in3p1 = 0.00000;
-	vec3 n_out3p0 = vec3(n_out18p0, n_in3p1, n_out19p0);
-
-// Output:0
-	COLOR.rgb = n_out3p0;
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -477.933, 7 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 580, 100 )
-nodes/fragment/3/node = SubResource( 28 )
-nodes/fragment/3/position = Vector2( 360, 100 )
-nodes/fragment/4/node = SubResource( 29 )
-nodes/fragment/4/position = Vector2( -560, 80 )
-nodes/fragment/6/node = SubResource( 30 )
-nodes/fragment/6/position = Vector2( -160, 80 )
-nodes/fragment/7/node = SubResource( 31 )
-nodes/fragment/7/position = Vector2( -380, 80 )
-nodes/fragment/8/node = SubResource( 32 )
-nodes/fragment/8/position = Vector2( -380, 220 )
-nodes/fragment/16/node = SubResource( 24 )
-nodes/fragment/16/position = Vector2( -300, 300 )
-nodes/fragment/17/node = SubResource( 25 )
-nodes/fragment/17/position = Vector2( -300, -60 )
-nodes/fragment/18/node = SubResource( 26 )
-nodes/fragment/18/position = Vector2( 140, 40 )
-nodes/fragment/19/node = SubResource( 27 )
-nodes/fragment/19/position = Vector2( 140, 180 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 0, 0, 7, 0, 6, 0, 7, 1, 6, 1, 8, 0, 6, 2, 4, 0, 7, 0, 18, 0, 3, 0, 6, 0, 18, 0, 17, 0, 18, 2, 19, 0, 3, 2, 16, 0, 19, 2, 6, 0, 19, 0 )
-
-[sub_resource type="ShaderMaterial" id=34]
-shader = SubResource( 33 )
-
-[sub_resource type="VisualShaderNodeCustom" id=35]
-script = ExtResource( 5 )
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=36]
-constant = Vector3( 2, 2, 5 )
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=37]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=38]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=39]
-
-[sub_resource type="VisualShaderNodeInput" id=40]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeInput" id=41]
-input_name = "uv"
-
-[sub_resource type="VisualShader" id=42]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise3D
-
-// GLSL textureless classic 3D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-10-11
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-//
-
-vec3 HELPER_PerlinNoise3D_mod289_3(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise3D_mod289_4(vec4 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise3D_permute(vec4 x) {
-    return HELPER_PerlinNoise3D_mod289_4(((x*34.0)+1.0)*x);
-}
-
-vec4 HELPER_PerlinNoise3D_taylorInvSqrt(vec4 r) {
-    return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec3 HELPER_PerlinNoise3D_fade(vec3 t) {
-    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_3d_np(vec3 P) {
-    vec3 Pi0 = floor(P); // Integer part for indexing
-    vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
-    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
-    vec3 Pf0 = fract(P); // Fractional part for interpolation
-    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.z);
-    vec4 iz1 = vec4(Pi1.z);
-    
-    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
-    
-    vec4 gx0 = ixy0 * (1.0 / 7.0);
-    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-    gx0 = fract(gx0);
-    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-    vec4 sz0 = step(gz0, vec4(0.0));
-    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-    
-    vec4 gx1 = ixy1 * (1.0 / 7.0);
-    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-    gx1 = fract(gx1);
-    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-    vec4 sz1 = step(gz1, vec4(0.0));
-    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-    
-    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-    
-    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
-    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
-    
-    float n000 = dot(g000, Pf0);
-    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-    float n111 = dot(g111, Pf1);
-    
-    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
-    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-    return 1.1 * n_xyz + 0.5;
-}
-
-// Classic Perlin noise, periodic variant
-float perlin_noise_3d_p(vec3 P, vec3 rep) {
-    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
-    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
-    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
-    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
-    vec3 Pf0 = fract(P); // Fractional part for interpolation
-    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.z);
-    vec4 iz1 = vec4(Pi1.z);
-    
-    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
-    
-    vec4 gx0 = ixy0 * (1.0 / 7.0);
-    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-    gx0 = fract(gx0);
-    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-    vec4 sz0 = step(gz0, vec4(0.0));
-    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-    
-    vec4 gx1 = ixy1 * (1.0 / 7.0);
-    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-    gx1 = fract(gx1);
-    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-    vec4 sz1 = step(gz1, vec4(0.0));
-    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-    
-    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-    
-    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
-    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
-    
-    float n000 = dot(g000, Pf0);
-    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-    float n111 = dot(g111, Pf1);
-    
-    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
-    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-    return 1.1 * n_xyz + 0.5;
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:8
-	vec3 n_out8p0 = vec3(UV, 0.0);
-
-// VectorDecompose:6
-	float n_out6p0 = n_out8p0.x;
-	float n_out6p1 = n_out8p0.y;
-	float n_out6p2 = n_out8p0.z;
-
-// Input:7
-	float n_out7p0 = TIME;
-
-// VectorCompose:5
-	vec3 n_out5p0 = vec3(n_out6p0, n_out6p1, n_out7p0);
-
-// Vector:3
-	vec3 n_out3p0 = vec3(2.000000, 2.000000, 5.000000);
-
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// PerlinNoise3D:2
-	float n_out2p0;
-	{
-		n_out2p0 = perlin_noise_3d_p(n_out5p0 * vec3(n_out4p0), n_out3p0);
-	}
-
-// Output:0
-	COLOR.rgb = vec3(n_out2p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -549.933, 24 )
-mode = 1
-flags/light_only = false
-nodes/fragment/2/node = SubResource( 35 )
-nodes/fragment/2/position = Vector2( 100, 160 )
-nodes/fragment/3/node = SubResource( 36 )
-nodes/fragment/3/position = Vector2( -360, 180 )
-nodes/fragment/4/node = SubResource( 37 )
-nodes/fragment/4/position = Vector2( -274.933, 327 )
-nodes/fragment/5/node = SubResource( 38 )
-nodes/fragment/5/position = Vector2( -140, 20 )
-nodes/fragment/6/node = SubResource( 39 )
-nodes/fragment/6/position = Vector2( -380, -40 )
-nodes/fragment/7/node = SubResource( 40 )
-nodes/fragment/7/position = Vector2( -380, 100 )
-nodes/fragment/8/node = SubResource( 41 )
-nodes/fragment/8/position = Vector2( -600, -40 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 2, 1, 4, 0, 2, 2, 5, 0, 2, 0, 6, 0, 5, 0, 6, 1, 5, 1, 7, 0, 5, 2, 8, 0, 6, 0 )
-
-[sub_resource type="ShaderMaterial" id=43]
-shader = SubResource( 42 )
-
-[sub_resource type="VisualShaderNodeCustom" id=44]
-script = ExtResource( 4 )
-
-[sub_resource type="VisualShaderNodeInput" id=45]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=46]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeInput" id=47]
-input_name = "screen_uv"
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=48]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=49]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=50]
-
-[sub_resource type="VisualShader" id=51]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise4D
-
-
-// GLSL textureless classic 4D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-08-22
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-
-vec4 HELPER_PerlinNoise4D_mod289(vec4 x) {
-	return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise4D_permute(vec4 x) {
-	return HELPER_PerlinNoise4D_mod289(((x*34.0)+1.0)*x);
-}
-
-vec4 HELPER_PerlinNoise4D_taylorInvSqrt(vec4 r) {
-	return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec4 HELPER_PerlinNoise4D_fade(vec4 t) {
-	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_4d_np(vec4 P) {
-    vec4 Pi0 = floor(P); // Integer part for indexing
-    vec4 Pi1 = Pi0 + 1.0; // Integer part + 1
-    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
-    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
-    vec4 Pf0 = fract(P); // Fractional part for interpolation
-    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.zzzz);
-    vec4 iz1 = vec4(Pi1.zzzz);
-    vec4 iw0 = vec4(Pi0.wwww);
-    vec4 iw1 = vec4(Pi1.wwww);
-    
-    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
-    
-    vec4 gx00 = ixy00 * (1.0 / 7.0);
-    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
-    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
-    gx00 = fract(gx00) - 0.5;
-    gy00 = fract(gy00) - 0.5;
-    gz00 = fract(gz00) - 0.5;
-    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
-    vec4 sw00 = step(gw00, vec4(0.0));
-    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
-    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
-    
-    vec4 gx01 = ixy01 * (1.0 / 7.0);
-    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
-    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
-    gx01 = fract(gx01) - 0.5;
-    gy01 = fract(gy01) - 0.5;
-    gz01 = fract(gz01) - 0.5;
-    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
-    vec4 sw01 = step(gw01, vec4(0.0));
-    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
-    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
-    
-    vec4 gx10 = ixy10 * (1.0 / 7.0);
-    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
-    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
-    gx10 = fract(gx10) - 0.5;
-    gy10 = fract(gy10) - 0.5;
-    gz10 = fract(gz10) - 0.5;
-    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
-    vec4 sw10 = step(gw10, vec4(0.0));
-    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
-    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
-    
-    vec4 gx11 = ixy11 * (1.0 / 7.0);
-    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
-    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
-    gx11 = fract(gx11) - 0.5;
-    gy11 = fract(gy11) - 0.5;
-    gz11 = fract(gz11) - 0.5;
-    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
-    vec4 sw11 = step(gw11, vec4(0.0));
-    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
-    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
-    
-    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
-    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
-    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
-    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
-    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
-    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
-    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
-    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
-    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
-    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
-    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
-    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
-    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
-    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
-    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
-    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
-    
-    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
-    g0000 *= norm00.x;
-    g0100 *= norm00.y;
-    g1000 *= norm00.z;
-    g1100 *= norm00.w;
-    
-    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
-    g0001 *= norm01.x;
-    g0101 *= norm01.y;
-    g1001 *= norm01.z;
-    g1101 *= norm01.w;
-    
-    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
-    g0010 *= norm10.x;
-    g0110 *= norm10.y;
-    g1010 *= norm10.z;
-    g1110 *= norm10.w;
-    
-    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
-    g0011 *= norm11.x;
-    g0111 *= norm11.y;
-    g1011 *= norm11.z;
-    g1111 *= norm11.w;
-    
-    float n0000 = dot(g0000, Pf0);
-    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
-    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
-    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
-    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
-    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
-    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
-    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
-    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
-    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
-    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
-    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
-    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
-    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
-    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
-    float n1111 = dot(g1111, Pf1);
-    
-    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
-    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
-    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
-    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
-    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
-    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
-    return 1.1 * n_xyzw + 0.5;
-}
-
-// Classic Perlin noise, periodic version
-float perlin_noise_4d_p(vec4 P, vec4 rep) {
-    vec4 Pi0 = mod(floor(P), rep); // Integer part modulo rep
-    vec4 Pi1 = mod(Pi0 + 1.0, rep); // Integer part + 1 mod rep
-    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
-    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
-    vec4 Pf0 = fract(P); // Fractional part for interpolation
-    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.zzzz);
-    vec4 iz1 = vec4(Pi1.zzzz);
-    vec4 iw0 = vec4(Pi0.wwww);
-    vec4 iw1 = vec4(Pi1.wwww);
-    
-    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
-    
-    vec4 gx00 = ixy00 * (1.0 / 7.0);
-    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
-    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
-    gx00 = fract(gx00) - 0.5;
-    gy00 = fract(gy00) - 0.5;
-    gz00 = fract(gz00) - 0.5;
-    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
-    vec4 sw00 = step(gw00, vec4(0.0));
-    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
-    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
-    
-    vec4 gx01 = ixy01 * (1.0 / 7.0);
-    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
-    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
-    gx01 = fract(gx01) - 0.5;
-    gy01 = fract(gy01) - 0.5;
-    gz01 = fract(gz01) - 0.5;
-    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
-    vec4 sw01 = step(gw01, vec4(0.0));
-    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
-    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
-    
-    vec4 gx10 = ixy10 * (1.0 / 7.0);
-    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
-    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
-    gx10 = fract(gx10) - 0.5;
-    gy10 = fract(gy10) - 0.5;
-    gz10 = fract(gz10) - 0.5;
-    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
-    vec4 sw10 = step(gw10, vec4(0.0));
-    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
-    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
-    
-    vec4 gx11 = ixy11 * (1.0 / 7.0);
-    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
-    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
-    gx11 = fract(gx11) - 0.5;
-    gy11 = fract(gy11) - 0.5;
-    gz11 = fract(gz11) - 0.5;
-    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
-    vec4 sw11 = step(gw11, vec4(0.0));
-    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
-    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
-    
-    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
-    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
-    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
-    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
-    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
-    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
-    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
-    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
-    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
-    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
-    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
-    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
-    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
-    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
-    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
-    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
-    
-    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
-    g0000 *= norm00.x;
-    g0100 *= norm00.y;
-    g1000 *= norm00.z;
-    g1100 *= norm00.w;
-    
-    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
-    g0001 *= norm01.x;
-    g0101 *= norm01.y;
-    g1001 *= norm01.z;
-    g1101 *= norm01.w;
-    
-    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
-    g0010 *= norm10.x;
-    g0110 *= norm10.y;
-    g1010 *= norm10.z;
-    g1110 *= norm10.w;
-    
-    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
-    g0011 *= norm11.x;
-    g0111 *= norm11.y;
-    g1011 *= norm11.z;
-    g1111 *= norm11.w;
-    
-    float n0000 = dot(g0000, Pf0);
-    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
-    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
-    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
-    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
-    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
-    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
-    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
-    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
-    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
-    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
-    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
-    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
-    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
-    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
-    float n1111 = dot(g1111, Pf1);
-    
-    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
-    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
-    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
-    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
-    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
-    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
-    return 1.1 * n_xyzw + 0.5;
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// VectorDecompose:7
-	float n_out7p0 = n_out3p0.x;
-	float n_out7p1 = n_out3p0.y;
-	float n_out7p2 = n_out3p0.z;
-
-// Input:5
-	vec3 n_out5p0 = vec3(SCREEN_UV, 0.0);
-
-// VectorDecompose:8
-	float n_out8p0 = n_out5p0.x;
-	float n_out8p1 = n_out5p0.y;
-	float n_out8p2 = n_out5p0.z;
-
-// VectorCompose:6
-	vec3 n_out6p0 = vec3(n_out7p0, n_out7p1, n_out8p0);
-
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// PerlinNoise4D:2
-	float n_out2p0;
-	{
-		n_out2p0 = perlin_noise_4d_np(vec4(n_out6p0, n_out8p1) * vec4(vec3(n_out4p0), n_out4p0));
-	}
-
-// Output:0
-	COLOR.rgb = vec3(n_out2p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -606, -85 )
-mode = 1
-flags/light_only = false
-nodes/fragment/2/node = SubResource( 44 )
-nodes/fragment/2/position = Vector2( 160, 140 )
-nodes/fragment/3/node = SubResource( 45 )
-nodes/fragment/3/position = Vector2( -520, 40 )
-nodes/fragment/4/node = SubResource( 46 )
-nodes/fragment/4/position = Vector2( -260, 340 )
-nodes/fragment/5/node = SubResource( 47 )
-nodes/fragment/5/position = Vector2( -580, 160 )
-nodes/fragment/6/node = SubResource( 48 )
-nodes/fragment/6/position = Vector2( -60, 60 )
-nodes/fragment/7/node = SubResource( 49 )
-nodes/fragment/7/position = Vector2( -340, 40 )
-nodes/fragment/8/node = SubResource( 50 )
-nodes/fragment/8/position = Vector2( -340, 160 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 4, 0, 2, 4, 4, 0, 2, 5, 6, 0, 2, 0, 3, 0, 7, 0, 7, 0, 6, 0, 7, 1, 6, 1, 5, 0, 8, 0, 8, 0, 6, 2, 8, 1, 2, 1 )
-
-[sub_resource type="ShaderMaterial" id=52]
-shader = SubResource( 51 )
-
-[sub_resource type="VisualShaderNodeCustom" id=53]
-script = ExtResource( 4 )
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=54]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=55]
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=56]
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=57]
-constant = 2.0
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=58]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeInput" id=59]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeInput" id=60]
-input_name = "screen_uv"
-
-[sub_resource type="VisualShader" id=61]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise4D
-
-
-// GLSL textureless classic 4D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-08-22
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-
-vec4 HELPER_PerlinNoise4D_mod289(vec4 x) {
-	return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise4D_permute(vec4 x) {
-	return HELPER_PerlinNoise4D_mod289(((x*34.0)+1.0)*x);
-}
-
-vec4 HELPER_PerlinNoise4D_taylorInvSqrt(vec4 r) {
-	return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec4 HELPER_PerlinNoise4D_fade(vec4 t) {
-	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_4d_np(vec4 P) {
-    vec4 Pi0 = floor(P); // Integer part for indexing
-    vec4 Pi1 = Pi0 + 1.0; // Integer part + 1
-    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
-    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
-    vec4 Pf0 = fract(P); // Fractional part for interpolation
-    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.zzzz);
-    vec4 iz1 = vec4(Pi1.zzzz);
-    vec4 iw0 = vec4(Pi0.wwww);
-    vec4 iw1 = vec4(Pi1.wwww);
-    
-    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
-    
-    vec4 gx00 = ixy00 * (1.0 / 7.0);
-    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
-    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
-    gx00 = fract(gx00) - 0.5;
-    gy00 = fract(gy00) - 0.5;
-    gz00 = fract(gz00) - 0.5;
-    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
-    vec4 sw00 = step(gw00, vec4(0.0));
-    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
-    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
-    
-    vec4 gx01 = ixy01 * (1.0 / 7.0);
-    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
-    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
-    gx01 = fract(gx01) - 0.5;
-    gy01 = fract(gy01) - 0.5;
-    gz01 = fract(gz01) - 0.5;
-    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
-    vec4 sw01 = step(gw01, vec4(0.0));
-    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
-    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
-    
-    vec4 gx10 = ixy10 * (1.0 / 7.0);
-    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
-    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
-    gx10 = fract(gx10) - 0.5;
-    gy10 = fract(gy10) - 0.5;
-    gz10 = fract(gz10) - 0.5;
-    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
-    vec4 sw10 = step(gw10, vec4(0.0));
-    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
-    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
-    
-    vec4 gx11 = ixy11 * (1.0 / 7.0);
-    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
-    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
-    gx11 = fract(gx11) - 0.5;
-    gy11 = fract(gy11) - 0.5;
-    gz11 = fract(gz11) - 0.5;
-    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
-    vec4 sw11 = step(gw11, vec4(0.0));
-    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
-    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
-    
-    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
-    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
-    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
-    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
-    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
-    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
-    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
-    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
-    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
-    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
-    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
-    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
-    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
-    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
-    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
-    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
-    
-    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
-    g0000 *= norm00.x;
-    g0100 *= norm00.y;
-    g1000 *= norm00.z;
-    g1100 *= norm00.w;
-    
-    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
-    g0001 *= norm01.x;
-    g0101 *= norm01.y;
-    g1001 *= norm01.z;
-    g1101 *= norm01.w;
-    
-    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
-    g0010 *= norm10.x;
-    g0110 *= norm10.y;
-    g1010 *= norm10.z;
-    g1110 *= norm10.w;
-    
-    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
-    g0011 *= norm11.x;
-    g0111 *= norm11.y;
-    g1011 *= norm11.z;
-    g1111 *= norm11.w;
-    
-    float n0000 = dot(g0000, Pf0);
-    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
-    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
-    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
-    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
-    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
-    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
-    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
-    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
-    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
-    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
-    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
-    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
-    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
-    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
-    float n1111 = dot(g1111, Pf1);
-    
-    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
-    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
-    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
-    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
-    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
-    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
-    return 1.1 * n_xyzw + 0.5;
-}
-
-// Classic Perlin noise, periodic version
-float perlin_noise_4d_p(vec4 P, vec4 rep) {
-    vec4 Pi0 = mod(floor(P), rep); // Integer part modulo rep
-    vec4 Pi1 = mod(Pi0 + 1.0, rep); // Integer part + 1 mod rep
-    Pi0 = HELPER_PerlinNoise4D_mod289(Pi0);
-    Pi1 = HELPER_PerlinNoise4D_mod289(Pi1);
-    vec4 Pf0 = fract(P); // Fractional part for interpolation
-    vec4 Pf1 = Pf0 - 1.0; // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.zzzz);
-    vec4 iz1 = vec4(Pi1.zzzz);
-    vec4 iw0 = vec4(Pi0.wwww);
-    vec4 iw1 = vec4(Pi1.wwww);
-    
-    vec4 ixy = HELPER_PerlinNoise4D_permute(HELPER_PerlinNoise4D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise4D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise4D_permute(ixy + iz1);
-    vec4 ixy00 = HELPER_PerlinNoise4D_permute(ixy0 + iw0);
-    vec4 ixy01 = HELPER_PerlinNoise4D_permute(ixy0 + iw1);
-    vec4 ixy10 = HELPER_PerlinNoise4D_permute(ixy1 + iw0);
-    vec4 ixy11 = HELPER_PerlinNoise4D_permute(ixy1 + iw1);
-    
-    vec4 gx00 = ixy00 * (1.0 / 7.0);
-    vec4 gy00 = floor(gx00) * (1.0 / 7.0);
-    vec4 gz00 = floor(gy00) * (1.0 / 6.0);
-    gx00 = fract(gx00) - 0.5;
-    gy00 = fract(gy00) - 0.5;
-    gz00 = fract(gz00) - 0.5;
-    vec4 gw00 = vec4(0.75) - abs(gx00) - abs(gy00) - abs(gz00);
-    vec4 sw00 = step(gw00, vec4(0.0));
-    gx00 -= sw00 * (step(0.0, gx00) - 0.5);
-    gy00 -= sw00 * (step(0.0, gy00) - 0.5);
-    
-    vec4 gx01 = ixy01 * (1.0 / 7.0);
-    vec4 gy01 = floor(gx01) * (1.0 / 7.0);
-    vec4 gz01 = floor(gy01) * (1.0 / 6.0);
-    gx01 = fract(gx01) - 0.5;
-    gy01 = fract(gy01) - 0.5;
-    gz01 = fract(gz01) - 0.5;
-    vec4 gw01 = vec4(0.75) - abs(gx01) - abs(gy01) - abs(gz01);
-    vec4 sw01 = step(gw01, vec4(0.0));
-    gx01 -= sw01 * (step(0.0, gx01) - 0.5);
-    gy01 -= sw01 * (step(0.0, gy01) - 0.5);
-    
-    vec4 gx10 = ixy10 * (1.0 / 7.0);
-    vec4 gy10 = floor(gx10) * (1.0 / 7.0);
-    vec4 gz10 = floor(gy10) * (1.0 / 6.0);
-    gx10 = fract(gx10) - 0.5;
-    gy10 = fract(gy10) - 0.5;
-    gz10 = fract(gz10) - 0.5;
-    vec4 gw10 = vec4(0.75) - abs(gx10) - abs(gy10) - abs(gz10);
-    vec4 sw10 = step(gw10, vec4(0.0));
-    gx10 -= sw10 * (step(0.0, gx10) - 0.5);
-    gy10 -= sw10 * (step(0.0, gy10) - 0.5);
-    
-    vec4 gx11 = ixy11 * (1.0 / 7.0);
-    vec4 gy11 = floor(gx11) * (1.0 / 7.0);
-    vec4 gz11 = floor(gy11) * (1.0 / 6.0);
-    gx11 = fract(gx11) - 0.5;
-    gy11 = fract(gy11) - 0.5;
-    gz11 = fract(gz11) - 0.5;
-    vec4 gw11 = vec4(0.75) - abs(gx11) - abs(gy11) - abs(gz11);
-    vec4 sw11 = step(gw11, vec4(0.0));
-    gx11 -= sw11 * (step(0.0, gx11) - 0.5);
-    gy11 -= sw11 * (step(0.0, gy11) - 0.5);
-    
-    vec4 g0000 = vec4(gx00.x,gy00.x,gz00.x,gw00.x);
-    vec4 g1000 = vec4(gx00.y,gy00.y,gz00.y,gw00.y);
-    vec4 g0100 = vec4(gx00.z,gy00.z,gz00.z,gw00.z);
-    vec4 g1100 = vec4(gx00.w,gy00.w,gz00.w,gw00.w);
-    vec4 g0010 = vec4(gx10.x,gy10.x,gz10.x,gw10.x);
-    vec4 g1010 = vec4(gx10.y,gy10.y,gz10.y,gw10.y);
-    vec4 g0110 = vec4(gx10.z,gy10.z,gz10.z,gw10.z);
-    vec4 g1110 = vec4(gx10.w,gy10.w,gz10.w,gw10.w);
-    vec4 g0001 = vec4(gx01.x,gy01.x,gz01.x,gw01.x);
-    vec4 g1001 = vec4(gx01.y,gy01.y,gz01.y,gw01.y);
-    vec4 g0101 = vec4(gx01.z,gy01.z,gz01.z,gw01.z);
-    vec4 g1101 = vec4(gx01.w,gy01.w,gz01.w,gw01.w);
-    vec4 g0011 = vec4(gx11.x,gy11.x,gz11.x,gw11.x);
-    vec4 g1011 = vec4(gx11.y,gy11.y,gz11.y,gw11.y);
-    vec4 g0111 = vec4(gx11.z,gy11.z,gz11.z,gw11.z);
-    vec4 g1111 = vec4(gx11.w,gy11.w,gz11.w,gw11.w);
-    
-    vec4 norm00 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0000, g0000), dot(g0100, g0100), dot(g1000, g1000), dot(g1100, g1100)));
-    g0000 *= norm00.x;
-    g0100 *= norm00.y;
-    g1000 *= norm00.z;
-    g1100 *= norm00.w;
-    
-    vec4 norm01 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0001, g0001), dot(g0101, g0101), dot(g1001, g1001), dot(g1101, g1101)));
-    g0001 *= norm01.x;
-    g0101 *= norm01.y;
-    g1001 *= norm01.z;
-    g1101 *= norm01.w;
-    
-    vec4 norm10 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0010, g0010), dot(g0110, g0110), dot(g1010, g1010), dot(g1110, g1110)));
-    g0010 *= norm10.x;
-    g0110 *= norm10.y;
-    g1010 *= norm10.z;
-    g1110 *= norm10.w;
-    
-    vec4 norm11 = HELPER_PerlinNoise4D_taylorInvSqrt(vec4(dot(g0011, g0011), dot(g0111, g0111), dot(g1011, g1011), dot(g1111, g1111)));
-    g0011 *= norm11.x;
-    g0111 *= norm11.y;
-    g1011 *= norm11.z;
-    g1111 *= norm11.w;
-    
-    float n0000 = dot(g0000, Pf0);
-    float n1000 = dot(g1000, vec4(Pf1.x, Pf0.yzw));
-    float n0100 = dot(g0100, vec4(Pf0.x, Pf1.y, Pf0.zw));
-    float n1100 = dot(g1100, vec4(Pf1.xy, Pf0.zw));
-    float n0010 = dot(g0010, vec4(Pf0.xy, Pf1.z, Pf0.w));
-    float n1010 = dot(g1010, vec4(Pf1.x, Pf0.y, Pf1.z, Pf0.w));
-    float n0110 = dot(g0110, vec4(Pf0.x, Pf1.yz, Pf0.w));
-    float n1110 = dot(g1110, vec4(Pf1.xyz, Pf0.w));
-    float n0001 = dot(g0001, vec4(Pf0.xyz, Pf1.w));
-    float n1001 = dot(g1001, vec4(Pf1.x, Pf0.yz, Pf1.w));
-    float n0101 = dot(g0101, vec4(Pf0.x, Pf1.y, Pf0.z, Pf1.w));
-    float n1101 = dot(g1101, vec4(Pf1.xy, Pf0.z, Pf1.w));
-    float n0011 = dot(g0011, vec4(Pf0.xy, Pf1.zw));
-    float n1011 = dot(g1011, vec4(Pf1.x, Pf0.y, Pf1.zw));
-    float n0111 = dot(g0111, vec4(Pf0.x, Pf1.yzw));
-    float n1111 = dot(g1111, Pf1);
-    
-    vec4 fade_xyzw = HELPER_PerlinNoise4D_fade(Pf0);
-    vec4 n_0w = mix(vec4(n0000, n1000, n0100, n1100), vec4(n0001, n1001, n0101, n1101), fade_xyzw.w);
-    vec4 n_1w = mix(vec4(n0010, n1010, n0110, n1110), vec4(n0011, n1011, n0111, n1111), fade_xyzw.w);
-    vec4 n_zw = mix(n_0w, n_1w, fade_xyzw.z);
-    vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
-    float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
-    return 1.1 * n_xyzw + 0.5;
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:8
-	vec3 n_out8p0 = vec3(UV, 0.0);
-
-// VectorDecompose:3
-	float n_out3p0 = n_out8p0.x;
-	float n_out3p1 = n_out8p0.y;
-	float n_out3p2 = n_out8p0.z;
-
-// Input:9
-	vec3 n_out9p0 = vec3(SCREEN_UV, 0.0);
-
-// VectorDecompose:4
-	float n_out4p0 = n_out9p0.x;
-	float n_out4p1 = n_out9p0.y;
-	float n_out4p2 = n_out9p0.z;
-
-// VectorCompose:5
-	vec3 n_out5p0 = vec3(n_out3p0, n_out3p1, n_out4p0);
-
-// Scalar:6
-	float n_out6p0 = 2.000000;
-
-// Scalar:7
-	float n_out7p0 = 10.000000;
-
-// PerlinNoise4D:2
-	float n_out2p0;
-	{
-		n_out2p0 = perlin_noise_4d_p(vec4(n_out5p0, n_out4p1) * vec4(vec3(n_out7p0), n_out7p0), vec4(vec3(n_out6p0), n_out6p0));
-	}
-
-// Output:0
-	COLOR.rgb = vec3(n_out2p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-mode = 1
-flags/light_only = false
-nodes/fragment/2/node = SubResource( 53 )
-nodes/fragment/2/position = Vector2( 80, 120 )
-nodes/fragment/3/node = SubResource( 54 )
-nodes/fragment/3/position = Vector2( -520, 60 )
-nodes/fragment/4/node = SubResource( 55 )
-nodes/fragment/4/position = Vector2( -520, 200 )
-nodes/fragment/5/node = SubResource( 56 )
-nodes/fragment/5/position = Vector2( -160, 60 )
-nodes/fragment/6/node = SubResource( 57 )
-nodes/fragment/6/position = Vector2( -220, 240 )
-nodes/fragment/7/node = SubResource( 58 )
-nodes/fragment/7/position = Vector2( -220, 300 )
-nodes/fragment/8/node = SubResource( 59 )
-nodes/fragment/8/position = Vector2( -720, 60 )
-nodes/fragment/9/node = SubResource( 60 )
-nodes/fragment/9/position = Vector2( -780, 200 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 5, 0, 3, 1, 5, 1, 4, 0, 5, 2, 4, 1, 2, 1, 5, 0, 2, 0, 6, 0, 2, 2, 6, 0, 2, 3, 7, 0, 2, 4, 7, 0, 2, 5, 8, 0, 3, 0, 9, 0, 4, 0 )
-
-[sub_resource type="ShaderMaterial" id=62]
-shader = SubResource( 61 )
-
-[sub_resource type="VisualShaderNodeInput" id=63]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeInput" id=64]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeCustom" id=65]
-script = ExtResource( 7 )
-
-[sub_resource type="VisualShaderNodeScalarInterp" id=66]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=67]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=68]
-default_input_values = [ 0, 0.0, 1, 0.5 ]
-operator = 9
-
-[sub_resource type="VisualShader" id=69]
-code = "shader_type canvas_item;
-
-
-// RandomNoise
-
-	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
-		return fract(sin(f) * 437588.5453);
-	}
-	
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// Input:4
-	float n_out4p0 = TIME;
-
-// VectorDecompose:7
-	float n_out7p0 = n_out3p0.x;
-	float n_out7p1 = n_out3p0.y;
-	float n_out7p2 = n_out3p0.z;
-
-// ScalarOp:8
-	float n_in8p1 = 0.50000;
-	float n_out8p0 = step(n_out7p0, n_in8p1);
-
-// ScalarMix:6
-	float n_in6p1 = 1.00000;
-	float n_out6p0 = mix(n_out4p0, n_in6p1, n_out8p0);
-
-// RandomNoise:5
-	float n_out5p0;
-	{
-		n_out5p0 = rand(vec4(n_out3p0, n_out6p0));
-	}
-
-// Output:0
-	COLOR.rgb = vec3(n_out5p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -649.333, 47 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 280, 120 )
-nodes/fragment/3/node = SubResource( 63 )
-nodes/fragment/3/position = Vector2( -1080, 120 )
-nodes/fragment/4/node = SubResource( 64 )
-nodes/fragment/4/position = Vector2( -320, 200 )
-nodes/fragment/5/node = SubResource( 65 )
-nodes/fragment/5/position = Vector2( 80, 120 )
-nodes/fragment/6/node = SubResource( 66 )
-nodes/fragment/6/position = Vector2( -120, 240 )
-nodes/fragment/7/node = SubResource( 67 )
-nodes/fragment/7/position = Vector2( -900, 220 )
-nodes/fragment/8/node = SubResource( 68 )
-nodes/fragment/8/position = Vector2( -620, 220 )
-nodes/fragment/connections = PoolIntArray( 5, 0, 0, 0, 3, 0, 5, 0, 4, 0, 6, 0, 6, 0, 5, 1, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 6, 2 )
-
-[sub_resource type="ShaderMaterial" id=70]
-shader = SubResource( 69 )
-
-[sub_resource type="VisualShaderNodeInput" id=71]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=72]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=73]
-constant = 1.0
-
-[sub_resource type="VisualShaderNodeCustom" id=74]
-output_port_for_preview = 2
-script = ExtResource( 8 )
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=75]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=76]
-default_input_values = [ 0, 0.0, 1, 0.5 ]
-operator = 9
-
-[sub_resource type="VisualShaderNodeScalarInterp" id=77]
-output_port_for_preview = 0
-
-[sub_resource type="VisualShader" id=78]
-code = "shader_type canvas_item;
-
-
-// CellularNoise2D
-
-
-// Cellular noise (\"Worley noise\") in 2D in GLSL.
-// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
-// This code is released under the conditions of the MIT license.
-// See LICENSE file for details.
-// https://github.com/stegu/webgl-noise
-
-// Modulo 289 without a division (only multiplications)
-vec3 HELPER_CellularNoise2D_mod289_3(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec2 HELPER_CellularNoise2D_mod289_2(vec2 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-// Modulo 7 without a division
-vec3 HELPER_CellularNoise2D_mod7(vec3 x) {
-    return x - floor(x * (1.0 / 7.0)) * 7.0;
-}
-
-// Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_CellularNoise2D_permute(vec3 x) {
-    return HELPER_CellularNoise2D_mod289_3((34.0 * x + 1.0) * x);
-}
-
-// Cellular noise, returning F1 and F2 in a vec2.
-// Standard 3x3 search window for good F1 and F2 values
-vec2 cellular_noise_2d(vec2 P, float jitter) {
-    float K = 0.142857142857; // 1/7
-    float Ko = 0.428571428571; // 3/7
-
-    vec2 Pi = HELPER_CellularNoise2D_mod289_2(floor(P));
-    vec2 Pf = fract(P);
-    vec3 oi = vec3(-1.0, 0.0, 1.0);
-    vec3 of = vec3(-0.5, 0.5, 1.5);
-    vec3 px = HELPER_CellularNoise2D_permute(Pi.x + oi);
-    vec3 p = HELPER_CellularNoise2D_permute(px.x + Pi.y + oi); // p11, p12, p13
-    vec3 ox = fract(p*K) - Ko;
-    vec3 oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
-    vec3 dx = Pf.x + 0.5 + jitter*ox;
-    vec3 dy = Pf.y - of + jitter*oy;
-    vec3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
-    p = HELPER_CellularNoise2D_permute(px.y + Pi.y + oi); // p21, p22, p23
-    ox = fract(p*K) - Ko;
-    oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
-    dx = Pf.x - 0.5 + jitter*ox;
-    dy = Pf.y - of + jitter*oy;
-    vec3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
-    p = HELPER_CellularNoise2D_permute(px.z + Pi.y + oi); // p31, p32, p33
-    ox = fract(p*K) - Ko;
-    oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
-    dx = Pf.x - 1.5 + jitter*ox;
-    dy = Pf.y - of + jitter*oy;
-    vec3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared
-    // Sort out the two smallest distances (F1, F2)
-    vec3 d1a = min(d1, d2);
-    d2 = max(d1, d2); // Swap to keep candidates for F2
-    d2 = min(d2, d3); // neither F1 nor F2 are now in d3
-    d1 = min(d1a, d2); // F1 is now in d1
-    d2 = max(d1a, d2); // Swap to keep candidates for F2
-    d1.xy = (d1.x < d1.y) ? d1.xy : d1.yx; // Swap if smaller
-    d1.xz = (d1.x < d1.z) ? d1.xz : d1.zx; // F1 is in d1.x
-    d1.yz = min(d1.yz, d2.yz); // F2 is now not in d2.yz
-    d1.y = min(d1.y, d1.z); // nor in  d1.z
-    d1.y = min(d1.y, d2.x); // F2 is in d1.y, we're done.
-    return sqrt(d1.xy);
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// Scalar:4
-	float n_out4p0 = 10.000000;
-
-// Scalar:5
-	float n_out5p0 = 1.000000;
-
-// CellularNoise2D:6
-	vec3 n_out6p0;
-	float n_out6p1;
-	float n_out6p2;
-	{
-		
-			
-			n_out6p0 = vec3(cellular_noise_2d((n_out3p0).xy * (vec3(n_out4p0)).xy, n_out5p0), 0.0);
-			n_out6p1 = n_out6p0.x;n_out6p2 = n_out6p0.y;
-			
-	}
-
-// VectorDecompose:7
-	float n_out7p0 = n_out3p0.x;
-	float n_out7p1 = n_out3p0.y;
-	float n_out7p2 = n_out3p0.z;
-
-// ScalarOp:8
-	float n_in8p1 = 0.50000;
-	float n_out8p0 = step(n_out7p0, n_in8p1);
-
-// ScalarMix:9
-	float n_out9p0 = mix(n_out6p2, n_out6p1, n_out8p0);
-
-// Output:0
-	COLOR.rgb = vec3(n_out9p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -212, -7.75 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 580, 120 )
-nodes/fragment/3/node = SubResource( 71 )
-nodes/fragment/3/position = Vector2( -280, 40 )
-nodes/fragment/4/node = SubResource( 72 )
-nodes/fragment/4/position = Vector2( -280, 120 )
-nodes/fragment/5/node = SubResource( 73 )
-nodes/fragment/5/position = Vector2( -280, 200 )
-nodes/fragment/6/node = SubResource( 74 )
-nodes/fragment/6/position = Vector2( 60, 120 )
-nodes/fragment/7/node = SubResource( 75 )
-nodes/fragment/7/position = Vector2( -120, -40 )
-nodes/fragment/8/node = SubResource( 76 )
-nodes/fragment/8/position = Vector2( 100, -40 )
-nodes/fragment/9/node = SubResource( 77 )
-nodes/fragment/9/position = Vector2( 360, 40 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 6, 0, 4, 0, 6, 1, 5, 0, 6, 2, 3, 0, 7, 0, 7, 0, 8, 0, 8, 0, 9, 2, 9, 0, 0, 0, 6, 1, 9, 1, 6, 2, 9, 0 )
-
-[sub_resource type="ShaderMaterial" id=79]
-shader = SubResource( 78 )
-
-[sub_resource type="VisualShaderNodeScalarInterp" id=80]
-
-[sub_resource type="VisualShaderNodeInput" id=81]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=82]
-constant = 10.0
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=83]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=84]
-default_input_values = [ 0, 0.0, 1, 0.5 ]
-operator = 9
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=85]
-constant = 1.0
-
-[sub_resource type="VisualShaderNodeCustom" id=86]
-script = ExtResource( 9 )
-
-[sub_resource type="VisualShader" id=87]
-code = "shader_type canvas_item;
-
-
-// CellularNoise2D_2X2
-
-
-// Cellular noise (\\\"Worley noise\\\") in 2D in GLSL.
-// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
-// This code is released under the conditions of the MIT license.
-// See LICENSE file for details.
-// https://github.com/stegu/webgl-noise
-
-// Modulo 289 without a division (only multiplications)
-vec2 HELPER_CellularNoise2D_2X2_mod289_2(vec2 x) {
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_CellularNoise2D_2X2_mod289_4(vec4 x) {
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-// Modulo 7 without a division
-vec4 HELPER_CellularNoise2D_2X2_mod7(vec4 x) {
-  return x - floor(x * (1.0 / 7.0)) * 7.0;
-}
-
-// Permutation polynomial: (34x^2 + x) mod 289
-vec4 HELPER_CellularNoise2D_2X2_permute(vec4 x) {
-  return HELPER_CellularNoise2D_2X2_mod289_4((34.0 * x + 1.0) * x);
-}
-
-// Cellular noise, returning F1 and F2 in a vec2.
-// Speeded up by using 2x2 search window instead of 3x3,
-// at the expense of some strong pattern artifacts.
-// F2 is often wrong and has sharp discontinuities.
-// If you need a smooth F2, use the slower 3x3 version.
-// F1 is sometimes wrong, too, but OK for most purposes.
-vec2 cellular_noise_2d_2x2(vec2 P, float jitter) {
-    float K = 0.142857142857; // 1/7
-    float K2 = 0.0714285714285; // K/2
-
-    vec2 Pi = HELPER_CellularNoise2D_2X2_mod289_2(floor(P));
-    vec2 Pf = fract(P);
-    vec4 Pfx = Pf.x + vec4(-0.5, -1.5, -0.5, -1.5);
-    vec4 Pfy = Pf.y + vec4(-0.5, -0.5, -1.5, -1.5);
-    vec4 p = HELPER_CellularNoise2D_2X2_permute(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
-    p = HELPER_CellularNoise2D_2X2_permute(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
-    vec4 ox = HELPER_CellularNoise2D_2X2_mod7(p)*K+K2;
-    vec4 oy = HELPER_CellularNoise2D_2X2_mod7(floor(p*K))*K+K2;
-    vec4 dx = Pfx + jitter*ox;
-    vec4 dy = Pfy + jitter*oy;
-    vec4 d = dx * dx + dy * dy; // d11, d12, d21 and d22, squared
-    // Sort out the two smallest distances
-
-/*// F1 Only Block (works faster of course)
-    d.xy = min(d.xy, d.zw);
-    d.x = min(d.x, d.y);
-    return vec2(sqrt(d.x)); // F1 duplicated, F2 not computed
-//*/// End of F1 Only Block
-
-//*// F1 and F2 block
-    d.xy = (d.x < d.y) ? d.xy : d.yx; // Swap if smaller
-    d.xz = (d.x < d.z) ? d.xz : d.zx;
-    d.xw = (d.x < d.w) ? d.xw : d.wx;
-    d.y = min(d.y, d.z);
-    d.y = min(d.y, d.w);
-    return sqrt(d.xy);
-//*/// End of F1 and F2 block
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:4
-	vec3 n_out4p0 = vec3(UV, 0.0);
-
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// Scalar:8
-	float n_out8p0 = 1.000000;
-
-// CellularNoise2D_2X2:9
-	vec3 n_out9p0;
-	float n_out9p1;
-	float n_out9p2;
-	{
-		
-			
-			n_out9p0 = vec3(cellular_noise_2d_2x2((n_out4p0).xy * (vec3(n_out5p0)).xy, n_out8p0), 0.0);
-			n_out9p1 = n_out9p0.x;n_out9p2 = n_out9p0.y;
-			
-	}
-
-// VectorDecompose:6
-	float n_out6p0 = n_out4p0.x;
-	float n_out6p1 = n_out4p0.y;
-	float n_out6p2 = n_out4p0.z;
-
-// ScalarOp:7
-	float n_in7p1 = 0.50000;
-	float n_out7p0 = step(n_out6p0, n_in7p1);
-
-// ScalarMix:3
-	float n_out3p0 = mix(n_out9p2, n_out9p1, n_out7p0);
-
-// Output:0
-	COLOR.rgb = vec3(n_out3p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -92, -40 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 840, 60 )
-nodes/fragment/3/node = SubResource( 80 )
-nodes/fragment/3/position = Vector2( 660, 60 )
-nodes/fragment/4/node = SubResource( 81 )
-nodes/fragment/4/position = Vector2( 40, 0 )
-nodes/fragment/5/node = SubResource( 82 )
-nodes/fragment/5/position = Vector2( 40, 100 )
-nodes/fragment/6/node = SubResource( 83 )
-nodes/fragment/6/position = Vector2( 240, -40 )
-nodes/fragment/7/node = SubResource( 84 )
-nodes/fragment/7/position = Vector2( 440, -60 )
-nodes/fragment/8/node = SubResource( 85 )
-nodes/fragment/8/position = Vector2( 40, 200 )
-nodes/fragment/9/node = SubResource( 86 )
-nodes/fragment/9/position = Vector2( 360, 100 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 4, 0, 9, 0, 5, 0, 9, 1, 8, 0, 9, 2, 9, 1, 3, 1, 9, 2, 3, 0, 3, 0, 0, 0 )
-
-[sub_resource type="ShaderMaterial" id=88]
-shader = SubResource( 87 )
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=89]
-
-[sub_resource type="VisualShaderNodeCustom" id=90]
-script = ExtResource( 10 )
-
-[sub_resource type="VisualShaderNodeInput" id=91]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeScalarOp" id=92]
-default_input_values = [ 0, 0.0, 1, 0.1 ]
-operator = 2
-
-[sub_resource type="VisualShader" id=93]
-code = "shader_type canvas_item;
-
-
-// CelluarNoise3D
-
-
-// Cellular noise (\"Worley noise\") in 3D in GLSL.
-// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
-// This code is released under the conditions of the MIT license.
-// See LICENSE file for details.
-// https://github.com/stegu/webgl-noise
-
-// Modulo 289 without a division (only multiplications)
-vec3 HELPER_CelluarNoise3D_mod289(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-// Modulo 7 without a division
-vec3 HELPER_CelluarNoise3D_mod7(vec3 x) {
-    return x - floor(x * (1.0 / 7.0)) * 7.0;
-}
-
-// Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_CelluarNoise3D_permute(vec3 x) {
-    return HELPER_CelluarNoise3D_mod289((34.0 * x + 1.0) * x);
-}
-
-// Cellular noise, returning F1 and F2 in a vec2.
-// 3x3x3 search region for good F2 everywhere, but a lot
-// slower than the 2x2x2 version.
-// The code below is a bit scary even to its author,
-// but it has at least half decent performance on a
-// modern GPU. In any case, it beats any software
-// implementation of Worley noise hands down.
-
-vec2 cellular_noise_3d(vec3 P, float jitter) {
-    float K = 0.142857142857; // 1/7
-    float Ko = 0.428571428571; // 1/2-K/2
-    float K2 = 0.020408163265306; // 1/(7*7)
-    float Kz = 0.166666666667; // 1/6
-    float Kzo = 0.416666666667; // 1/2-1/6*2
-    
-    vec3 Pi = HELPER_CelluarNoise3D_mod289(floor(P));
-    vec3 Pf = fract(P) - 0.5;
-    
-    vec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);
-    vec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);
-    vec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);
-    
-    vec3 p = HELPER_CelluarNoise3D_permute(Pi.x + vec3(-1.0, 0.0, 1.0));
-    vec3 p1 = HELPER_CelluarNoise3D_permute(p + Pi.y - 1.0);
-    vec3 p2 = HELPER_CelluarNoise3D_permute(p + Pi.y);
-    vec3 p3 = HELPER_CelluarNoise3D_permute(p + Pi.y + 1.0);
-    
-    vec3 p11 = HELPER_CelluarNoise3D_permute(p1 + Pi.z - 1.0);
-    vec3 p12 = HELPER_CelluarNoise3D_permute(p1 + Pi.z);
-    vec3 p13 = HELPER_CelluarNoise3D_permute(p1 + Pi.z + 1.0);
-    
-    vec3 p21 = HELPER_CelluarNoise3D_permute(p2 + Pi.z - 1.0);
-    vec3 p22 = HELPER_CelluarNoise3D_permute(p2 + Pi.z);
-    vec3 p23 = HELPER_CelluarNoise3D_permute(p2 + Pi.z + 1.0);
-    
-    vec3 p31 = HELPER_CelluarNoise3D_permute(p3 + Pi.z - 1.0);
-    vec3 p32 = HELPER_CelluarNoise3D_permute(p3 + Pi.z);
-    vec3 p33 = HELPER_CelluarNoise3D_permute(p3 + Pi.z + 1.0);
-    
-    vec3 ox11 = fract(p11*K) - Ko;
-    vec3 oy11 = HELPER_CelluarNoise3D_mod7(floor(p11*K))*K - Ko;
-    vec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed
-    
-    vec3 ox12 = fract(p12*K) - Ko;
-    vec3 oy12 = HELPER_CelluarNoise3D_mod7(floor(p12*K))*K - Ko;
-    vec3 oz12 = floor(p12*K2)*Kz - Kzo;
-    
-    vec3 ox13 = fract(p13*K) - Ko;
-    vec3 oy13 = HELPER_CelluarNoise3D_mod7(floor(p13*K))*K - Ko;
-    vec3 oz13 = floor(p13*K2)*Kz - Kzo;
-    
-    vec3 ox21 = fract(p21*K) - Ko;
-    vec3 oy21 = HELPER_CelluarNoise3D_mod7(floor(p21*K))*K - Ko;
-    vec3 oz21 = floor(p21*K2)*Kz - Kzo;
-    
-    vec3 ox22 = fract(p22*K) - Ko;
-    vec3 oy22 = HELPER_CelluarNoise3D_mod7(floor(p22*K))*K - Ko;
-    vec3 oz22 = floor(p22*K2)*Kz - Kzo;
-    
-    vec3 ox23 = fract(p23*K) - Ko;
-    vec3 oy23 = HELPER_CelluarNoise3D_mod7(floor(p23*K))*K - Ko;
-    vec3 oz23 = floor(p23*K2)*Kz - Kzo;
-    
-    vec3 ox31 = fract(p31*K) - Ko;
-    vec3 oy31 = HELPER_CelluarNoise3D_mod7(floor(p31*K))*K - Ko;
-    vec3 oz31 = floor(p31*K2)*Kz - Kzo;
-    
-    vec3 ox32 = fract(p32*K) - Ko;
-    vec3 oy32 = HELPER_CelluarNoise3D_mod7(floor(p32*K))*K - Ko;
-    vec3 oz32 = floor(p32*K2)*Kz - Kzo;
-    
-    vec3 ox33 = fract(p33*K) - Ko;
-    vec3 oy33 = HELPER_CelluarNoise3D_mod7(floor(p33*K))*K - Ko;
-    vec3 oz33 = floor(p33*K2)*Kz - Kzo;
-    
-    vec3 dx11 = Pfx + jitter*ox11;
-    vec3 dy11 = Pfy.x + jitter*oy11;
-    vec3 dz11 = Pfz.x + jitter*oz11;
-    
-    vec3 dx12 = Pfx + jitter*ox12;
-    vec3 dy12 = Pfy.x + jitter*oy12;
-    vec3 dz12 = Pfz.y + jitter*oz12;
-    
-    vec3 dx13 = Pfx + jitter*ox13;
-    vec3 dy13 = Pfy.x + jitter*oy13;
-    vec3 dz13 = Pfz.z + jitter*oz13;
-    
-    vec3 dx21 = Pfx + jitter*ox21;
-    vec3 dy21 = Pfy.y + jitter*oy21;
-    vec3 dz21 = Pfz.x + jitter*oz21;
-    
-    vec3 dx22 = Pfx + jitter*ox22;
-    vec3 dy22 = Pfy.y + jitter*oy22;
-    vec3 dz22 = Pfz.y + jitter*oz22;
-    
-    vec3 dx23 = Pfx + jitter*ox23;
-    vec3 dy23 = Pfy.y + jitter*oy23;
-    vec3 dz23 = Pfz.z + jitter*oz23;
-    
-    vec3 dx31 = Pfx + jitter*ox31;
-    vec3 dy31 = Pfy.z + jitter*oy31;
-    vec3 dz31 = Pfz.x + jitter*oz31;
-    
-    vec3 dx32 = Pfx + jitter*ox32;
-    vec3 dy32 = Pfy.z + jitter*oy32;
-    vec3 dz32 = Pfz.y + jitter*oz32;
-    
-    vec3 dx33 = Pfx + jitter*ox33;
-    vec3 dy33 = Pfy.z + jitter*oy33;
-    vec3 dz33 = Pfz.z + jitter*oz33;
-    
-    vec3 d11 = dx11 * dx11 + dy11 * dy11 + dz11 * dz11;
-    vec3 d12 = dx12 * dx12 + dy12 * dy12 + dz12 * dz12;
-    vec3 d13 = dx13 * dx13 + dy13 * dy13 + dz13 * dz13;
-    vec3 d21 = dx21 * dx21 + dy21 * dy21 + dz21 * dz21;
-    vec3 d22 = dx22 * dx22 + dy22 * dy22 + dz22 * dz22;
-    vec3 d23 = dx23 * dx23 + dy23 * dy23 + dz23 * dz23;
-    vec3 d31 = dx31 * dx31 + dy31 * dy31 + dz31 * dz31;
-    vec3 d32 = dx32 * dx32 + dy32 * dy32 + dz32 * dz32;
-    vec3 d33 = dx33 * dx33 + dy33 * dy33 + dz33 * dz33;
-    
-    // Sort out the two smallest distances (F1, F2)
-/*// F1 only block
-    vec3 d1 = min(min(d11,d12), d13);
-    vec3 d2 = min(min(d21,d22), d23);
-    vec3 d3 = min(min(d31,d32), d33);
-    vec3 d = min(min(d1,d2), d3);
-    d.x = min(min(d.x,d.y),d.z);
-    return vec2(sqrt(d.x)); // F1 duplicated, no F2 computed
-//*/// End of F1 only block
-//*// F1 and F2 block
-    vec3 d1a = min(d11, d12);
-    d12 = max(d11, d12);
-    d11 = min(d1a, d13); // Smallest now not in d12 or d13
-    d13 = max(d1a, d13);
-    d12 = min(d12, d13); // 2nd smallest now not in d13
-    vec3 d2a = min(d21, d22);
-    d22 = max(d21, d22);
-    d21 = min(d2a, d23); // Smallest now not in d22 or d23
-    d23 = max(d2a, d23);
-    d22 = min(d22, d23); // 2nd smallest now not in d23
-    vec3 d3a = min(d31, d32);
-    d32 = max(d31, d32);
-    d31 = min(d3a, d33); // Smallest now not in d32 or d33
-    d33 = max(d3a, d33);
-    d32 = min(d32, d33); // 2nd smallest now not in d33
-    vec3 da = min(d11, d21);
-    d21 = max(d11, d21);
-    d11 = min(da, d31); // Smallest now in d11
-    d31 = max(da, d31); // 2nd smallest now not in d31
-    d11.xy = (d11.x < d11.y) ? d11.xy : d11.yx;
-    d11.xz = (d11.x < d11.z) ? d11.xz : d11.zx; // d11.x now smallest
-    d12 = min(d12, d21); // 2nd smallest now not in d21
-    d12 = min(d12, d22); // nor in d22
-    d12 = min(d12, d31); // nor in d31
-    d12 = min(d12, d32); // nor in d32
-    d11.yz = min(d11.yz,d12.xy); // nor in d12.yz
-    d11.y = min(d11.y,d12.z); // Only two more to go
-    d11.y = min(d11.y,d11.z); // Done! (Phew!)
-    return sqrt(d11.xy); // F1, F2
-//*/// End of F1 and F2 block
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:4
-	vec3 n_out4p0 = vec3(UV, 0.0);
-
-// VectorDecompose:6
-	float n_out6p0 = n_out4p0.x;
-	float n_out6p1 = n_out4p0.y;
-	float n_out6p2 = n_out4p0.z;
-
-// Input:12
-	float n_out12p0 = TIME;
-
-// ScalarOp:13
-	float n_in13p1 = 0.10000;
-	float n_out13p0 = n_out12p0 * n_in13p1;
-
-// VectorCompose:10
-	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out13p0);
-
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// Scalar:8
-	float n_out8p0 = 1.000000;
-
-// CelluarNoise3D:11
-	vec3 n_out11p0;
-	float n_out11p1;
-	float n_out11p2;
-	{
-		
-			
-			n_out11p0 = vec3(cellular_noise_3d(n_out10p0 * vec3(n_out5p0), n_out8p0), 0.0);
-			n_out11p1 = n_out11p0.x;n_out11p2 = n_out11p0.y;
-			
-	}
-
-// ScalarOp:7
-	float n_in7p1 = 0.50000;
-	float n_out7p0 = step(n_out6p0, n_in7p1);
-
-// ScalarMix:3
-	float n_out3p0 = mix(n_out11p2, n_out11p1, n_out7p0);
-
-// Output:0
-	COLOR.rgb = vec3(n_out3p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -345, -75 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 840, 60 )
-nodes/fragment/3/node = SubResource( 80 )
-nodes/fragment/3/position = Vector2( 660, 60 )
-nodes/fragment/4/node = SubResource( 81 )
-nodes/fragment/4/position = Vector2( -140, -20 )
-nodes/fragment/5/node = SubResource( 82 )
-nodes/fragment/5/position = Vector2( -160, 200 )
-nodes/fragment/6/node = SubResource( 83 )
-nodes/fragment/6/position = Vector2( 40, -60 )
-nodes/fragment/7/node = SubResource( 84 )
-nodes/fragment/7/position = Vector2( 440, -60 )
-nodes/fragment/8/node = SubResource( 85 )
-nodes/fragment/8/position = Vector2( -160, 280 )
-nodes/fragment/10/node = SubResource( 89 )
-nodes/fragment/10/position = Vector2( 140, 80 )
-nodes/fragment/11/node = SubResource( 90 )
-nodes/fragment/11/position = Vector2( 400, 100 )
-nodes/fragment/12/node = SubResource( 91 )
-nodes/fragment/12/position = Vector2( -300, 80 )
-nodes/fragment/13/node = SubResource( 92 )
-nodes/fragment/13/position = Vector2( -80, 60 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 11, 1, 3, 1, 10, 0, 11, 0, 5, 0, 11, 1, 8, 0, 11, 2, 12, 0, 13, 0, 13, 0, 10, 2, 11, 2, 3, 0 )
-
-[sub_resource type="ShaderMaterial" id=94]
-shader = SubResource( 93 )
-
-[sub_resource type="VisualShaderNodeCustom" id=95]
-script = ExtResource( 11 )
-
-[sub_resource type="VisualShader" id=96]
-code = "shader_type canvas_item;
-
-
-// CelluarNoise3D_2x2x2
-
-
-// Cellular noise (\"Worley noise\") in 3D in GLSL.
-// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
-// This code is released under the conditions of the MIT license.
-// See LICENSE file for details.
-// https://github.com/stegu/webgl-noise
-
-// Modulo 289 without a division (only multiplications)
-vec3 HELPER_CelluarNoise3D_2x2x2_mod289_3(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_CelluarNoise3D_2x2x2_mod289_4(vec4 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-// Modulo 7 without a division
-vec4 HELPER_CelluarNoise3D_2x2x2_mod7(vec4 x) {
-    return x - floor(x * (1.0 / 7.0)) * 7.0;
-}
-
-// Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_CelluarNoise3D_2x2x2_permute_3(vec3 x) {
-    return HELPER_CelluarNoise3D_2x2x2_mod289_3((34.0 * x + 1.0) * x);
-}
-
-vec4 HELPER_CelluarNoise3D_2x2x2_permute_4(vec4 x) {
-    return HELPER_CelluarNoise3D_2x2x2_mod289_4((34.0 * x + 1.0) * x);
-}
-
-// Cellular noise, returning F1 and F2 in a vec2.
-// Speeded up by using 2x2x2 search window instead of 3x3x3,
-// at the expense of some pattern artifacts.
-// F2 is often wrong and has sharp discontinuities.
-// If you need a good F2, use the slower 3x3x3 version.
-vec2 cellular_noise_3d_2x2x2(vec3 P, float jitter) {
-    float K = 0.142857142857; // 1/7
-    float Ko = 0.428571428571; // 1/2-K/2
-    float K2 = 0.020408163265306; // 1/(7*7)
-    float Kz = 0.166666666667; // 1/6
-    float Kzo = 0.416666666667; // 1/2-1/6*2
-
-    vec3 Pi = HELPER_CelluarNoise3D_2x2x2_mod289_3(floor(P));
-    vec3 Pf = fract(P);
-    vec4 Pfx = Pf.x + vec4(0.0, -1.0, 0.0, -1.0);
-    vec4 Pfy = Pf.y + vec4(0.0, 0.0, -1.0, -1.0);
-    vec4 p = HELPER_CelluarNoise3D_2x2x2_permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
-    p = HELPER_CelluarNoise3D_2x2x2_permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
-    vec4 p1 = HELPER_CelluarNoise3D_2x2x2_permute_4(p + Pi.z); // z+0
-    vec4 p2 = HELPER_CelluarNoise3D_2x2x2_permute_4(p + Pi.z + vec4(1.0)); // z+1
-    vec4 ox1 = fract(p1*K) - Ko;
-    vec4 oy1 = HELPER_CelluarNoise3D_2x2x2_mod7(floor(p1*K))*K - Ko;
-    vec4 oz1 = floor(p1*K2)*Kz - Kzo; // p1 < 289 guaranteed
-    vec4 ox2 = fract(p2*K) - Ko;
-    vec4 oy2 = HELPER_CelluarNoise3D_2x2x2_mod7(floor(p2*K))*K - Ko;
-    vec4 oz2 = floor(p2*K2)*Kz - Kzo;
-    vec4 dx1 = Pfx + jitter*ox1;
-    vec4 dy1 = Pfy + jitter*oy1;
-    vec4 dz1 = Pf.z + jitter*oz1;
-    vec4 dx2 = Pfx + jitter*ox2;
-    vec4 dy2 = Pfy + jitter*oy2;
-    vec4 dz2 = Pf.z - 1.0 + jitter*oz2;
-    vec4 d1 = dx1 * dx1 + dy1 * dy1 + dz1 * dz1; // z+0
-    vec4 d2 = dx2 * dx2 + dy2 * dy2 + dz2 * dz2; // z+1
-
-    // Sort out the two smallest distances (F1, F2)
-/*// Block for F1 only
-    d1 = min(d1, d2);
-    d1.xy = min(d1.xy, d1.wz);
-    d1.x = min(d1.x, d1.y);
-    return vec2(sqrt(d1.x));
-//*///End of F1 only block
-//*// Block for both F1 and F2
-    vec4 d = min(d1,d2); // F1 is now in d
-    d2 = max(d1,d2); // Make sure we keep all candidates for F2
-    d.xy = (d.x < d.y) ? d.xy : d.yx; // Swap smallest to d.x
-    d.xz = (d.x < d.z) ? d.xz : d.zx;
-    d.xw = (d.x < d.w) ? d.xw : d.wx; // F1 is now in d.x
-    d.yzw = min(d.yzw, d2.yzw); // F2 now not in d2.yzw
-    d.y = min(d.y, d.z); // nor in d.z
-    d.y = min(d.y, d.w); // nor in d.w
-    d.y = min(d.y, d2.x); // F2 is now in d.y
-    return sqrt(d.xy); // F1 and F2
-//*/// End Of F1 and F2 block
-}
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:4
-	vec3 n_out4p0 = vec3(UV, 0.0);
-
-// VectorDecompose:6
-	float n_out6p0 = n_out4p0.x;
-	float n_out6p1 = n_out4p0.y;
-	float n_out6p2 = n_out4p0.z;
-
-// Input:12
-	float n_out12p0 = TIME;
-
-// ScalarOp:13
-	float n_in13p1 = 0.10000;
-	float n_out13p0 = n_out12p0 * n_in13p1;
-
-// VectorCompose:10
-	vec3 n_out10p0 = vec3(n_out6p0, n_out6p1, n_out13p0);
-
-// Scalar:5
-	float n_out5p0 = 10.000000;
-
-// Scalar:8
-	float n_out8p0 = 1.000000;
-
-// CelluarNoise3D_2x2x2:14
-	vec3 n_out14p0;
-	float n_out14p1;
-	float n_out14p2;
-	{
-		
-			
-			n_out14p0 = vec3(cellular_noise_3d_2x2x2(n_out10p0 * vec3(n_out5p0), n_out8p0), 0.0);
-			n_out14p1 = n_out14p0.x;n_out14p2 = n_out14p0.y;
-			
-	}
-
-// ScalarOp:7
-	float n_in7p1 = 0.50000;
-	float n_out7p0 = step(n_out6p0, n_in7p1);
-
-// ScalarMix:3
-	float n_out3p0 = mix(n_out14p2, n_out14p1, n_out7p0);
-
-// Output:0
-	COLOR.rgb = vec3(n_out3p0);
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -212, -118 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 840, 60 )
-nodes/fragment/3/node = SubResource( 80 )
-nodes/fragment/3/position = Vector2( 660, 60 )
-nodes/fragment/4/node = SubResource( 81 )
-nodes/fragment/4/position = Vector2( -140, -20 )
-nodes/fragment/5/node = SubResource( 82 )
-nodes/fragment/5/position = Vector2( -160, 200 )
-nodes/fragment/6/node = SubResource( 83 )
-nodes/fragment/6/position = Vector2( 40, -60 )
-nodes/fragment/7/node = SubResource( 84 )
-nodes/fragment/7/position = Vector2( 440, -60 )
-nodes/fragment/8/node = SubResource( 85 )
-nodes/fragment/8/position = Vector2( -160, 280 )
-nodes/fragment/10/node = SubResource( 89 )
-nodes/fragment/10/position = Vector2( 140, 80 )
-nodes/fragment/12/node = SubResource( 91 )
-nodes/fragment/12/position = Vector2( -300, 80 )
-nodes/fragment/13/node = SubResource( 92 )
-nodes/fragment/13/position = Vector2( -80, 60 )
-nodes/fragment/14/node = SubResource( 95 )
-nodes/fragment/14/position = Vector2( 360, 140 )
-nodes/fragment/connections = PoolIntArray( 4, 0, 6, 0, 6, 0, 7, 0, 7, 0, 3, 2, 3, 0, 0, 0, 6, 0, 10, 0, 6, 1, 10, 1, 12, 0, 13, 0, 13, 0, 10, 2, 14, 1, 3, 1, 14, 2, 3, 0, 10, 0, 14, 0, 5, 0, 14, 1, 8, 0, 14, 2 )
-
-[sub_resource type="ShaderMaterial" id=97]
-shader = SubResource( 96 )
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=98]
-constant = 20.0
-
-[sub_resource type="VisualShaderNodeCustom" id=99]
-script = ExtResource( 7 )
-
-[sub_resource type="VisualShaderNodeScalarOp" id=100]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=101]
-output_port_for_preview = 0
-default_input_values = [ 0, 0.0, 1, 0.5 ]
-operator = 2
-
-[sub_resource type="VisualShaderNodeCustom" id=102]
-script = ExtResource( 10 )
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=103]
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=104]
-
-[sub_resource type="VisualShaderNodeInput" id=105]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeScalarOp" id=106]
-default_input_values = [ 0, 0.0, 1, 0.1 ]
-operator = 2
-
-[sub_resource type="VisualShaderNodeInput" id=107]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarOp" id=108]
-operator = 1
-
-[sub_resource type="VisualShaderNodeScalarFunc" id=109]
-output_port_for_preview = 0
-function = 12
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=110]
-constant = 1.0
-
-[sub_resource type="VisualShaderNodeCustom" id=111]
-script = ExtResource( 5 )
-
-[sub_resource type="VisualShaderNodeVectorCompose" id=112]
-
-[sub_resource type="VisualShaderNodeCustom" id=191]
-output_port_for_preview = 0
-default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.05 ]
-script = ExtResource( 15 )
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=192]
-constant = 0.01
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=114]
-constant = 10.0
-
-[sub_resource type="VisualShader" id=116]
-code = "shader_type canvas_item;
-
-
-// PerlinNoise3D
-
-// GLSL textureless classic 3D noise \\\"cnoise\\\",
-// with an RSL-style periodic variant \\\"pnoise\\\".
-// Author:  Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-10-11
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/stegu/webgl-noise
-//
-
-vec3 HELPER_PerlinNoise3D_mod289_3(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise3D_mod289_4(vec4 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 HELPER_PerlinNoise3D_permute(vec4 x) {
-    return HELPER_PerlinNoise3D_mod289_4(((x*34.0)+1.0)*x);
-}
-
-vec4 HELPER_PerlinNoise3D_taylorInvSqrt(vec4 r) {
-    return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec3 HELPER_PerlinNoise3D_fade(vec3 t) {
-    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
-}
-
-// Classic Perlin noise
-float perlin_noise_3d_np(vec3 P) {
-    vec3 Pi0 = floor(P); // Integer part for indexing
-    vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
-    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
-    vec3 Pf0 = fract(P); // Fractional part for interpolation
-    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.z);
-    vec4 iz1 = vec4(Pi1.z);
-    
-    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
-    
-    vec4 gx0 = ixy0 * (1.0 / 7.0);
-    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-    gx0 = fract(gx0);
-    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-    vec4 sz0 = step(gz0, vec4(0.0));
-    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-    
-    vec4 gx1 = ixy1 * (1.0 / 7.0);
-    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-    gx1 = fract(gx1);
-    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-    vec4 sz1 = step(gz1, vec4(0.0));
-    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-    
-    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-    
-    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
-    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
-    
-    float n000 = dot(g000, Pf0);
-    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-    float n111 = dot(g111, Pf1);
-    
-    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
-    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-    return 1.1 * n_xyz + 0.5;
-}
-
-// Classic Perlin noise, periodic variant
-float perlin_noise_3d_p(vec3 P, vec3 rep) {
-    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
-    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
-    Pi0 = HELPER_PerlinNoise3D_mod289_3(Pi0);
-    Pi1 = HELPER_PerlinNoise3D_mod289_3(Pi1);
-    vec3 Pf0 = fract(P); // Fractional part for interpolation
-    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-    vec4 iy = vec4(Pi0.yy, Pi1.yy);
-    vec4 iz0 = vec4(Pi0.z);
-    vec4 iz1 = vec4(Pi1.z);
-    
-    vec4 ixy = HELPER_PerlinNoise3D_permute(HELPER_PerlinNoise3D_permute(ix) + iy);
-    vec4 ixy0 = HELPER_PerlinNoise3D_permute(ixy + iz0);
-    vec4 ixy1 = HELPER_PerlinNoise3D_permute(ixy + iz1);
-    
-    vec4 gx0 = ixy0 * (1.0 / 7.0);
-    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-    gx0 = fract(gx0);
-    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-    vec4 sz0 = step(gz0, vec4(0.0));
-    gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-    gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-    
-    vec4 gx1 = ixy1 * (1.0 / 7.0);
-    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-    gx1 = fract(gx1);
-    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-    vec4 sz1 = step(gz1, vec4(0.0));
-    gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-    gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-    
-    vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-    vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-    vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-    vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-    vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-    vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-    vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-    vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-    
-    vec4 norm0 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
-    vec4 norm1 = HELPER_PerlinNoise3D_taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
-    
-    float n000 = dot(g000, Pf0);
-    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-    float n111 = dot(g111, Pf1);
-    
-    vec3 fade_xyz = HELPER_PerlinNoise3D_fade(Pf0);
-    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-    return 1.1 * n_xyz + 0.5;
-}
-
-// RandomNoise
-
-	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
-		return fract(sin(f) * 437588.5453);
-	}
-	
-// CelluarNoise3D
-
-
-// Cellular noise (\"Worley noise\") in 3D in GLSL.
-// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
-// This code is released under the conditions of the MIT license.
-// See LICENSE file for details.
-// https://github.com/stegu/webgl-noise
-
-// Modulo 289 without a division (only multiplications)
-vec3 HELPER_CelluarNoise3D_mod289(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-// Modulo 7 without a division
-vec3 HELPER_CelluarNoise3D_mod7(vec3 x) {
-    return x - floor(x * (1.0 / 7.0)) * 7.0;
-}
-
-// Permutation polynomial: (34x^2 + x) mod 289
-vec3 HELPER_CelluarNoise3D_permute(vec3 x) {
-    return HELPER_CelluarNoise3D_mod289((34.0 * x + 1.0) * x);
-}
-
-// Cellular noise, returning F1 and F2 in a vec2.
-// 3x3x3 search region for good F2 everywhere, but a lot
-// slower than the 2x2x2 version.
-// The code below is a bit scary even to its author,
-// but it has at least half decent performance on a
-// modern GPU. In any case, it beats any software
-// implementation of Worley noise hands down.
-
-vec2 cellular_noise_3d(vec3 P, float jitter) {
-    float K = 0.142857142857; // 1/7
-    float Ko = 0.428571428571; // 1/2-K/2
-    float K2 = 0.020408163265306; // 1/(7*7)
-    float Kz = 0.166666666667; // 1/6
-    float Kzo = 0.416666666667; // 1/2-1/6*2
-    
-    vec3 Pi = HELPER_CelluarNoise3D_mod289(floor(P));
-    vec3 Pf = fract(P) - 0.5;
-    
-    vec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);
-    vec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);
-    vec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);
-    
-    vec3 p = HELPER_CelluarNoise3D_permute(Pi.x + vec3(-1.0, 0.0, 1.0));
-    vec3 p1 = HELPER_CelluarNoise3D_permute(p + Pi.y - 1.0);
-    vec3 p2 = HELPER_CelluarNoise3D_permute(p + Pi.y);
-    vec3 p3 = HELPER_CelluarNoise3D_permute(p + Pi.y + 1.0);
-    
-    vec3 p11 = HELPER_CelluarNoise3D_permute(p1 + Pi.z - 1.0);
-    vec3 p12 = HELPER_CelluarNoise3D_permute(p1 + Pi.z);
-    vec3 p13 = HELPER_CelluarNoise3D_permute(p1 + Pi.z + 1.0);
-    
-    vec3 p21 = HELPER_CelluarNoise3D_permute(p2 + Pi.z - 1.0);
-    vec3 p22 = HELPER_CelluarNoise3D_permute(p2 + Pi.z);
-    vec3 p23 = HELPER_CelluarNoise3D_permute(p2 + Pi.z + 1.0);
-    
-    vec3 p31 = HELPER_CelluarNoise3D_permute(p3 + Pi.z - 1.0);
-    vec3 p32 = HELPER_CelluarNoise3D_permute(p3 + Pi.z);
-    vec3 p33 = HELPER_CelluarNoise3D_permute(p3 + Pi.z + 1.0);
-    
-    vec3 ox11 = fract(p11*K) - Ko;
-    vec3 oy11 = HELPER_CelluarNoise3D_mod7(floor(p11*K))*K - Ko;
-    vec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed
-    
-    vec3 ox12 = fract(p12*K) - Ko;
-    vec3 oy12 = HELPER_CelluarNoise3D_mod7(floor(p12*K))*K - Ko;
-    vec3 oz12 = floor(p12*K2)*Kz - Kzo;
-    
-    vec3 ox13 = fract(p13*K) - Ko;
-    vec3 oy13 = HELPER_CelluarNoise3D_mod7(floor(p13*K))*K - Ko;
-    vec3 oz13 = floor(p13*K2)*Kz - Kzo;
-    
-    vec3 ox21 = fract(p21*K) - Ko;
-    vec3 oy21 = HELPER_CelluarNoise3D_mod7(floor(p21*K))*K - Ko;
-    vec3 oz21 = floor(p21*K2)*Kz - Kzo;
-    
-    vec3 ox22 = fract(p22*K) - Ko;
-    vec3 oy22 = HELPER_CelluarNoise3D_mod7(floor(p22*K))*K - Ko;
-    vec3 oz22 = floor(p22*K2)*Kz - Kzo;
-    
-    vec3 ox23 = fract(p23*K) - Ko;
-    vec3 oy23 = HELPER_CelluarNoise3D_mod7(floor(p23*K))*K - Ko;
-    vec3 oz23 = floor(p23*K2)*Kz - Kzo;
-    
-    vec3 ox31 = fract(p31*K) - Ko;
-    vec3 oy31 = HELPER_CelluarNoise3D_mod7(floor(p31*K))*K - Ko;
-    vec3 oz31 = floor(p31*K2)*Kz - Kzo;
-    
-    vec3 ox32 = fract(p32*K) - Ko;
-    vec3 oy32 = HELPER_CelluarNoise3D_mod7(floor(p32*K))*K - Ko;
-    vec3 oz32 = floor(p32*K2)*Kz - Kzo;
-    
-    vec3 ox33 = fract(p33*K) - Ko;
-    vec3 oy33 = HELPER_CelluarNoise3D_mod7(floor(p33*K))*K - Ko;
-    vec3 oz33 = floor(p33*K2)*Kz - Kzo;
-    
-    vec3 dx11 = Pfx + jitter*ox11;
-    vec3 dy11 = Pfy.x + jitter*oy11;
-    vec3 dz11 = Pfz.x + jitter*oz11;
-    
-    vec3 dx12 = Pfx + jitter*ox12;
-    vec3 dy12 = Pfy.x + jitter*oy12;
-    vec3 dz12 = Pfz.y + jitter*oz12;
-    
-    vec3 dx13 = Pfx + jitter*ox13;
-    vec3 dy13 = Pfy.x + jitter*oy13;
-    vec3 dz13 = Pfz.z + jitter*oz13;
-    
-    vec3 dx21 = Pfx + jitter*ox21;
-    vec3 dy21 = Pfy.y + jitter*oy21;
-    vec3 dz21 = Pfz.x + jitter*oz21;
-    
-    vec3 dx22 = Pfx + jitter*ox22;
-    vec3 dy22 = Pfy.y + jitter*oy22;
-    vec3 dz22 = Pfz.y + jitter*oz22;
-    
-    vec3 dx23 = Pfx + jitter*ox23;
-    vec3 dy23 = Pfy.y + jitter*oy23;
-    vec3 dz23 = Pfz.z + jitter*oz23;
-    
-    vec3 dx31 = Pfx + jitter*ox31;
-    vec3 dy31 = Pfy.z + jitter*oy31;
-    vec3 dz31 = Pfz.x + jitter*oz31;
-    
-    vec3 dx32 = Pfx + jitter*ox32;
-    vec3 dy32 = Pfy.z + jitter*oy32;
-    vec3 dz32 = Pfz.y + jitter*oz32;
-    
-    vec3 dx33 = Pfx + jitter*ox33;
-    vec3 dy33 = Pfy.z + jitter*oy33;
-    vec3 dz33 = Pfz.z + jitter*oz33;
-    
-    vec3 d11 = dx11 * dx11 + dy11 * dy11 + dz11 * dz11;
-    vec3 d12 = dx12 * dx12 + dy12 * dy12 + dz12 * dz12;
-    vec3 d13 = dx13 * dx13 + dy13 * dy13 + dz13 * dz13;
-    vec3 d21 = dx21 * dx21 + dy21 * dy21 + dz21 * dz21;
-    vec3 d22 = dx22 * dx22 + dy22 * dy22 + dz22 * dz22;
-    vec3 d23 = dx23 * dx23 + dy23 * dy23 + dz23 * dz23;
-    vec3 d31 = dx31 * dx31 + dy31 * dy31 + dz31 * dz31;
-    vec3 d32 = dx32 * dx32 + dy32 * dy32 + dz32 * dz32;
-    vec3 d33 = dx33 * dx33 + dy33 * dy33 + dz33 * dz33;
-    
-    // Sort out the two smallest distances (F1, F2)
-/*// F1 only block
-    vec3 d1 = min(min(d11,d12), d13);
-    vec3 d2 = min(min(d21,d22), d23);
-    vec3 d3 = min(min(d31,d32), d33);
-    vec3 d = min(min(d1,d2), d3);
-    d.x = min(min(d.x,d.y),d.z);
-    return vec2(sqrt(d.x)); // F1 duplicated, no F2 computed
-//*/// End of F1 only block
-//*// F1 and F2 block
-    vec3 d1a = min(d11, d12);
-    d12 = max(d11, d12);
-    d11 = min(d1a, d13); // Smallest now not in d12 or d13
-    d13 = max(d1a, d13);
-    d12 = min(d12, d13); // 2nd smallest now not in d13
-    vec3 d2a = min(d21, d22);
-    d22 = max(d21, d22);
-    d21 = min(d2a, d23); // Smallest now not in d22 or d23
-    d23 = max(d2a, d23);
-    d22 = min(d22, d23); // 2nd smallest now not in d23
-    vec3 d3a = min(d31, d32);
-    d32 = max(d31, d32);
-    d31 = min(d3a, d33); // Smallest now not in d32 or d33
-    d33 = max(d3a, d33);
-    d32 = min(d32, d33); // 2nd smallest now not in d33
-    vec3 da = min(d11, d21);
-    d21 = max(d11, d21);
-    d11 = min(da, d31); // Smallest now in d11
-    d31 = max(da, d31); // 2nd smallest now not in d31
-    d11.xy = (d11.x < d11.y) ? d11.xy : d11.yx;
-    d11.xz = (d11.x < d11.z) ? d11.xz : d11.zx; // d11.x now smallest
-    d12 = min(d12, d21); // 2nd smallest now not in d21
-    d12 = min(d12, d22); // nor in d22
-    d12 = min(d12, d31); // nor in d31
-    d12 = min(d12, d32); // nor in d32
-    d11.yz = min(d11.yz,d12.xy); // nor in d12.yz
-    d11.y = min(d11.y,d12.z); // Only two more to go
-    d11.y = min(d11.y,d11.z); // Done! (Phew!)
-    return sqrt(d11.xy); // F1, F2
-//*/// End of F1 and F2 block
-}
-
-// StepMixS
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:2
-	vec3 n_out2p0 = vec3(UV, 0.0);
-
-// VectorDecompose:17
-	float n_out17p0 = n_out2p0.x;
-	float n_out17p1 = n_out2p0.y;
-	float n_out17p2 = n_out2p0.z;
-
-// Input:18
-	float n_out18p0 = TIME;
-
-// ScalarOp:19
-	float n_in19p1 = 0.10000;
-	float n_out19p0 = n_out18p0 * n_in19p1;
-
-// VectorCompose:24
-	vec3 n_out24p0 = vec3(n_out17p0, n_out17p1, n_out19p0);
-
-// Scalar:11
-	float n_out11p0 = 20.000000;
-
-// PerlinNoise3D:23
-	float n_out23p0;
-	{
-		n_out23p0 = perlin_noise_3d_np(n_out24p0 * vec3(n_out11p0));
-	}
-
-// RandomNoise:12
-	float n_out12p0;
-	{
-		n_out12p0 = rand(vec4(n_out2p0, n_out18p0));
-	}
-
-// ScalarOp:13
-	float n_out13p0 = n_out23p0 + n_out12p0;
-
-// ScalarOp:14
-	float n_in14p1 = 0.50000;
-	float n_out14p0 = n_out13p0 * n_in14p1;
-
-// VectorCompose:16
-	vec3 n_out16p0 = vec3(n_out17p0, n_out17p1, n_out19p0);
-
-// Scalar:6
-	float n_out6p0 = 10.000000;
-
-// Scalar:22
-	float n_out22p0 = 1.000000;
-
-// CelluarNoise3D:15
-	vec3 n_out15p0;
-	float n_out15p1;
-	float n_out15p2;
-	{
-		
-			
-			n_out15p0 = vec3(cellular_noise_3d(n_out16p0 * vec3(n_out6p0), n_out22p0), 0.0);
-			n_out15p1 = n_out15p0.x;n_out15p2 = n_out15p0.y;
-			
-	}
-
-// ScalarOp:20
-	float n_out20p0 = n_out15p1 - n_out15p2;
-
-// ScalarFunc:21
-	float n_out21p0 = abs(n_out20p0);
-
-// Scalar:26
-	float n_out26p0 = 0.010000;
-
-// StepMixS:25
-	vec3 n_in25p0 = vec3(1.00000, 1.00000, 1.00000);
-	float n_in25p3 = 0.05000;
-	vec3 n_out25p0;
-	{
-		
-				n_out25p0 = mix(n_in25p0, vec3(n_out14p0), smoothstep(n_in25p3 - n_out26p0, n_in25p3 + n_out26p0, n_out21p0));
-			
-	}
-
-// Output:0
-	COLOR.rgb = n_out25p0;
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( 31.5584, 194 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 920, 160 )
-nodes/fragment/2/node = SubResource( 107 )
-nodes/fragment/2/position = Vector2( -760, -20 )
-nodes/fragment/6/node = SubResource( 114 )
-nodes/fragment/6/position = Vector2( -500, 120 )
-nodes/fragment/11/node = SubResource( 98 )
-nodes/fragment/11/position = Vector2( -500, 260 )
-nodes/fragment/12/node = SubResource( 99 )
-nodes/fragment/12/position = Vector2( -40, 280 )
-nodes/fragment/13/node = SubResource( 100 )
-nodes/fragment/13/position = Vector2( 180, 220 )
-nodes/fragment/14/node = SubResource( 101 )
-nodes/fragment/14/position = Vector2( 360, 220 )
-nodes/fragment/15/node = SubResource( 102 )
-nodes/fragment/15/position = Vector2( 80, -80 )
-nodes/fragment/16/node = SubResource( 103 )
-nodes/fragment/16/position = Vector2( -335, -23.5 )
-nodes/fragment/17/node = SubResource( 104 )
-nodes/fragment/17/position = Vector2( -560, -40 )
-nodes/fragment/18/node = SubResource( 105 )
-nodes/fragment/18/position = Vector2( -820, 120 )
-nodes/fragment/19/node = SubResource( 106 )
-nodes/fragment/19/position = Vector2( -652, 157.5 )
-nodes/fragment/20/node = SubResource( 108 )
-nodes/fragment/20/position = Vector2( 300, -80 )
-nodes/fragment/21/node = SubResource( 109 )
-nodes/fragment/21/position = Vector2( 480, -60 )
-nodes/fragment/22/node = SubResource( 110 )
-nodes/fragment/22/position = Vector2( -500, 360 )
-nodes/fragment/23/node = SubResource( 111 )
-nodes/fragment/23/position = Vector2( -40, 140 )
-nodes/fragment/24/node = SubResource( 112 )
-nodes/fragment/24/position = Vector2( -240, 120 )
-nodes/fragment/25/node = SubResource( 191 )
-nodes/fragment/25/position = Vector2( 700, 100 )
-nodes/fragment/26/node = SubResource( 192 )
-nodes/fragment/26/position = Vector2( 360, 460 )
-nodes/fragment/connections = PoolIntArray( 12, 0, 13, 1, 2, 0, 12, 0, 13, 0, 14, 0, 16, 0, 15, 0, 17, 0, 16, 0, 17, 1, 16, 1, 2, 0, 17, 0, 6, 0, 15, 1, 18, 0, 19, 0, 19, 0, 16, 2, 15, 1, 20, 0, 15, 2, 20, 1, 20, 0, 21, 0, 22, 0, 15, 2, 23, 0, 13, 0, 24, 0, 23, 0, 17, 0, 24, 0, 17, 1, 24, 1, 11, 0, 23, 2, 19, 0, 24, 2, 18, 0, 12, 1, 21, 0, 25, 2, 14, 0, 25, 1, 25, 0, 0, 0, 26, 0, 25, 4 )
-
-[sub_resource type="ShaderMaterial" id=117]
-shader = SubResource( 116 )
-
-[sub_resource type="VisualShaderNodeVectorInterp" id=118]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=119]
-default_input_values = [ 0, 0.0, 1, 0.5 ]
-operator = 9
-
-[sub_resource type="VisualShaderNodeVectorDecompose" id=120]
-
-[sub_resource type="VisualShaderNodeCustom" id=121]
-script = ExtResource( 12 )
-
-[sub_resource type="VisualShaderNodeInput" id=122]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeScalarConstant" id=123]
-constant = 20.0
-
-[sub_resource type="VisualShaderNodeInput" id=124]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeScalarOp" id=125]
-default_input_values = [ 0, 0.0, 1, 1.0 ]
-
-[sub_resource type="VisualShaderNodeScalarOp" id=126]
-default_input_values = [ 0, 0.0, 1, 0.5 ]
-operator = 2
-
-[sub_resource type="VisualShaderNodeVectorOp" id=127]
-default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ) ]
-
-[sub_resource type="VisualShaderNodeVectorOp" id=128]
-default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0.5 ) ]
-operator = 2
-
-[sub_resource type="VisualShader" id=129]
-code = "shader_type canvas_item;
-
-
-// SimplexNoise2DRG
-
-
-
-// Modulo 289, optimizes to code without divisions
-vec3 HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(vec3 x) {
-	return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-float HELPER_SimplexNoise2DRG_mod289(float x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-// Permutation polynomial (ring size 289 = 17*17)
-vec3 HELPER_SimplexNoise2DRG_permute_3(vec3 x) {
-	return HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(((x*34.0)+1.0)*x);
-}
-
-float HELPER_SimplexNoise2DRG_permute(float x) {
-    return HELPER_SimplexNoise2DRG_mod289(((x * 34.0) + 1.0) * x);
-}
-
-// Hashed 2-D gradients with an extra rotation.
-// (The constant 0.0243902439 is 1/41)
-vec2 HELPER_SimplexNoise2DRG_rgrad2(vec2 p, float rot) {
-/*// Map from a line to a diamond such that a shift maps to a rotation.
-	float u = HELPER_SimplexNoise2DRG_permute(HELPER_SimplexNoise2DRG_permute(p.x) + p.y) * 0.0243902439 + rot; // Rotate by shift
-	u = 4.0 * fract(u) - 2.0;
-	// (This vector could be normalized, exactly or approximately.)
-	return vec2(abs(u)-1.0, abs(abs(u+1.0)-2.0)-1.0);
-*/
-// For more isotropic gradients, sin/cos can be used instead.
-	float u = HELPER_SimplexNoise2DRG_permute(HELPER_SimplexNoise2DRG_permute(p.x) + p.y) * 0.0243902439 + rot; // Rotate by shift
-	u = fract(u) * 6.28318530718; // 2*pi
-	return vec2(cos(u), sin(u));
-}
-
-//*
-//
-// 2-D tiling simplex noise with rotating gradients and analytical derivative.
-// The first component of the 3-element return vector is the noise value,
-// and the second and third components are the x and y partial derivatives.
-//
-vec3 simplex_noise_2d_rg_p(vec2 pos, vec2 per, float rot) {
-    // Hack: offset y slightly to hide some rare artifacts
-    pos.y += 0.01;
-    // Skew to hexagonal grid
-    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
-    
-    vec2 i0 = floor(uv);
-    vec2 f0 = fract(uv);
-    // Traversal order
-    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    
-    // Unskewed grid points in (x,y) space
-    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
-    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
-    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
-    
-    // Integer grid point indices in (u,v) space
-    i1 = i0 + i1;
-    vec2 i2 = i0 + vec2(1.0, 1.0);
-    
-    // Vectors in unskewed (x,y) coordinates from
-    // each of the simplex corners to the evaluation point
-    vec2 d0 = pos - p0;
-    vec2 d1 = pos - p1;
-    vec2 d2 = pos - p2;
-    
-    // Wrap i0, i1 and i2 to the desired period before gradient hashing:
-    // wrap points in (x,y), map to (u,v)
-    vec3 xw = mod(vec3(p0.x, p1.x, p2.x), per.x);
-    vec3 yw = mod(vec3(p0.y, p1.y, p2.y), per.y);
-    vec3 iuw = xw + 0.5 * yw;
-    vec3 ivw = yw;
-    
-    // Create gradients from indices
-    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
-    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
-    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
-    
-    // Gradients dot vectors to corresponding corners
-    // (The derivatives of this are simply the gradients)
-    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
-    
-    // Radial weights from corners
-    // 0.8 is the square of 2/sqrt(5), the distance from
-    // a grid point to the nearest simplex boundary
-    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
-    
-    // Partial derivatives for analytical gradient computation
-    vec3 dtdx = -2.0 * vec3(d0.x, d1.x, d2.x);
-    vec3 dtdy = -2.0 * vec3(d0.y, d1.y, d2.y);
-    
-    // Set influence of each surflet to zero outside radius sqrt(0.8)
-    if (t.x < 0.0) {
-        dtdx.x = 0.0;
-        dtdy.x = 0.0;
-        t.x = 0.0;
-    }
-    if (t.y < 0.0) {
-        dtdx.y = 0.0;
-        dtdy.y = 0.0;
-        t.y = 0.0;
-    }
-    if (t.z < 0.0) {
-        dtdx.z = 0.0;
-        dtdy.z = 0.0;
-        t.z = 0.0;
-    }
-    
-    // Fourth power of t (and third power for derivative)
-    vec3 t2 = t * t;
-    vec3 t4 = t2 * t2;
-    vec3 t3 = t2 * t;
-    
-    // Final noise value is:
-    // sum of ((radial weights) times (gradient dot vector from corner))
-    float n = dot(t4, w);
-    
-    // Final analytical derivative (gradient of a sum of scalar products)
-    vec2 dt0 = vec2(dtdx.x, dtdy.x) * 4.0 * t3.x;
-    vec2 dn0 = t4.x * g0 + dt0 * w.x;
-    vec2 dt1 = vec2(dtdx.y, dtdy.y) * 4.0 * t3.y;
-    vec2 dn1 = t4.y * g1 + dt1 * w.y;
-    vec2 dt2 = vec2(dtdx.z, dtdy.z) * 4.0 * t3.z;
-    vec2 dn2 = t4.z * g2 + dt2 * w.z;
-    
-    return 11.0*vec3(n, dn0 + dn1 + dn2);
-}
-
-/*/
-//
-// 2-D tiling simplex noise with rotating gradients,
-// but without the analytical derivative.
-//
-float simplex_noise_2d_rg_p(vec2 pos, vec2 per, float rot) {
-    // Offset y slightly to hide some rare artifacts
-    pos.y += 0.001;
-    // Skew to hexagonal grid
-    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
-    
-    vec2 i0 = floor(uv);
-    vec2 f0 = fract(uv);
-    // Traversal order
-    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    
-    // Unskewed grid points in (x,y) space
-    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
-    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
-    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
-    
-    // Integer grid point indices in (u,v) space
-    i1 = i0 + i1;
-    vec2 i2 = i0 + vec2(1.0, 1.0);
-    
-    // Vectors in unskewed (x,y) coordinates from
-    // each of the simplex corners to the evaluation point
-    vec2 d0 = pos - p0;
-    vec2 d1 = pos - p1;
-    vec2 d2 = pos - p2;
-    
-    // Wrap i0, i1 and i2 to the desired period before gradient hashing:
-    // wrap points in (x,y), map to (u,v)
-    vec3 xw = mod(vec3(p0.x, p1.x, p2.x), per.x);
-    vec3 yw = mod(vec3(p0.y, p1.y, p2.y), per.y);
-    vec3 iuw = xw + 0.5 * yw;
-    vec3 ivw = yw;
-    
-    // Create gradients from indices
-    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
-    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
-    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
-    
-    // Gradients dot vectors to corresponding corners
-    // (The derivatives of this are simply the gradients)
-    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
-    
-    // Radial weights from corners
-    // 0.8 is the square of 2/sqrt(5), the distance from
-    // a grid point to the nearest simplex boundary
-    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
-    
-    // Set influence of each surflet to zero outside radius sqrt(0.8)
-    t = max(t, vec3(0.0));
-    
-    // Fourth power of t
-    vec3 t2 = t * t;
-    vec3 t4 = t2 * t2;
-    
-    // Final noise value is:
-    // sum of ((radial weights) times (gradient dot vector from corner))
-    float n = dot(t4, w);
-    
-    // Rescale to cover the range [-1,1] reasonably well
-    return 11.0*n;
-}
-
-//*/
-
-//*
-//
-// 2-D non-tiling simplex noise with rotating gradients and analytical derivative.
-// The first component of the 3-element return vector is the noise value,
-// and the second and third components are the x and y partial derivatives.
-//
-vec3 simplex_noise_2d_rg_np(vec2 pos, float rot) {
-    // Offset y slightly to hide some rare artifacts
-    pos.y += 0.001;
-    // Skew to hexagonal grid
-    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
-    
-    vec2 i0 = floor(uv);
-    vec2 f0 = fract(uv);
-    // Traversal order
-    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    
-    // Unskewed grid points in (x,y) space
-    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
-    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
-    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
-    
-    // Integer grid point indices in (u,v) space
-    i1 = i0 + i1;
-    vec2 i2 = i0 + vec2(1.0, 1.0);
-    
-    // Vectors in unskewed (x,y) coordinates from
-    // each of the simplex corners to the evaluation point
-    vec2 d0 = pos - p0;
-    vec2 d1 = pos - p1;
-    vec2 d2 = pos - p2;
-    
-    vec3 x = vec3(p0.x, p1.x, p2.x);
-    vec3 y = vec3(p0.y, p1.y, p2.y);
-    vec3 iuw = x + 0.5 * y;
-    vec3 ivw = y;
-    
-    // Avoid precision issues in permutation
-    iuw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(iuw);
-    ivw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(ivw);
-    
-    // Create gradients from indices
-    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
-    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
-    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
-    
-    // Gradients dot vectors to corresponding corners
-    // (The derivatives of this are simply the gradients)
-    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
-    
-    // Radial weights from corners
-    // 0.8 is the square of 2/sqrt(5), the distance from
-    // a grid point to the nearest simplex boundary
-    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
-    
-    // Partial derivatives for analytical gradient computation
-    vec3 dtdx = -2.0 * vec3(d0.x, d1.x, d2.x);
-    vec3 dtdy = -2.0 * vec3(d0.y, d1.y, d2.y);
-    
-    // Set influence of each surflet to zero outside radius sqrt(0.8)
-    if (t.x < 0.0) {
-        dtdx.x = 0.0;
-        dtdy.x = 0.0;
-        t.x = 0.0;
-    }
-    if (t.y < 0.0) {
-        dtdx.y = 0.0;
-        dtdy.y = 0.0;
-        t.y = 0.0;
-    }
-    if (t.z < 0.0) {
-        dtdx.z = 0.0;
-        dtdy.z = 0.0;
-        t.z = 0.0;
-    }
-    
-    // Fourth power of t (and third power for derivative)
-    vec3 t2 = t * t;
-    vec3 t4 = t2 * t2;
-    vec3 t3 = t2 * t;
-    
-    // Final noise value is:
-    // sum of ((radial weights) times (gradient dot vector from corner))
-    float n = dot(t4, w);
-    
-    // Final analytical derivative (gradient of a sum of scalar products)
-    vec2 dt0 = vec2(dtdx.x, dtdy.x) * 4.0 * t3.x;
-    vec2 dn0 = t4.x * g0 + dt0 * w.x;
-    vec2 dt1 = vec2(dtdx.y, dtdy.y) * 4.0 * t3.y;
-    vec2 dn1 = t4.y * g1 + dt1 * w.y;
-    vec2 dt2 = vec2(dtdx.z, dtdy.z) * 4.0 * t3.z;
-    vec2 dn2 = t4.z * g2 + dt2 * w.z;
-    
-    return 11.0*vec3(n, dn0 + dn1 + dn2);
-}
-
-/*/
-
-//
-// 2-D non-tiling simplex noise with rotating gradients,
-// without the analytical derivative.
-//
-float simplex_noise_2d_rg_np(vec2 pos, float rot) {
-    // Offset y slightly to hide some rare artifacts
-    pos.y += 0.001;
-    // Skew to hexagonal grid
-    vec2 uv = vec2(pos.x + pos.y*0.5, pos.y);
-    
-    vec2 i0 = floor(uv);
-    vec2 f0 = fract(uv);
-    // Traversal order
-    vec2 i1 = (f0.x > f0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    
-    // Unskewed grid points in (x,y) space
-    vec2 p0 = vec2(i0.x - i0.y * 0.5, i0.y);
-    vec2 p1 = vec2(p0.x + i1.x - i1.y * 0.5, p0.y + i1.y);
-    vec2 p2 = vec2(p0.x + 0.5, p0.y + 1.0);
-    
-    // Integer grid point indices in (u,v) space
-    i1 = i0 + i1;
-    vec2 i2 = i0 + vec2(1.0, 1.0);
-    
-    // Vectors in unskewed (x,y) coordinates from
-    // each of the simplex corners to the evaluation point
-    vec2 d0 = pos - p0;
-    vec2 d1 = pos - p1;
-    vec2 d2 = pos - p2;
-    
-    // Wrap i0, i1 and i2 to the desired period before gradient hashing:
-    // wrap points in (x,y), map to (u,v)
-    vec3 x = vec3(p0.x, p1.x, p2.x);
-    vec3 y = vec3(p0.y, p1.y, p2.y);
-    vec3 iuw = x + 0.5 * y;
-    vec3 ivw = y;
-    
-    // Avoid precision issues in permutation
-    iuw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(iuw);
-    ivw = HELPER_SimplexNoise2DRG_HELPER_SimplexNoise2DRG_mod289_3(ivw);
-    
-    // Create gradients from indices
-    vec2 g0 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.x, ivw.x), rot);
-    vec2 g1 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.y, ivw.y), rot);
-    vec2 g2 = HELPER_SimplexNoise2DRG_rgrad2(vec2(iuw.z, ivw.z), rot);
-    
-    // Gradients dot vectors to corresponding corners
-    // (The derivatives of this are simply the gradients)
-    vec3 w = vec3(dot(g0, d0), dot(g1, d1), dot(g2, d2));
-    
-    // Radial weights from corners
-    // 0.8 is the square of 2/sqrt(5), the distance from
-    // a grid point to the nearest simplex boundary
-    vec3 t = 0.8 - vec3(dot(d0, d0), dot(d1, d1), dot(d2, d2));
-    
-    // Set influence of each surflet to zero outside radius sqrt(0.8)
-    t = max(t, vec3(0.0));
-    
-    // Fourth power of t
-    vec3 t2 = t * t;
-    vec3 t4 = t2 * t2;
-    
-    // Final noise value is:
-    // sum of ((radial weights) times (gradient dot vector from corner))
-    float n = dot(t4, w);
-    
-    // Rescale to cover the range [-1,1] reasonably well
-    return 11.0*n;
-}
-
-//*/
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// Scalar:4
-	float n_out4p0 = 20.000000;
-
-// Input:5
-	float n_out5p0 = TIME;
-
-// SimplexNoise2DRG:2
-	float n_out2p0;
-	vec3 n_out2p1;
-	{
-		
-			 vec3 result = simplex_noise_2d_rg_np(((n_out3p0).xy).xy * (vec3(n_out4p0)).xy.xy, n_out5p0);
-			n_out2p0 = result.x;
-			n_out2p1 = vec3(result.xy, 0.0);
-			
-	}
-
-// VectorOp:8
-	vec3 n_in8p1 = vec3(1.00000, 1.00000, 1.00000);
-	vec3 n_out8p0 = n_out2p1 + n_in8p1;
-
-// VectorOp:9
-	vec3 n_in9p1 = vec3(0.50000, 0.50000, 0.50000);
-	vec3 n_out9p0 = n_out8p0 * n_in9p1;
-
-// ScalarOp:6
-	float n_in6p1 = 1.00000;
-	float n_out6p0 = n_out2p0 + n_in6p1;
-
-// ScalarOp:7
-	float n_in7p1 = 0.50000;
-	float n_out7p0 = n_out6p0 * n_in7p1;
-
-// VectorDecompose:12
-	float n_out12p0 = n_out3p0.x;
-	float n_out12p1 = n_out3p0.y;
-	float n_out12p2 = n_out3p0.z;
-
-// ScalarOp:11
-	float n_in11p1 = 0.50000;
-	float n_out11p0 = step(n_out12p0, n_in11p1);
-
-// VectorMix:10
-	vec3 n_out10p0 = mix(n_out9p0, vec3(n_out7p0), vec3(n_out11p0));
-
-// Output:0
-	COLOR.rgb = n_out10p0;
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -434, 31.5 )
-mode = 1
-flags/light_only = false
-nodes/fragment/0/position = Vector2( 840, 180 )
-nodes/fragment/2/node = SubResource( 121 )
-nodes/fragment/2/position = Vector2( -40, 160 )
-nodes/fragment/3/node = SubResource( 122 )
-nodes/fragment/3/position = Vector2( -280, 100 )
-nodes/fragment/4/node = SubResource( 123 )
-nodes/fragment/4/position = Vector2( -280, 300 )
-nodes/fragment/5/node = SubResource( 124 )
-nodes/fragment/5/position = Vector2( -280, 400 )
-nodes/fragment/6/node = SubResource( 125 )
-nodes/fragment/6/position = Vector2( 237, 42.5 )
-nodes/fragment/7/node = SubResource( 126 )
-nodes/fragment/7/position = Vector2( 400, 40 )
-nodes/fragment/8/node = SubResource( 127 )
-nodes/fragment/8/position = Vector2( 240, 200 )
-nodes/fragment/9/node = SubResource( 128 )
-nodes/fragment/9/position = Vector2( 408, 261.5 )
-nodes/fragment/10/node = SubResource( 118 )
-nodes/fragment/10/position = Vector2( 620, 100 )
-nodes/fragment/11/node = SubResource( 119 )
-nodes/fragment/11/position = Vector2( 400, -100 )
-nodes/fragment/12/node = SubResource( 120 )
-nodes/fragment/12/position = Vector2( -40, 0 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 2, 0, 4, 0, 2, 2, 2, 0, 6, 0, 6, 0, 7, 0, 2, 1, 8, 0, 8, 0, 9, 0, 7, 0, 10, 1, 9, 0, 10, 0, 10, 0, 0, 0, 11, 0, 10, 2, 12, 0, 11, 0, 3, 0, 12, 0, 5, 0, 2, 3 )
-
-[sub_resource type="ShaderMaterial" id=130]
-shader = SubResource( 129 )
-
-[sub_resource type="VisualShaderNodeVectorOp" id=131]
+[sub_resource type="VisualShaderNodeVectorOp" id=13]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.523, 0.5641, 0 ) ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeCustom" id=132]
+[sub_resource type="VisualShaderNodeCustom" id=14]
 output_port_for_preview = 0
 script = ExtResource( 7 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=133]
+[sub_resource type="VisualShaderNodeColorConstant" id=15]
 constant = Color( 0.242188, 0.144176, 0.101227, 1 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=134]
+[sub_resource type="VisualShaderNodeColorConstant" id=16]
 constant = Color( 0.394531, 0.181589, 0.0261993, 1 )
 
-[sub_resource type="VisualShaderNodeVectorScalarMix" id=135]
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=17]
 output_port_for_preview = 0
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=136]
+[sub_resource type="VisualShaderNodeScalarConstant" id=18]
 constant = 0.03
 
-[sub_resource type="VisualShaderNodeCustom" id=137]
+[sub_resource type="VisualShaderNodeCustom" id=19]
 output_port_for_preview = 0
 default_input_values = [ 2, 0.05 ]
 script = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeCustom" id=138]
+[sub_resource type="VisualShaderNodeCustom" id=20]
 output_port_for_preview = 0
 default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0, 4, 0.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShaderNodeCustom" id=139]
+[sub_resource type="VisualShaderNodeCustom" id=21]
 script = ExtResource( 13 )
 
-[sub_resource type="VisualShaderNodeInput" id=140]
+[sub_resource type="VisualShaderNodeInput" id=22]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeVectorOp" id=141]
+[sub_resource type="VisualShaderNodeVectorOp" id=23]
 operator = 2
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=142]
+[sub_resource type="VisualShaderNodeScalarConstant" id=24]
 constant = 4.0
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=143]
+[sub_resource type="VisualShaderNodeScalarConstant" id=25]
 constant = 0.1
 
-[sub_resource type="VisualShader" id=144]
+[sub_resource type="VisualShader" id=26]
 code = "shader_type canvas_item;
 
 
@@ -3903,8 +66,8 @@ code = "shader_type canvas_item;
 
 // RandomNoise
 
-	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
+	float gpu_random_float(vec4 co){
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
 		return fract(sin(f) * 437588.5453);
 	}
 	
@@ -3969,7 +132,7 @@ void fragment() {
 // RandomNoise:14
 	float n_out14p0;
 	{
-		n_out14p0 = rand(vec4(n_out13p0, 0.0));
+		n_out14p0 = gpu_random_float(vec4(n_out13p0, 0.0));
 	}
 
 // VectorScalarMix:17
@@ -4012,54 +175,54 @@ graph_offset = Vector2( -259.442, -123.5 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 960, -120 )
-nodes/fragment/3/node = SubResource( 140 )
+nodes/fragment/3/node = SubResource( 22 )
 nodes/fragment/3/position = Vector2( -700, -140 )
-nodes/fragment/4/node = SubResource( 141 )
+nodes/fragment/4/node = SubResource( 23 )
 nodes/fragment/4/position = Vector2( -520, -140 )
-nodes/fragment/5/node = SubResource( 142 )
+nodes/fragment/5/node = SubResource( 24 )
 nodes/fragment/5/position = Vector2( -740, -80 )
-nodes/fragment/8/node = SubResource( 143 )
+nodes/fragment/8/node = SubResource( 25 )
 nodes/fragment/8/position = Vector2( -240, 60 )
-nodes/fragment/13/node = SubResource( 131 )
+nodes/fragment/13/node = SubResource( 13 )
 nodes/fragment/13/position = Vector2( 0, -260 )
-nodes/fragment/14/node = SubResource( 132 )
+nodes/fragment/14/node = SubResource( 14 )
 nodes/fragment/14/position = Vector2( 220, -340 )
-nodes/fragment/15/node = SubResource( 133 )
+nodes/fragment/15/node = SubResource( 15 )
 nodes/fragment/15/position = Vector2( 280, -540 )
-nodes/fragment/16/node = SubResource( 134 )
+nodes/fragment/16/node = SubResource( 16 )
 nodes/fragment/16/position = Vector2( 280, -440 )
-nodes/fragment/17/node = SubResource( 135 )
+nodes/fragment/17/node = SubResource( 17 )
 nodes/fragment/17/position = Vector2( 460, -340 )
-nodes/fragment/21/node = SubResource( 136 )
+nodes/fragment/21/node = SubResource( 18 )
 nodes/fragment/21/position = Vector2( -540, 0 )
-nodes/fragment/22/node = SubResource( 137 )
+nodes/fragment/22/node = SubResource( 19 )
 nodes/fragment/22/position = Vector2( 0, -80 )
-nodes/fragment/23/node = SubResource( 138 )
+nodes/fragment/23/node = SubResource( 20 )
 nodes/fragment/23/position = Vector2( 740, -140 )
-nodes/fragment/24/node = SubResource( 139 )
+nodes/fragment/24/node = SubResource( 21 )
 nodes/fragment/24/position = Vector2( -300, -100 )
 nodes/fragment/connections = PoolIntArray( 3, 0, 4, 0, 5, 0, 4, 1, 13, 0, 14, 0, 15, 0, 17, 0, 16, 0, 17, 1, 14, 0, 17, 2, 8, 0, 22, 2, 23, 0, 0, 0, 22, 0, 23, 2, 17, 0, 23, 0, 4, 0, 24, 0, 24, 1, 22, 0, 24, 2, 22, 1, 21, 0, 24, 1, 24, 3, 13, 0 )
 
-[sub_resource type="ShaderMaterial" id=145]
-shader = SubResource( 144 )
+[sub_resource type="ShaderMaterial" id=27]
+shader = SubResource( 26 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=146]
+[sub_resource type="VisualShaderNodeColorConstant" id=28]
 constant = Color( 0.5625, 0.5625, 0.5625, 1 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=147]
+[sub_resource type="VisualShaderNodeColorConstant" id=29]
 constant = Color( 0.347656, 0.347656, 0.347656, 1 )
 
-[sub_resource type="VisualShaderNodeCustom" id=148]
+[sub_resource type="VisualShaderNodeCustom" id=30]
 script = ExtResource( 16 )
 
-[sub_resource type="VisualShaderNodeCustom" id=149]
+[sub_resource type="VisualShaderNodeCustom" id=31]
 default_input_values = [ 2, 0.05 ]
 script = ExtResource( 17 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=150]
+[sub_resource type="VisualShaderNodeScalarConstant" id=32]
 constant = 0.1
 
-[sub_resource type="VisualShader" id=151]
+[sub_resource type="VisualShader" id=33]
 code = "shader_type canvas_item;
 
 
@@ -4067,13 +230,11 @@ code = "shader_type canvas_item;
 
 // RandomNoise
 
-	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
+	float gpu_random_float(vec4 co){
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
 		return fract(sin(f) * 437588.5453);
 	}
 	
-// SDFChampferIntersect
-
 // StepMixS
 
 
@@ -4130,7 +291,7 @@ void fragment() {
 // RandomNoise:14
 	float n_out14p0;
 	{
-		n_out14p0 = rand(vec4(n_out13p0, 0.0));
+		n_out14p0 = gpu_random_float(vec4(n_out13p0, 0.0));
 	}
 
 // VectorScalarMix:17
@@ -4173,146 +334,146 @@ graph_offset = Vector2( 290.981, -239 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 960, -120 )
-nodes/fragment/3/node = SubResource( 140 )
+nodes/fragment/3/node = SubResource( 22 )
 nodes/fragment/3/position = Vector2( -700, -140 )
-nodes/fragment/4/node = SubResource( 141 )
+nodes/fragment/4/node = SubResource( 23 )
 nodes/fragment/4/position = Vector2( -520, -140 )
-nodes/fragment/5/node = SubResource( 142 )
+nodes/fragment/5/node = SubResource( 24 )
 nodes/fragment/5/position = Vector2( -740, -80 )
-nodes/fragment/13/node = SubResource( 131 )
+nodes/fragment/13/node = SubResource( 13 )
 nodes/fragment/13/position = Vector2( 0, -260 )
-nodes/fragment/14/node = SubResource( 132 )
+nodes/fragment/14/node = SubResource( 14 )
 nodes/fragment/14/position = Vector2( 220, -340 )
-nodes/fragment/17/node = SubResource( 135 )
+nodes/fragment/17/node = SubResource( 17 )
 nodes/fragment/17/position = Vector2( 460, -340 )
-nodes/fragment/21/node = SubResource( 136 )
+nodes/fragment/21/node = SubResource( 18 )
 nodes/fragment/21/position = Vector2( -540, 0 )
-nodes/fragment/23/node = SubResource( 138 )
+nodes/fragment/23/node = SubResource( 20 )
 nodes/fragment/23/position = Vector2( 740, -140 )
-nodes/fragment/25/node = SubResource( 146 )
+nodes/fragment/25/node = SubResource( 28 )
 nodes/fragment/25/position = Vector2( 300, -560 )
-nodes/fragment/26/node = SubResource( 147 )
+nodes/fragment/26/node = SubResource( 29 )
 nodes/fragment/26/position = Vector2( 300, -460 )
-nodes/fragment/27/node = SubResource( 148 )
+nodes/fragment/27/node = SubResource( 30 )
 nodes/fragment/27/position = Vector2( -300, -120 )
-nodes/fragment/28/node = SubResource( 149 )
+nodes/fragment/28/node = SubResource( 31 )
 nodes/fragment/28/position = Vector2( 140, -40 )
-nodes/fragment/29/node = SubResource( 150 )
+nodes/fragment/29/node = SubResource( 32 )
 nodes/fragment/29/position = Vector2( -220, 60 )
 nodes/fragment/connections = PoolIntArray( 3, 0, 4, 0, 5, 0, 4, 1, 13, 0, 14, 0, 14, 0, 17, 2, 23, 0, 0, 0, 17, 0, 23, 0, 26, 0, 17, 1, 25, 0, 17, 0, 4, 0, 27, 0, 21, 0, 27, 1, 27, 3, 13, 0, 27, 1, 28, 0, 27, 2, 28, 1, 28, 0, 23, 2, 29, 0, 28, 2 )
 
-[sub_resource type="ShaderMaterial" id=152]
-shader = SubResource( 151 )
+[sub_resource type="ShaderMaterial" id=34]
+shader = SubResource( 33 )
 
-[sub_resource type="VisualShaderNodeCustom" id=155]
+[sub_resource type="VisualShaderNodeCustom" id=35]
 default_input_values = [ 2, 0.05 ]
 script = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeCustom" id=156]
+[sub_resource type="VisualShaderNodeCustom" id=36]
 default_input_values = [ 2, 0.05 ]
 script = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeCustom" id=157]
+[sub_resource type="VisualShaderNodeCustom" id=37]
 script = ExtResource( 7 )
 
-[sub_resource type="VisualShaderNodeVectorOp" id=158]
+[sub_resource type="VisualShaderNodeVectorOp" id=38]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.23123, 0.32423, 0.324 ) ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=159]
+[sub_resource type="VisualShaderNodeScalarConstant" id=39]
 constant = 0.02
 
-[sub_resource type="VisualShaderNodeVectorScalarMix" id=160]
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=40]
 
-[sub_resource type="VisualShaderNodeColorConstant" id=161]
+[sub_resource type="VisualShaderNodeColorConstant" id=41]
 constant = Color( 0.282718, 1, 0.932755, 1 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=162]
+[sub_resource type="VisualShaderNodeColorConstant" id=42]
 constant = Color( 0.28515, 0.0427733, 0.292969, 1 )
 
-[sub_resource type="VisualShaderNodeCustom" id=190]
+[sub_resource type="VisualShaderNodeCustom" id=43]
 default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShaderNodeScalarFunc" id=194]
+[sub_resource type="VisualShaderNodeScalarFunc" id=44]
 function = 19
 
-[sub_resource type="VisualShaderNodeCustom" id=195]
+[sub_resource type="VisualShaderNodeCustom" id=45]
 default_input_values = [ 2, 0.1 ]
 script = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeCustom" id=196]
+[sub_resource type="VisualShaderNodeCustom" id=46]
 default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShaderNodeScalarOp" id=197]
+[sub_resource type="VisualShaderNodeScalarOp" id=47]
 default_input_values = [ 0, 0.0, 1, 0.2 ]
 
-[sub_resource type="VisualShaderNodeColorConstant" id=198]
+[sub_resource type="VisualShaderNodeColorConstant" id=48]
 constant = Color( 0.376953, 0.376953, 0.376953, 1 )
 
-[sub_resource type="VisualShaderNodeCustom" id=199]
+[sub_resource type="VisualShaderNodeCustom" id=49]
 output_port_for_preview = 0
 default_input_values = [ 1, Vector3( 1, 1.5, 0 ), 2, Vector3( 5, 5, 0 ), 3, 0.8 ]
 script = ExtResource( 22 )
 
-[sub_resource type="VisualShaderNodeInput" id=163]
+[sub_resource type="VisualShaderNodeInput" id=50]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeScalarOp" id=200]
+[sub_resource type="VisualShaderNodeScalarOp" id=51]
 output_port_for_preview = 0
-default_input_values = [ 0, 0.0, 1, -3.0 ]
+default_input_values = [ 0, 0.0, 1, -2.0 ]
 
-[sub_resource type="VisualShaderNodeCustom" id=201]
+[sub_resource type="VisualShaderNodeCustom" id=52]
+default_input_values = [ 1, Vector3( 1, 1, 1 ), 2, 0.5 ]
 script = ExtResource( 8 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=202]
+[sub_resource type="VisualShaderNodeScalarConstant" id=53]
 constant = 1.0
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=203]
+[sub_resource type="VisualShaderNodeScalarConstant" id=54]
 constant = 1.5
 
-[sub_resource type="VisualShaderNodeScalarOp" id=204]
+[sub_resource type="VisualShaderNodeScalarOp" id=55]
 output_port_for_preview = 0
 operator = 1
 
-[sub_resource type="VisualShaderNodeScalarOp" id=205]
+[sub_resource type="VisualShaderNodeScalarOp" id=56]
 output_port_for_preview = 0
 default_input_values = [ 0, 0.2, 1, 0.1 ]
 operator = 1
 
-[sub_resource type="VisualShaderNodeCustom" id=206]
-output_port_for_preview = 0
-default_input_values = [ 2, 2.0 ]
-script = ExtResource( 14 )
-
-[sub_resource type="VisualShaderNodeScalarFunc" id=207]
+[sub_resource type="VisualShaderNodeScalarFunc" id=58]
 function = 19
 
-[sub_resource type="VisualShaderNodeScalarOp" id=208]
+[sub_resource type="VisualShaderNodeScalarOp" id=59]
 output_port_for_preview = 0
+default_input_values = [ 0, -0.3, 1, 0.0 ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeScalarOp" id=209]
-default_input_values = [ 0, 0.0, 1, -1.0 ]
-operator = 2
-
-[sub_resource type="VisualShaderNodeCustom" id=210]
+[sub_resource type="VisualShaderNodeCustom" id=61]
 output_port_for_preview = 0
 default_input_values = [ 2, 0.2 ]
 script = ExtResource( 17 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=164]
+[sub_resource type="VisualShaderNodeScalarOp" id=83]
+output_port_for_preview = 0
+operator = 1
+
+[sub_resource type="VisualShaderNodeScalarClamp" id=84]
+default_input_values = [ 0, 0.0, 1, -1.0, 2, 0.02 ]
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=62]
 constant = 0.1
 
-[sub_resource type="VisualShaderNodeCustom" id=165]
+[sub_resource type="VisualShaderNodeCustom" id=63]
 script = ExtResource( 21 )
 
-[sub_resource type="VisualShaderNodeVectorOp" id=166]
+[sub_resource type="VisualShaderNodeVectorOp" id=64]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 10, 10, 0 ) ]
 operator = 2
 
-[sub_resource type="VisualShader" id=168]
+[sub_resource type="VisualShader" id=65]
 code = "shader_type canvas_item;
 
 
@@ -4355,8 +516,8 @@ void hexagon_pattern(
 
 // RandomNoise
 
-	float rand(vec4 co){
-		float f = dot(fract(co),vec4(129.898,782.33,944.32214932,122.2834234542));
+	float gpu_random_float(vec4 co){
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
 		return fract(sin(f) * 437588.5453);
 	}
 	
@@ -4479,7 +640,7 @@ void fragment() {
 // RandomNoise:15
 	float n_out15p0;
 	{
-		n_out15p0 = rand(vec4(n_out16p0, 0.0));
+		n_out15p0 = gpu_random_float(vec4(n_out16p0, 0.0));
 	}
 
 // VectorScalarMix:18
@@ -4555,10 +716,6 @@ void fragment() {
 			
 	}
 
-// ScalarOp:30
-	float n_in30p1 = -3.00000;
-	float n_out30p0 = n_out29p0 + n_in30p1;
-
 // Scalar:38
 	float n_out38p0 = 1.500000;
 
@@ -4571,9 +728,9 @@ void fragment() {
 	float n_out31p2;
 	{
 		
-			
 			n_out31p0 = vec3(cellular_noise_2d((n_out8p0).xy * (vec3(n_out38p0)).xy, n_out33p0), 0.0);
-			n_out31p1 = n_out31p0.x;n_out31p2 = n_out31p0.y;
+			n_out31p1 = n_out31p0.x;
+			n_out31p2 = n_out31p0.y;
 			
 	}
 
@@ -4584,25 +741,24 @@ void fragment() {
 	float n_in40p1 = 0.10000;
 	float n_out40p0 = n_out39p0 - n_in40p1;
 
-// ScalarOp:44
-	float n_in44p1 = -1.00000;
-	float n_out44p0 = n_out30p0 * n_in44p1;
+// ScalarOp:30
+	float n_in30p1 = -2.00000;
+	float n_out30p0 = n_out29p0 + n_in30p1;
 
 // ScalarOp:43
-	float n_out43p0 = n_out40p0 * n_out44p0;
+	float n_in43p0 = -0.30000;
+	float n_out43p0 = n_in43p0 * n_out30p0;
 
-// SDFRoundIntersect:41
-	float n_in41p2 = 2.00000;
-	float n_out41p0;
-	{
-		
-				vec2 is = max(vec2(0), vec2(n_out30p0 + n_in41p2, n_out43p0 + n_in41p2));
-				n_out41p0 = min(max(n_out30p0, n_out43p0), -n_in41p2) + length(is);
-			
-	}
+// ScalarClamp:47
+	float n_in47p1 = -1.00000;
+	float n_in47p2 = 0.02000;
+	float n_out47p0 = clamp(n_out43p0, n_in47p1, n_in47p2);
+
+// ScalarOp:46
+	float n_out46p0 = n_out40p0 - n_out47p0;
 
 // ScalarFunc:42
-	float n_out42p0 = -(n_out41p0);
+	float n_out42p0 = -(n_out46p0);
 
 // SDFChampferIntersect:45
 	float n_in45p2 = 0.20000;
@@ -4633,112 +789,150 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -73.3759, -415 )
+graph_offset = Vector2( -35.1167, 440 )
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2( 1340, 100 )
-nodes/fragment/3/node = SubResource( 163 )
+nodes/fragment/3/node = SubResource( 50 )
 nodes/fragment/3/position = Vector2( -520, 80 )
-nodes/fragment/6/node = SubResource( 164 )
+nodes/fragment/6/node = SubResource( 62 )
 nodes/fragment/6/position = Vector2( 228, 270 )
-nodes/fragment/7/node = SubResource( 165 )
+nodes/fragment/7/node = SubResource( 63 )
 nodes/fragment/7/position = Vector2( 20, 20 )
-nodes/fragment/8/node = SubResource( 166 )
+nodes/fragment/8/node = SubResource( 64 )
 nodes/fragment/8/position = Vector2( -284.981, 51 )
-nodes/fragment/13/node = SubResource( 155 )
+nodes/fragment/13/node = SubResource( 35 )
 nodes/fragment/13/position = Vector2( 360, 120 )
-nodes/fragment/14/node = SubResource( 156 )
+nodes/fragment/14/node = SubResource( 36 )
 nodes/fragment/14/position = Vector2( 620, 80 )
-nodes/fragment/15/node = SubResource( 157 )
+nodes/fragment/15/node = SubResource( 37 )
 nodes/fragment/15/position = Vector2( 380, -160 )
-nodes/fragment/16/node = SubResource( 158 )
+nodes/fragment/16/node = SubResource( 38 )
 nodes/fragment/16/position = Vector2( 160, -180 )
-nodes/fragment/17/node = SubResource( 159 )
+nodes/fragment/17/node = SubResource( 39 )
 nodes/fragment/17/position = Vector2( 640, 200 )
-nodes/fragment/18/node = SubResource( 160 )
+nodes/fragment/18/node = SubResource( 40 )
 nodes/fragment/18/position = Vector2( 760, -260 )
-nodes/fragment/19/node = SubResource( 161 )
+nodes/fragment/19/node = SubResource( 41 )
 nodes/fragment/19/position = Vector2( 560, -340 )
-nodes/fragment/20/node = SubResource( 162 )
+nodes/fragment/20/node = SubResource( 42 )
 nodes/fragment/20/position = Vector2( 560, -260 )
-nodes/fragment/21/node = SubResource( 190 )
+nodes/fragment/21/node = SubResource( 43 )
 nodes/fragment/21/position = Vector2( 1120, 40 )
-nodes/fragment/24/node = SubResource( 194 )
+nodes/fragment/24/node = SubResource( 44 )
 nodes/fragment/24/position = Vector2( 460, 380 )
-nodes/fragment/25/node = SubResource( 195 )
+nodes/fragment/25/node = SubResource( 45 )
 nodes/fragment/25/position = Vector2( 857.558, 255.5 )
-nodes/fragment/26/node = SubResource( 196 )
+nodes/fragment/26/node = SubResource( 46 )
 nodes/fragment/26/position = Vector2( 860, 380 )
-nodes/fragment/27/node = SubResource( 197 )
+nodes/fragment/27/node = SubResource( 47 )
 nodes/fragment/27/position = Vector2( 460, 460 )
-nodes/fragment/28/node = SubResource( 198 )
+nodes/fragment/28/node = SubResource( 48 )
 nodes/fragment/28/position = Vector2( 640, 520 )
-nodes/fragment/29/node = SubResource( 199 )
+nodes/fragment/29/node = SubResource( 49 )
 nodes/fragment/29/position = Vector2( 100, 360 )
-nodes/fragment/30/node = SubResource( 200 )
+nodes/fragment/30/node = SubResource( 51 )
 nodes/fragment/30/position = Vector2( 460, 580 )
-nodes/fragment/31/node = SubResource( 201 )
+nodes/fragment/31/node = SubResource( 52 )
 nodes/fragment/31/position = Vector2( -100, 680 )
-nodes/fragment/33/node = SubResource( 202 )
-nodes/fragment/33/position = Vector2( -361.035, 794 )
-nodes/fragment/38/node = SubResource( 203 )
+nodes/fragment/33/node = SubResource( 53 )
+nodes/fragment/33/position = Vector2( -342, 801 )
+nodes/fragment/38/node = SubResource( 54 )
 nodes/fragment/38/position = Vector2( -338.035, 732.25 )
-nodes/fragment/39/node = SubResource( 204 )
-nodes/fragment/39/position = Vector2( 140, 780 )
-nodes/fragment/40/node = SubResource( 205 )
-nodes/fragment/40/position = Vector2( 320, 860 )
-nodes/fragment/41/node = SubResource( 206 )
-nodes/fragment/41/position = Vector2( 820, 740 )
-nodes/fragment/42/node = SubResource( 207 )
+nodes/fragment/39/node = SubResource( 55 )
+nodes/fragment/39/position = Vector2( 117, 630 )
+nodes/fragment/40/node = SubResource( 56 )
+nodes/fragment/40/position = Vector2( 279, 630 )
+nodes/fragment/42/node = SubResource( 58 )
 nodes/fragment/42/position = Vector2( 860, 540 )
-nodes/fragment/43/node = SubResource( 208 )
-nodes/fragment/43/position = Vector2( 600, 880 )
-nodes/fragment/44/node = SubResource( 209 )
-nodes/fragment/44/position = Vector2( 640, 620 )
-nodes/fragment/45/node = SubResource( 210 )
+nodes/fragment/43/node = SubResource( 59 )
+nodes/fragment/43/position = Vector2( 630, 612 )
+nodes/fragment/45/node = SubResource( 61 )
 nodes/fragment/45/position = Vector2( 1120, 280 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 8, 0, 8, 0, 7, 0, 13, 0, 14, 1, 6, 0, 13, 2, 6, 0, 14, 2, 7, 1, 14, 0, 7, 2, 13, 0, 7, 3, 13, 1, 16, 0, 15, 0, 7, 4, 16, 0, 15, 0, 18, 2, 20, 0, 18, 1, 19, 0, 18, 0, 17, 0, 21, 4, 18, 0, 21, 0, 14, 0, 25, 0, 24, 0, 25, 1, 26, 0, 21, 1, 27, 0, 26, 2, 17, 0, 26, 4, 28, 0, 26, 0, 8, 0, 29, 0, 29, 0, 27, 0, 29, 0, 24, 0, 29, 0, 30, 0, 8, 0, 31, 0, 33, 0, 31, 2, 38, 0, 31, 1, 21, 0, 0, 0, 31, 1, 39, 1, 31, 2, 39, 0, 39, 0, 40, 0, 30, 0, 41, 0, 41, 0, 42, 0, 40, 0, 43, 0, 43, 0, 41, 1, 30, 0, 44, 0, 44, 0, 43, 1, 25, 0, 45, 0, 42, 0, 45, 1, 45, 0, 21, 2 )
+nodes/fragment/46/node = SubResource( 83 )
+nodes/fragment/46/position = Vector2( 1017, 630 )
+nodes/fragment/47/node = SubResource( 84 )
+nodes/fragment/47/position = Vector2( 819, 630 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 8, 0, 8, 0, 7, 0, 13, 0, 14, 1, 6, 0, 13, 2, 6, 0, 14, 2, 7, 1, 14, 0, 7, 2, 13, 0, 7, 3, 13, 1, 16, 0, 15, 0, 7, 4, 16, 0, 15, 0, 18, 2, 20, 0, 18, 1, 19, 0, 18, 0, 17, 0, 21, 4, 18, 0, 21, 0, 14, 0, 25, 0, 24, 0, 25, 1, 26, 0, 21, 1, 27, 0, 26, 2, 17, 0, 26, 4, 28, 0, 26, 0, 8, 0, 29, 0, 29, 0, 27, 0, 29, 0, 24, 0, 29, 0, 30, 0, 8, 0, 31, 0, 33, 0, 31, 2, 38, 0, 31, 1, 21, 0, 0, 0, 31, 1, 39, 1, 31, 2, 39, 0, 39, 0, 40, 0, 25, 0, 45, 0, 42, 0, 45, 1, 45, 0, 21, 2, 40, 0, 46, 0, 46, 0, 42, 0, 30, 0, 43, 1, 43, 0, 47, 0, 47, 0, 46, 1 )
 
-[sub_resource type="ShaderMaterial" id=169]
-shader = SubResource( 168 )
+[sub_resource type="ShaderMaterial" id=66]
+shader = SubResource( 65 )
 
-[sub_resource type="VisualShaderNodeScalarOp" id=170]
-default_input_values = [ 0, 0.0, 1, 0.25 ]
-operator = 2
+[sub_resource type="VisualShaderNodeCustom" id=67]
+output_port_for_preview = 0
+default_input_values = [ 2, 0.01 ]
+script = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeCustom" id=171]
-default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0, 4, 0.0 ]
+[sub_resource type="VisualShaderNodeCustom" id=68]
+output_port_for_preview = 0
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=172]
-constant = Color( 0.898438, 0, 1, 1 )
+[sub_resource type="VisualShaderNodeScalarConstant" id=69]
+constant = 0.005
 
-[sub_resource type="VisualShaderNodeColorConstant" id=173]
+[sub_resource type="VisualShaderNodeColorConstant" id=70]
+constant = Color( 0.425781, 1, 0.569336, 1 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=174]
-constant = 0.01
+[sub_resource type="VisualShaderNodeColorConstant" id=71]
+constant = Color( 0, 0, 0, 1 )
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=175]
-constant = Vector3( 0.5, 0.7, 0 )
+[sub_resource type="VisualShaderNodeScalarOp" id=82]
+default_input_values = [ 0, 0.0, 1, 3.0 ]
+operator = 2
 
-[sub_resource type="VisualShaderNodeInput" id=176]
+[sub_resource type="VisualShaderNodeInput" id=72]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeCustom" id=177]
-script = ExtResource( 18 )
-
-[sub_resource type="VisualShaderNodeScalarFunc" id=178]
-function = 1
-
-[sub_resource type="VisualShaderNodeScalarOp" id=179]
-default_input_values = [ 0, 0.25, 1, 1.0 ]
+[sub_resource type="VisualShaderNodeVectorOp" id=73]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0 ) ]
 operator = 1
 
-[sub_resource type="VisualShader" id=180]
+[sub_resource type="VisualShaderNodeCustom" id=74]
+output_port_for_preview = 0
+script = ExtResource( 3 )
+
+[sub_resource type="VisualShaderNodeInput" id=75]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeCustom" id=76]
+output_port_for_preview = 0
+default_input_values = [ 1, Vector3( 0.04, 0.5, 0 ), 2, Vector3( 0, 0, 0 ), 3, 0.0 ]
+script = ExtResource( 22 )
+
+[sub_resource type="VisualShaderNodeCustom" id=77]
+output_port_for_preview = 0
+default_input_values = [ 1, 0.3, 2, Vector3( 0, 0, 0 ) ]
+script = ExtResource( 2 )
+
+[sub_resource type="VisualShaderNodeCustom" id=78]
+output_port_for_preview = 0
+default_input_values = [ 1, 0.05 ]
+script = ExtResource( 1 )
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=79]
+output_port_for_preview = 0
+function = 19
+
+[sub_resource type="VisualShader" id=80]
 code = "shader_type canvas_item;
 
 
-// ToPolar2D
+// Rotation2D
+
+void rotation_2d(float angle, vec3 pivot, in vec3 position_in,  out vec3 position_out) {
+	mat2 rotation_matrix = mat2( vec2(cos(angle), -sin(angle)), vec2(sin(angle), cos(angle)));
+	position_in -= pivot;
+	position_out.xy = rotation_matrix * position_in.xy;
+	position_out.z = position_in.z;
+	position_out += pivot;
+	
+}
+// SDFFieldRectangle
+
+// SDFFieldCircle
+
+// SDFExtractBorder
 
 // StepMixS
 
@@ -4749,54 +943,90 @@ void vertex() {
 }
 
 void fragment() {
-// Color:12
-	vec3 n_out12p0 = vec3(0.898438, 0.000000, 1.000000);
-	float n_out12p1 = 1.000000;
-
 // Color:13
-	vec3 n_out13p0 = vec3(1.000000, 1.000000, 1.000000);
+	vec3 n_out13p0 = vec3(0.425781, 1.000000, 0.569336);
 	float n_out13p1 = 1.000000;
+
+// Color:14
+	vec3 n_out14p0 = vec3(0.000000, 0.000000, 0.000000);
+	float n_out14p1 = 1.000000;
+
+// Input:5
+	float n_out5p0 = TIME;
+
+// ScalarOp:15
+	float n_in15p1 = 3.00000;
+	float n_out15p0 = n_out5p0 * n_in15p1;
 
 // Input:2
 	vec3 n_out2p0 = vec3(UV, 0.0);
 
-// Vector:15
-	vec3 n_out15p0 = vec3(0.500000, 0.700000, 0.000000);
+// VectorOp:3
+	vec3 n_in3p1 = vec3(0.50000, 0.50000, 0.00000);
+	vec3 n_out3p0 = n_out2p0 - n_in3p1;
 
-// ToPolar2D:5
-	vec3 n_out5p0;
-	float n_out5p1;
-	float n_out5p2;
+// Rotation2D:4
+	vec3 n_out4p0;
+	{
+		rotation_2d(n_out15p0, vec3(0.0, 0.0, 0.0), n_out3p0, n_out4p0);
+	}
+
+// SDFFieldRectangle:6
+	vec3 n_in6p1 = vec3(0.04000, 0.50000, 0.00000);
+	vec3 n_in6p2 = vec3(0.00000, 0.00000, 0.00000);
+	float n_in6p3 = 0.00000;
+	float n_out6p0;
 	{
 		
-				vec2 xy = n_out2p0.xy - n_out15p0.xy;
-				float a = atan(xy.x, xy.y);
-				float d = length(xy);
-				n_out5p0 = vec3(a, d, 0.0);
-				n_out5p1 = a;
-				n_out5p2 = d;
+			vec2 cd = abs(n_out4p0.xy - n_in6p2.xy) - n_in6p1.xy + n_in6p3;
+			float od = length(max(cd, vec2(0.0)));
+			float id = min(0.0, max(cd.x, cd.y));
+			
+			n_out6p0 = od + id - n_in6p3;
 			
 	}
 
-// ScalarFunc:7
-	float n_out7p0 = cos(n_out5p1);
+// ScalarFunc:9
+	float n_out9p0 = -(n_out6p0);
 
-// ScalarOp:10
-	float n_in10p1 = 0.25000;
-	float n_out10p0 = n_out7p0 * n_in10p1;
+// SDFFieldCircle:7
+	float n_in7p1 = 0.30000;
+	vec3 n_in7p2 = vec3(0.00000, 0.00000, 0.00000);
+	float n_out7p0;
+	{
+		
+			n_out7p0 = length(n_out4p0 - n_in7p2) - n_in7p1;
+			
+	}
 
-// ScalarOp:9
-	float n_in9p0 = 0.25000;
-	float n_out9p0 = n_in9p0 - n_out10p0;
+// SDFExtractBorder:8
+	float n_in8p1 = 0.05000;
+	float n_out8p0;
+	{
+		
+			n_out8p0 = abs(n_out7p0) - n_in8p1;
+			
+	}
 
-// Scalar:14
-	float n_out14p0 = 0.010000;
+// SDFRoundIntersect:10
+	float n_in10p2 = 0.01000;
+	float n_out10p0;
+	{
+		
+				vec2 is = max(vec2(0), vec2(n_out9p0 + n_in10p2, n_out8p0 + n_in10p2));
+				n_out10p0 = min(max(n_out9p0, n_out8p0), -n_in10p2) + length(is);
+			
+	}
+
+// Scalar:12
+	float n_out12p0 = 0.005000;
 
 // StepMixS:11
+	float n_in11p3 = 0.00000;
 	vec3 n_out11p0;
 	{
 		
-				n_out11p0 = mix(n_out12p0, n_out13p0, smoothstep(n_out9p0 - n_out14p0, n_out9p0 + n_out14p0, n_out5p2));
+				n_out11p0 = mix(n_out13p0, n_out14p0, smoothstep(n_in11p3 - n_out12p0, n_in11p3 + n_out12p0, n_out10p0));
 			
 	}
 
@@ -4810,453 +1040,51 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -120, -124.5 )
+graph_offset = Vector2( -225.465, -98.5 )
 mode = 1
 flags/light_only = false
-nodes/fragment/0/position = Vector2( 880, 100 )
-nodes/fragment/2/node = SubResource( 176 )
-nodes/fragment/2/position = Vector2( -260, 140 )
-nodes/fragment/5/node = SubResource( 177 )
-nodes/fragment/5/position = Vector2( 0, 140 )
-nodes/fragment/7/node = SubResource( 178 )
-nodes/fragment/7/position = Vector2( -60, -100 )
-nodes/fragment/9/node = SubResource( 179 )
-nodes/fragment/9/position = Vector2( 400, -120 )
-nodes/fragment/10/node = SubResource( 170 )
-nodes/fragment/10/position = Vector2( 160, -120 )
-nodes/fragment/11/node = SubResource( 171 )
-nodes/fragment/11/position = Vector2( 660, 80 )
-nodes/fragment/12/node = SubResource( 172 )
-nodes/fragment/12/position = Vector2( 300, 20 )
-nodes/fragment/13/node = SubResource( 173 )
-nodes/fragment/13/position = Vector2( 300, 120 )
-nodes/fragment/14/node = SubResource( 174 )
-nodes/fragment/14/position = Vector2( 240, 220 )
-nodes/fragment/15/node = SubResource( 175 )
-nodes/fragment/15/position = Vector2( -400, 220 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 5, 0, 5, 1, 7, 0, 7, 0, 10, 0, 10, 0, 9, 1, 11, 0, 0, 0, 5, 2, 11, 2, 9, 0, 11, 3, 12, 0, 11, 0, 13, 0, 11, 1, 14, 0, 11, 4, 15, 0, 5, 1 )
+nodes/fragment/0/position = Vector2( 1197, -45 )
+nodes/fragment/2/node = SubResource( 72 )
+nodes/fragment/2/position = Vector2( -680, 100 )
+nodes/fragment/3/node = SubResource( 73 )
+nodes/fragment/3/position = Vector2( -500, 100 )
+nodes/fragment/4/node = SubResource( 74 )
+nodes/fragment/4/position = Vector2( -320, 40 )
+nodes/fragment/5/node = SubResource( 75 )
+nodes/fragment/5/position = Vector2( -693, 9 )
+nodes/fragment/6/node = SubResource( 76 )
+nodes/fragment/6/position = Vector2( -40, -140 )
+nodes/fragment/7/node = SubResource( 77 )
+nodes/fragment/7/position = Vector2( -40, 120 )
+nodes/fragment/8/node = SubResource( 78 )
+nodes/fragment/8/position = Vector2( 160, 120 )
+nodes/fragment/9/node = SubResource( 79 )
+nodes/fragment/9/position = Vector2( 180, -140 )
+nodes/fragment/10/node = SubResource( 67 )
+nodes/fragment/10/position = Vector2( 499, 16.5 )
+nodes/fragment/11/node = SubResource( 68 )
+nodes/fragment/11/position = Vector2( 900, -72 )
+nodes/fragment/12/node = SubResource( 69 )
+nodes/fragment/12/position = Vector2( 495, 243 )
+nodes/fragment/13/node = SubResource( 70 )
+nodes/fragment/13/position = Vector2( 588, -323.5 )
+nodes/fragment/14/node = SubResource( 71 )
+nodes/fragment/14/position = Vector2( 585, -225 )
+nodes/fragment/15/node = SubResource( 82 )
+nodes/fragment/15/position = Vector2( -504, -27 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 3, 0, 3, 0, 4, 2, 4, 0, 6, 0, 4, 0, 7, 0, 7, 0, 8, 0, 6, 0, 9, 0, 9, 0, 10, 0, 8, 0, 10, 1, 10, 0, 11, 2, 12, 0, 11, 4, 13, 0, 11, 0, 14, 0, 11, 1, 11, 0, 0, 0, 5, 0, 15, 0, 15, 0, 4, 0 )
 
-[sub_resource type="ShaderMaterial" id=181]
-shader = SubResource( 180 )
-
-[sub_resource type="VisualShaderNodeTexture" id=182]
-source = 2
-texture = ExtResource( 1 )
-
-[sub_resource type="VisualShaderNodeInput" id=183]
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeCustom" id=184]
-script = ExtResource( 18 )
-
-[sub_resource type="VisualShaderNodeCustom" id=185]
-script = ExtResource( 19 )
-
-[sub_resource type="VisualShaderNodeVec3Constant" id=186]
-constant = Vector3( 0.5, 0.5, 0 )
-
-[sub_resource type="VisualShaderNodeScalarOp" id=187]
-default_input_values = [ 0, 0.0, 1, 2.09333 ]
-operator = 4
-
-[sub_resource type="VisualShader" id=188]
-code = "shader_type canvas_item;
-
-
-// ToPolar2D
-
-// FromPolar2D
-
-
-void vertex() {
-// Output:0
-
-}
-
-void fragment() {
-// Input:3
-	vec3 n_out3p0 = vec3(UV, 0.0);
-
-// Vector:6
-	vec3 n_out6p0 = vec3(0.500000, 0.500000, 0.000000);
-
-// ToPolar2D:4
-	vec3 n_out4p0;
-	float n_out4p1;
-	float n_out4p2;
-	{
-		
-				vec2 xy = n_out3p0.xy - n_out6p0.xy;
-				float a = atan(xy.x, xy.y);
-				float d = length(xy);
-				n_out4p0 = vec3(a, d, 0.0);
-				n_out4p1 = a;
-				n_out4p2 = d;
-			
-	}
-
-// ScalarOp:7
-	float n_in7p1 = 2.09333;
-	float n_out7p0 = mod(n_out4p1, n_in7p1);
-
-// FromPolar2D:5
-	vec3 n_out5p0;
-	{
-		
-				float a = n_out7p0, d = n_out4p2;
-				vec2 res = vec2(sin(a), cos(a)) * d + n_out6p0.xy;
-				n_out5p0 = vec3(res, 0.0);
-			
-	}
-
-// Texture:2
-	vec3 n_out2p0;
-	float n_out2p1;
-	{
-		vec4 _tex_read = texture(TEXTURE, n_out5p0.xy);
-		n_out2p0 = _tex_read.rgb;
-		n_out2p1 = _tex_read.a;
-	}
-
-// Output:0
-	COLOR.rgb = n_out2p0;
-
-}
-
-void light() {
-// Output:0
-
-}
-"
-graph_offset = Vector2( -487, -271 )
-mode = 1
-flags/light_only = false
-nodes/fragment/2/node = SubResource( 182 )
-nodes/fragment/2/position = Vector2( 120, 100 )
-nodes/fragment/3/node = SubResource( 183 )
-nodes/fragment/3/position = Vector2( -640, 80 )
-nodes/fragment/4/node = SubResource( 184 )
-nodes/fragment/4/position = Vector2( -440, 120 )
-nodes/fragment/5/node = SubResource( 185 )
-nodes/fragment/5/position = Vector2( -160, 140 )
-nodes/fragment/6/node = SubResource( 186 )
-nodes/fragment/6/position = Vector2( -780, 300 )
-nodes/fragment/7/node = SubResource( 187 )
-nodes/fragment/7/position = Vector2( -300, -140 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 4, 0, 5, 0, 2, 0, 6, 0, 4, 1, 6, 0, 5, 2, 4, 2, 5, 1, 4, 1, 7, 0, 7, 0, 5, 0 )
-
-[sub_resource type="ShaderMaterial" id=189]
-shader = SubResource( 188 )
+[sub_resource type="ShaderMaterial" id=81]
+shader = SubResource( 80 )
 
 [node name="Node2D" type="Node2D"]
 
-[node name="Rotation" type="Sprite" parent="."]
-material = SubResource( 7 )
-position = Vector2( 57.2789, 57.2789 )
-texture = ExtResource( 1 )
-
-[node name="Label" type="Label" parent="Rotation"]
-margin_left = -25.9443
-margin_top = 38.4532
-margin_right = 27.0557
-margin_bottom = 52.4532
-text = "Rotation"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Rotation 3D" type="Sprite" parent="."]
-material = SubResource( 12 )
-position = Vector2( 162.129, 55.3282 )
-texture = ExtResource( 1 )
-
-[node name="Label" type="Label" parent="Rotation 3D"]
-margin_left = -25.9443
-margin_top = 38.4532
-margin_right = 27.0557
-margin_bottom = 52.4532
-text = "Rotation 3D"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Perlin Noise 2D" type="ColorRect" parent="."]
-material = SubResource( 17 )
-margin_left = 284.839
-margin_top = 34.1266
-margin_right = 345.839
-margin_bottom = 95.1266
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Perlin Noise 2D"]
-margin_left = -13.8511
-margin_top = 63.2814
-margin_right = 92.1489
-margin_bottom = 77.2814
-text = "Perlin noise (2D)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Perlin Noise 2D periodic" type="ColorRect" parent="."]
-material = SubResource( 23 )
-margin_left = 286.961
-margin_top = 143.728
-margin_right = 347.961
-margin_bottom = 204.728
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Perlin Noise 2D periodic"]
-margin_left = -10.4644
-margin_top = 65.1213
-margin_right = 77.5356
-margin_bottom = 96.1213
-text = " Perlin noise
-(2D, periodic)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Perlin Noise 3D" type="ColorRect" parent="."]
-material = SubResource( 34 )
-margin_left = 416.5
-margin_top = 31.5
-margin_right = 477.5
-margin_bottom = 92.5
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Perlin Noise 3D"]
-margin_left = -14.3511
-margin_top = 63.2814
-margin_right = 91.6489
-margin_bottom = 77.2814
-text = "Perlin noise (3D)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Perlin Noise 3D periodic" type="ColorRect" parent="."]
-material = SubResource( 43 )
-margin_left = 422.157
-margin_top = 143.223
-margin_right = 483.157
-margin_bottom = 204.223
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Perlin Noise 3D periodic"]
-margin_left = -14.3511
-margin_top = 63.2814
-margin_right = 91.6489
-margin_bottom = 77.2814
-text = " Perlin noise
-(3D, periodic)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Perlin Noise 4D" type="ColorRect" parent="."]
-material = SubResource( 52 )
-margin_left = 545.865
-margin_top = 32.3969
-margin_right = 606.865
-margin_bottom = 93.3969
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Perlin Noise 4D"]
-margin_left = -20.2103
-margin_top = 62.7814
-margin_right = 85.7897
-margin_bottom = 76.7814
-text = "Perlin noise (4D)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Perlin Noise 4D periodic" type="ColorRect" parent="."]
-material = SubResource( 62 )
-margin_left = 550.108
-margin_top = 144.12
-margin_right = 611.108
-margin_bottom = 205.12
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Perlin Noise 4D periodic"]
-margin_left = -10.1005
-margin_top = 63.7071
-margin_right = 77.8995
-margin_bottom = 94.7071
-text = " Perlin noise
-(4D, periodic)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Random noise" type="ColorRect" parent="."]
-material = SubResource( 70 )
-margin_left = 676.918
-margin_top = 28.6563
-margin_right = 737.918
-margin_bottom = 89.6563
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Random noise"]
-margin_left = 4.68323
-margin_top = 66.0023
-margin_right = 59.6832
-margin_bottom = 97.0023
-text = "Random
-  noise"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Cellular Noise 2D" type="ColorRect" parent="."]
-material = SubResource( 79 )
-margin_left = 801.277
-margin_top = 28.8443
-margin_right = 862.277
-margin_bottom = 89.8443
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Cellular Noise 2D"]
-margin_left = -9.0
-margin_top = 66.0
-margin_right = 74.0
-margin_bottom = 97.0
-text = "Cellular noise
-       (2D)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Cellular Noise 2D 2x2" type="ColorRect" parent="."]
-material = SubResource( 88 )
-margin_left = 911.52
-margin_top = 30.0354
-margin_right = 972.52
-margin_bottom = 91.0354
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Cellular Noise 2D 2x2"]
-margin_left = -9.0
-margin_top = 66.0
-margin_right = 74.0
-margin_bottom = 97.0
-text = "Cellular noise
-    (2D, 2x2)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Cellular Noise 3D" type="ColorRect" parent="."]
-material = SubResource( 94 )
-margin_left = 800.958
-margin_top = 139.476
-margin_right = 861.958
-margin_bottom = 200.476
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Cellular Noise 3D"]
-margin_left = -9.0
-margin_top = 66.0
-margin_right = 74.0
-margin_bottom = 97.0
-text = "Cellular noise
-       (3D)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Cellular Noise 3D 2x2x2" type="ColorRect" parent="."]
-material = SubResource( 97 )
-margin_left = 912.797
-margin_top = 141.998
-margin_right = 973.797
-margin_bottom = 202.998
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Cellular Noise 3D 2x2x2"]
-margin_left = -9.0
-margin_top = 66.0
-margin_right = 78.0
-margin_bottom = 97.0
-text = "Cellular noise
-  (3D, 2x2x2)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Combined noises" type="ColorRect" parent="."]
-material = SubResource( 117 )
-margin_left = 678.797
-margin_top = 139.998
-margin_right = 739.797
-margin_bottom = 200.998
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Combined noises"]
-margin_left = -0.0203247
-margin_top = 65.4388
-margin_right = 64.9797
-margin_bottom = 96.4388
-text = "Combined
-   noises"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Simplex noise 2D" type="ColorRect" parent="."]
-material = SubResource( 130 )
-margin_left = 290.272
-margin_top = 263.252
-margin_right = 351.272
-margin_bottom = 324.252
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="Simplex noise 2D"]
-margin_left = -12.8375
-margin_top = 65.4054
-margin_right = 77.1625
-margin_bottom = 113.405
-text = "Simplex noise
- (2D, rotating
-    gradient)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="SDF - bricks" type="ColorRect" parent="."]
-material = SubResource( 145 )
-margin_left = 30.5108
-margin_top = 448.343
-margin_right = 91.5109
-margin_bottom = 509.343
+material = SubResource( 27 )
+margin_left = 108.464
+margin_top = 16.7026
+margin_right = 169.465
+margin_bottom = 77.7026
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -5273,11 +1101,11 @@ __meta__ = {
 }
 
 [node name="SDF - tiles" type="ColorRect" parent="."]
-material = SubResource( 152 )
-margin_left = 116.703
-margin_top = 448.764
-margin_right = 177.703
-margin_bottom = 509.764
+material = SubResource( 34 )
+margin_left = 194.657
+margin_top = 17.1236
+margin_right = 255.657
+margin_bottom = 78.1236
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -5294,11 +1122,11 @@ __meta__ = {
 }
 
 [node name="SDF - hex tiles" type="ColorRect" parent="."]
-material = SubResource( 169 )
-margin_left = 211.768
-margin_top = 450.464
-margin_right = 272.768
-margin_bottom = 511.464
+material = SubResource( 66 )
+margin_left = 289.722
+margin_top = 18.8236
+margin_right = 350.722
+margin_bottom = 79.8236
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -5309,44 +1137,29 @@ margin_top = 63.6464
 margin_right = 69.6835
 margin_bottom = 111.646
 text = "SDF hex tiles
+ with cracks
      texture"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Polar coordinates" type="ColorRect" parent="."]
-material = SubResource( 181 )
-margin_left = 28.1072
-margin_top = 269.304
-margin_right = 89.1073
-margin_bottom = 330.304
+[node name="Loading" type="ColorRect" parent="."]
+material = SubResource( 81 )
+margin_left = 21.454
+margin_top = 17.4872
+margin_right = 82.454
+margin_bottom = 78.4872
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="Polar coordinates"]
-margin_left = -5.55952
-margin_top = 63.685
-margin_right = 69.4405
-margin_bottom = 111.685
-text = "     Polar
-coordinates"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Polar coordinates 2" type="Sprite" parent="."]
-material = SubResource( 189 )
-position = Vector2( 154.86, 298.402 )
-texture = ExtResource( 1 )
-
-[node name="Label" type="Label" parent="Polar coordinates 2"]
-margin_left = -41.5009
-margin_top = 36.7714
-margin_right = 45.4991
-margin_bottom = 67.7714
-text = "      Polar
-coordinates 2"
+[node name="Label" type="Label" parent="Loading"]
+margin_left = -0.0819702
+margin_top = 63.1091
+margin_right = 63.918
+margin_bottom = 111.109
+text = "  Loading
+animation"
 __meta__ = {
 "_edit_use_anchors_": false
 }

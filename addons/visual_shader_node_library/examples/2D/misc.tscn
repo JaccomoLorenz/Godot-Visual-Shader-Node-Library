@@ -1,0 +1,507 @@
+[gd_scene load_steps=39 format=2]
+
+[ext_resource path="res://addons/visual_shader_node_library/examples/2D/icon.png" type="Texture" id=1]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_3d.gd" type="Script" id=2]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_2d.gd" type="Script" id=3]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/step_mix_s.gd" type="Script" id=15]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/to_polar_2d.gd" type="Script" id=18]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/from_polar_2d.gd" type="Script" id=19]
+
+[sub_resource type="VisualShaderNodeCustom" id=1]
+script = ExtResource( 3 )
+
+[sub_resource type="VisualShaderNodeInput" id=2]
+input_name = "vertex"
+
+[sub_resource type="VisualShaderNodeInput" id=3]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=4]
+constant = 45.0
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=5]
+function = 27
+
+[sub_resource type="VisualShader" id=6]
+code = "shader_type canvas_item;
+
+
+// Rotation2D
+
+void rotation_2d(float angle, vec3 pivot, in vec3 position_in,  out vec3 position_out) {
+	mat2 rotation_matrix = mat2( vec2(cos(angle), -sin(angle)), vec2(sin(angle), cos(angle)));
+	position_in -= pivot;
+	position_out.xy = rotation_matrix * position_in.xy;
+	position_out.z = position_in.z;
+	position_out += pivot;
+	
+}
+
+void vertex() {
+// Input:4
+	float n_out4p0 = TIME;
+
+// Input:3
+	vec3 n_out3p0 = vec3(VERTEX, 0.0);
+
+// Rotation2D:2
+	vec3 n_out2p0;
+	{
+		rotation_2d(n_out4p0, vec3(0.0, 0.0, 0.0), n_out3p0, n_out2p0);
+	}
+
+// Output:0
+	VERTEX = n_out2p0.xy;
+
+}
+
+void fragment() {
+// Output:0
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -120, -34.5 )
+mode = 1
+flags/light_only = false
+nodes/vertex/0/position = Vector2( 260, 140 )
+nodes/vertex/2/node = SubResource( 1 )
+nodes/vertex/2/position = Vector2( 20, 140 )
+nodes/vertex/3/node = SubResource( 2 )
+nodes/vertex/3/position = Vector2( -200, 240 )
+nodes/vertex/4/node = SubResource( 3 )
+nodes/vertex/4/position = Vector2( -200, 60 )
+nodes/vertex/5/node = SubResource( 4 )
+nodes/vertex/5/position = Vector2( -420, 160 )
+nodes/vertex/6/node = SubResource( 5 )
+nodes/vertex/6/position = Vector2( -220, 160 )
+nodes/vertex/connections = PoolIntArray( 3, 0, 2, 2, 2, 0, 0, 0, 5, 0, 6, 0, 4, 0, 2, 0 )
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = SubResource( 6 )
+
+[sub_resource type="VisualShaderNodeCustom" id=8]
+default_input_values = [ 1, 0.0 ]
+script = ExtResource( 2 )
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=9]
+constant = Vector3( 1, 1, 1 )
+
+[sub_resource type="VisualShaderNodeGlobalExpression" id=10]
+size = Vector2( 464, 132 )
+expression = "/*Rotation3D can also be used in Canvas Item*/
+
+"
+
+[sub_resource type="VisualShader" id=11]
+code = "shader_type canvas_item;
+
+
+// Rotation3D
+
+mat4 rotation_matrix_3d(vec3 axis, float angle){
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+
+    return mat4(vec4(oc * axis.x * axis.x + c,			oc * axis.x * axis.y - axis.z * s,	oc * axis.z * axis.x + axis.y * s,	0.0),
+                vec4(oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c,			oc * axis.y * axis.z - axis.x * s,	0.0),
+                vec4(oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, 	oc * axis.z * axis.z + c,			0.0),
+                vec4(0.0,								0.0, 								0.0,								1.0));
+}
+
+void rotation_3d_normal(vec3 axis, float angle, in vec3 normal_in, out vec3 normal_out) {
+	normal_out = (rotation_matrix_3d(axis, angle) * vec4(normal_in, 0.0)).xyz;
+}
+
+void rotation_3d(vec3 axis, float angle, vec3 pivot, in vec3 position_in, out vec3 position_out) {
+	position_in.xyz -= pivot;
+	vec4 position = vec4(position_in, 1.0);
+	position_out = (rotation_matrix_3d(axis, angle) * position).xyz;
+	position_out += pivot;
+}
+// GlobalExpression:0
+	/*Rotation3D can also be used in Canvas Item*/
+	
+	
+
+void vertex() {
+// Vector:8
+	vec3 n_out8p0 = vec3(1.000000, 1.000000, 1.000000);
+
+// Input:4
+	float n_out4p0 = TIME;
+
+// Input:3
+	vec3 n_out3p0 = vec3(VERTEX, 0.0);
+
+// Rotation3D:7
+	vec3 n_out7p0;
+	vec3 n_out7p1;
+	{
+		rotation_3d(n_out8p0, n_out4p0, vec3(0.0, 0.0, 0.0), n_out3p0, n_out7p0);n_out7p1 = vec3(0.0, 0.0, 0.0);
+	}
+
+// Output:0
+	VERTEX = n_out7p0.xy;
+
+}
+
+void fragment() {
+// Output:0
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -519, -103 )
+mode = 1
+flags/light_only = false
+nodes/vertex/0/position = Vector2( 260, 140 )
+nodes/vertex/3/node = SubResource( 2 )
+nodes/vertex/3/position = Vector2( -200, 240 )
+nodes/vertex/4/node = SubResource( 3 )
+nodes/vertex/4/position = Vector2( -200, 100 )
+nodes/vertex/5/node = SubResource( 4 )
+nodes/vertex/5/position = Vector2( -420, 160 )
+nodes/vertex/6/node = SubResource( 5 )
+nodes/vertex/6/position = Vector2( -220, 160 )
+nodes/vertex/7/node = SubResource( 8 )
+nodes/vertex/7/position = Vector2( 40, 140 )
+nodes/vertex/8/node = SubResource( 9 )
+nodes/vertex/8/position = Vector2( -340, 0 )
+nodes/vertex/9/node = SubResource( 10 )
+nodes/vertex/9/position = Vector2( 20, -40 )
+nodes/vertex/9/size = Vector2( 464, 132 )
+nodes/vertex/9/input_ports = ""
+nodes/vertex/9/output_ports = ""
+nodes/vertex/9/expression = "/*Rotation3D can also be used in Canvas Item*/
+
+"
+nodes/vertex/connections = PoolIntArray( 5, 0, 6, 0, 7, 0, 0, 0, 3, 0, 7, 3, 4, 0, 7, 1, 8, 0, 7, 0 )
+
+[sub_resource type="ShaderMaterial" id=12]
+shader = SubResource( 11 )
+
+[sub_resource type="VisualShaderNodeScalarOp" id=13]
+default_input_values = [ 0, 0.0, 1, 0.25 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeCustom" id=14]
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0, 4, 0.0 ]
+script = ExtResource( 15 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=15]
+constant = Color( 0.898438, 0, 1, 1 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=16]
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=17]
+constant = 0.01
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=18]
+constant = Vector3( 0.5, 0.7, 0 )
+
+[sub_resource type="VisualShaderNodeInput" id=19]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeCustom" id=20]
+script = ExtResource( 18 )
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=21]
+function = 1
+
+[sub_resource type="VisualShaderNodeScalarOp" id=22]
+default_input_values = [ 0, 0.25, 1, 1.0 ]
+operator = 1
+
+[sub_resource type="VisualShader" id=23]
+code = "shader_type canvas_item;
+
+
+// ToPolar2D
+
+// StepMixS
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Color:12
+	vec3 n_out12p0 = vec3(0.898438, 0.000000, 1.000000);
+	float n_out12p1 = 1.000000;
+
+// Color:13
+	vec3 n_out13p0 = vec3(1.000000, 1.000000, 1.000000);
+	float n_out13p1 = 1.000000;
+
+// Input:2
+	vec3 n_out2p0 = vec3(UV, 0.0);
+
+// Vector:15
+	vec3 n_out15p0 = vec3(0.500000, 0.700000, 0.000000);
+
+// ToPolar2D:5
+	vec3 n_out5p0;
+	float n_out5p1;
+	float n_out5p2;
+	{
+		
+				vec2 xy = n_out2p0.xy - n_out15p0.xy;
+				float a = atan(xy.x, xy.y);
+				float d = length(xy);
+				n_out5p0 = vec3(a, d, 0.0);
+				n_out5p1 = a;
+				n_out5p2 = d;
+			
+	}
+
+// ScalarFunc:7
+	float n_out7p0 = cos(n_out5p1);
+
+// ScalarOp:10
+	float n_in10p1 = 0.25000;
+	float n_out10p0 = n_out7p0 * n_in10p1;
+
+// ScalarOp:9
+	float n_in9p0 = 0.25000;
+	float n_out9p0 = n_in9p0 - n_out10p0;
+
+// Scalar:14
+	float n_out14p0 = 0.010000;
+
+// StepMixS:11
+	vec3 n_out11p0;
+	{
+		
+				n_out11p0 = mix(n_out12p0, n_out13p0, smoothstep(n_out9p0 - n_out14p0, n_out9p0 + n_out14p0, n_out5p2));
+			
+	}
+
+// Output:0
+	COLOR.rgb = n_out11p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -120, -124.5 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 880, 100 )
+nodes/fragment/2/node = SubResource( 19 )
+nodes/fragment/2/position = Vector2( -260, 140 )
+nodes/fragment/5/node = SubResource( 20 )
+nodes/fragment/5/position = Vector2( 0, 140 )
+nodes/fragment/7/node = SubResource( 21 )
+nodes/fragment/7/position = Vector2( -60, -100 )
+nodes/fragment/9/node = SubResource( 22 )
+nodes/fragment/9/position = Vector2( 400, -120 )
+nodes/fragment/10/node = SubResource( 13 )
+nodes/fragment/10/position = Vector2( 160, -120 )
+nodes/fragment/11/node = SubResource( 14 )
+nodes/fragment/11/position = Vector2( 660, 80 )
+nodes/fragment/12/node = SubResource( 15 )
+nodes/fragment/12/position = Vector2( 300, 20 )
+nodes/fragment/13/node = SubResource( 16 )
+nodes/fragment/13/position = Vector2( 300, 120 )
+nodes/fragment/14/node = SubResource( 17 )
+nodes/fragment/14/position = Vector2( 240, 220 )
+nodes/fragment/15/node = SubResource( 18 )
+nodes/fragment/15/position = Vector2( -400, 220 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 5, 0, 5, 1, 7, 0, 7, 0, 10, 0, 10, 0, 9, 1, 11, 0, 0, 0, 5, 2, 11, 2, 9, 0, 11, 3, 12, 0, 11, 0, 13, 0, 11, 1, 14, 0, 11, 4, 15, 0, 5, 1 )
+
+[sub_resource type="ShaderMaterial" id=24]
+shader = SubResource( 23 )
+
+[sub_resource type="VisualShaderNodeTexture" id=25]
+source = 2
+texture = ExtResource( 1 )
+
+[sub_resource type="VisualShaderNodeInput" id=26]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeCustom" id=27]
+script = ExtResource( 18 )
+
+[sub_resource type="VisualShaderNodeCustom" id=28]
+script = ExtResource( 19 )
+
+[sub_resource type="VisualShaderNodeVec3Constant" id=29]
+constant = Vector3( 0.5, 0.5, 0 )
+
+[sub_resource type="VisualShaderNodeScalarOp" id=30]
+default_input_values = [ 0, 0.0, 1, 2.09333 ]
+operator = 4
+
+[sub_resource type="VisualShader" id=31]
+code = "shader_type canvas_item;
+
+
+// ToPolar2D
+
+// FromPolar2D
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Vector:6
+	vec3 n_out6p0 = vec3(0.500000, 0.500000, 0.000000);
+
+// ToPolar2D:4
+	vec3 n_out4p0;
+	float n_out4p1;
+	float n_out4p2;
+	{
+		
+				vec2 xy = n_out3p0.xy - n_out6p0.xy;
+				float a = atan(xy.x, xy.y);
+				float d = length(xy);
+				n_out4p0 = vec3(a, d, 0.0);
+				n_out4p1 = a;
+				n_out4p2 = d;
+			
+	}
+
+// ScalarOp:7
+	float n_in7p1 = 2.09333;
+	float n_out7p0 = mod(n_out4p1, n_in7p1);
+
+// FromPolar2D:5
+	vec3 n_out5p0;
+	{
+		
+				float a = n_out7p0, d = n_out4p2;
+				vec2 res = vec2(sin(a), cos(a)) * d + n_out6p0.xy;
+				n_out5p0 = vec3(res, 0.0);
+			
+	}
+
+// Texture:2
+	vec3 n_out2p0;
+	float n_out2p1;
+	{
+		vec4 _tex_read = texture(TEXTURE, n_out5p0.xy);
+		n_out2p0 = _tex_read.rgb;
+		n_out2p1 = _tex_read.a;
+	}
+
+// Output:0
+	COLOR.rgb = n_out2p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -487, -271 )
+mode = 1
+flags/light_only = false
+nodes/fragment/2/node = SubResource( 25 )
+nodes/fragment/2/position = Vector2( 120, 100 )
+nodes/fragment/3/node = SubResource( 26 )
+nodes/fragment/3/position = Vector2( -640, 80 )
+nodes/fragment/4/node = SubResource( 27 )
+nodes/fragment/4/position = Vector2( -440, 120 )
+nodes/fragment/5/node = SubResource( 28 )
+nodes/fragment/5/position = Vector2( -160, 140 )
+nodes/fragment/6/node = SubResource( 29 )
+nodes/fragment/6/position = Vector2( -780, 300 )
+nodes/fragment/7/node = SubResource( 30 )
+nodes/fragment/7/position = Vector2( -300, -140 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 3, 0, 4, 0, 5, 0, 2, 0, 6, 0, 4, 1, 6, 0, 5, 2, 4, 2, 5, 1, 4, 1, 7, 0, 7, 0, 5, 0 )
+
+[sub_resource type="ShaderMaterial" id=32]
+shader = SubResource( 31 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Rotation" type="Sprite" parent="."]
+material = SubResource( 7 )
+position = Vector2( 57.2789, 57.2789 )
+texture = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="Rotation"]
+margin_left = -25.9443
+margin_top = 38.4532
+margin_right = 27.0557
+margin_bottom = 52.4532
+text = "Rotation"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Rotation 3D" type="Sprite" parent="."]
+material = SubResource( 12 )
+position = Vector2( 162.129, 55.3282 )
+texture = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="Rotation 3D"]
+margin_left = -25.9443
+margin_top = 38.4532
+margin_right = 27.0557
+margin_bottom = 52.4532
+text = "Rotation 3D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Polar coordinates" type="ColorRect" parent="."]
+material = SubResource( 24 )
+margin_left = 29.889
+margin_top = 134.778
+margin_right = 90.8891
+margin_bottom = 195.778
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Polar coordinates"]
+margin_left = -5.55952
+margin_top = 63.685
+margin_right = 69.4405
+margin_bottom = 111.685
+text = "     Polar
+coordinates"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Polar coordinates 2" type="Sprite" parent="."]
+material = SubResource( 32 )
+position = Vector2( 156.642, 163.876 )
+texture = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="Polar coordinates 2"]
+margin_left = -41.5009
+margin_top = 36.7714
+margin_right = 45.4991
+margin_bottom = 67.7714
+text = "      Polar
+coordinates 2"
+__meta__ = {
+"_edit_use_anchors_": false
+}
