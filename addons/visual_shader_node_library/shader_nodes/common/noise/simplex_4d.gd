@@ -1,24 +1,24 @@
 tool
 extends VisualShaderNodeCustom
-class_name VisualShaderNodePerlinNoise2D
+class_name VisualShaderNodeSimplexNoise4D
 
 enum Inputs {
 	OFFSET,
-	PERIOD,
+	OFFSET_W,
 	SCALE,
+	SCALE_W,
 	
 	I_COUNT
 }
 
-const INPUT_NAMES = ["offset", "period", "scale"];
+const INPUT_NAMES = ["offset", "offset_w", "scale", "scale_w"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR, VisualShaderNode.PORT_TYPE_SCALAR,
+	VisualShaderNode.PORT_TYPE_VECTOR, VisualShaderNode.PORT_TYPE_SCALAR
 ]
 
 func _get_name():
-	return "PerlinNoise2D"
+	return "SimplexNoise4D"
 
 func _get_category():
 	return "Common"
@@ -27,7 +27,7 @@ func _get_subcategory():
 	return "Noise"
 
 func _get_description():
-	return "Textureless 2D Perlin noise"
+	return "Textureless 4D simplex noise"
 
 func _get_return_icon_type():
 	return VisualShaderNode.PORT_TYPE_SCALAR
@@ -51,31 +51,31 @@ func _get_output_port_type(port):
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_global_code(mode):
-	var code = preload("perlin_2d.shader").code
+	var code = preload("simplex_4d.shader").code
 	code = code.replace("shader_type spatial;", "")
 	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code
 
-func _get_code(input_vars, output_vars, mode, type):
-	var offset = input_vars[Inputs.OFFSET];
+func get_input_vector_code(xyz_var, w_var, default):
+	if not xyz_var:
+		xyz_var = "%s, %s, %s" % [default, default, default]
 	
-	if not offset:
-		offset = "vec2(0.0, 0.0)"
-	else:
-		offset = "(%s).xy" % [offset]
+	if not w_var:
+		w_var = default
 
-	offset = "(%s).xy * (%s).xy" % [offset, input_vars[Inputs.SCALE]]
+	return "vec4(%s, %s)" % [xyz_var, w_var]
 
-	if input_vars[Inputs.PERIOD]:
-		# periodic noise
-		return "%s = perlin_noise_2d_p(%s.xy, (%s).xy);" % [
-			output_vars[0],
-			offset,
-			input_vars[Inputs.PERIOD]
-		]
-	else:
-		return "%s = perlin_noise_2d_np(%s.xy);" % [output_vars[0], offset]
+func _get_code(input_vars, output_vars, mode, type):
+	var offset = get_input_vector_code(input_vars[Inputs.OFFSET], input_vars[Inputs.OFFSET_W], "0.0");
+	
+	offset = "%s * %s" % [offset, get_input_vector_code(input_vars[Inputs.SCALE], input_vars[Inputs.SCALE_W], "1.0")]
+
+	var params = [output_vars[0], offset]
+
+	return "%s = simplex_noise_4d(%s);" % params
 
 func _init():
 	if not get_input_port_default_value(Inputs.SCALE):
 		set_input_port_default_value(Inputs.SCALE, Vector3(1.0, 1.0, 1.0))
+	if not get_input_port_default_value(Inputs.SCALE_W):
+		set_input_port_default_value(Inputs.SCALE_W, 1.0)
