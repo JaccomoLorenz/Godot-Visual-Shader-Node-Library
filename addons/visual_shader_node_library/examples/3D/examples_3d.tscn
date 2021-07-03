@@ -1,4 +1,4 @@
-[gd_scene load_steps=170 format=2]
+[gd_scene load_steps=171 format=2]
 
 [ext_resource path="res://addons/visual_shader_node_library/examples/3D/default_env.tres" type="Environment" id=1]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/3d/emission_add.gd" type="Script" id=2]
@@ -27,67 +27,70 @@
 [ext_resource path="res://addons/visual_shader_node_library/examples/3D/models/terrain.tscn" type="PackedScene" id=25]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd" type="Script" id=26]
 [ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/read_normalmap.gd" type="Script" id=27]
+[ext_resource path="res://addons/visual_shader_node_library/examples/3D/models/proc_wood.material" type="Material" id=28]
 
-[sub_resource type="SphereMesh" id=47]
+[sub_resource type="SphereMesh" id=1]
 radius = 1.5
 height = 3.0
 
-[sub_resource type="VisualShaderNodeTexture" id=48]
+[sub_resource type="VisualShaderNodeTexture" id=2]
 texture = ExtResource( 16 )
 texture_type = 2
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=49]
+[sub_resource type="VisualShaderNodeScalarConstant" id=3]
 constant = 1.0
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=50]
+[sub_resource type="VisualShaderNodeScalarConstant" id=4]
 constant = 0.47
 
-[sub_resource type="VisualShaderNodeTexture" id=51]
+[sub_resource type="VisualShaderNodeTexture" id=5]
 texture = ExtResource( 7 )
 
-[sub_resource type="VisualShaderNodeTexture" id=52]
+[sub_resource type="VisualShaderNodeTexture" id=6]
 texture = ExtResource( 14 )
 
-[sub_resource type="VisualShaderNodeScalarOp" id=53]
+[sub_resource type="VisualShaderNodeScalarOp" id=7]
 default_input_values = [ 0, 0.0, 1, 0.86 ]
 operator = 2
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=54]
+[sub_resource type="VisualShaderNodeVectorDecompose" id=8]
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=55]
+[sub_resource type="VisualShaderNodeScalarConstant" id=9]
 constant = 0.5
 
-[sub_resource type="VisualShaderNodeGlobalExpression" id=56]
+[sub_resource type="VisualShaderNodeGlobalExpression" id=10]
 size = Vector2( 569, 136 )
 expression = "/*The parallax texture must be passed as sampler2D from a
 TextureUniform node. The texture can be set in the 
 Shader params in the inspector panel */"
 
-[sub_resource type="VisualShaderNodeGlobalExpression" id=57]
+[sub_resource type="VisualShaderNodeGlobalExpression" id=11]
 size = Vector2( 304, 143 )
 expression = "// Simply use the output 
 // as uv for other textures"
 
-[sub_resource type="VisualShaderNodeTexture" id=58]
+[sub_resource type="VisualShaderNodeTexture" id=12]
 texture = ExtResource( 13 )
 texture_type = 1
 
-[sub_resource type="VisualShaderNodeCustom" id=59]
+[sub_resource type="VisualShaderNodeCustom" id=13]
 default_input_values = [ 2, 0.05, 3, 8, 4, 32, 9, Vector2( 1, 1 ) ]
 script = ExtResource( 19 )
 
-[sub_resource type="VisualShaderNodeCustom" id=60]
+[sub_resource type="VisualShaderNodeCustom" id=14]
 default_input_values = [ 2, 0.05, 3, 8, 4, 32, 9, Vector2( 1, 1 ), 10, "test" ]
 script = ExtResource( 12 )
 
-[sub_resource type="VisualShaderNodeTextureUniform" id=61]
+[sub_resource type="VisualShaderNodeTextureUniform" id=15]
 uniform_name = "ParallaxTexture"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=62]
+[sub_resource type="VisualShaderNodeScalarConstant" id=16]
 constant = 0.18
 
-[sub_resource type="VisualShader" id=63]
+[sub_resource type="VisualShader" id=17]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 uniform sampler2D ParallaxTexture;
 uniform sampler2D tex_frg_2 : hint_albedo;
 uniform sampler2D tex_frg_14;
@@ -209,27 +212,27 @@ void light() {
 "
 graph_offset = Vector2( -2105, 442 )
 nodes/fragment/0/position = Vector2( -540, 360 )
-nodes/fragment/2/node = SubResource( 58 )
+nodes/fragment/2/node = SubResource( 12 )
 nodes/fragment/2/position = Vector2( -1060, 80 )
-nodes/fragment/6/node = SubResource( 62 )
+nodes/fragment/6/node = SubResource( 16 )
 nodes/fragment/6/position = Vector2( -1680, 1060 )
-nodes/fragment/10/node = SubResource( 48 )
+nodes/fragment/10/node = SubResource( 2 )
 nodes/fragment/10/position = Vector2( -1100, 960 )
-nodes/fragment/11/node = SubResource( 49 )
+nodes/fragment/11/node = SubResource( 3 )
 nodes/fragment/11/position = Vector2( -1120, 1180 )
-nodes/fragment/12/node = SubResource( 50 )
+nodes/fragment/12/node = SubResource( 4 )
 nodes/fragment/12/position = Vector2( -1100, 580 )
-nodes/fragment/13/node = SubResource( 51 )
+nodes/fragment/13/node = SubResource( 5 )
 nodes/fragment/13/position = Vector2( -1100, 720 )
-nodes/fragment/14/node = SubResource( 52 )
+nodes/fragment/14/node = SubResource( 6 )
 nodes/fragment/14/position = Vector2( -1100, 340 )
-nodes/fragment/15/node = SubResource( 53 )
+nodes/fragment/15/node = SubResource( 7 )
 nodes/fragment/15/position = Vector2( -900, 420 )
-nodes/fragment/16/node = SubResource( 54 )
+nodes/fragment/16/node = SubResource( 8 )
 nodes/fragment/16/position = Vector2( -900, 320 )
-nodes/fragment/17/node = SubResource( 55 )
+nodes/fragment/17/node = SubResource( 9 )
 nodes/fragment/17/position = Vector2( -1100, 640 )
-nodes/fragment/18/node = SubResource( 56 )
+nodes/fragment/18/node = SubResource( 10 )
 nodes/fragment/18/position = Vector2( -2060, 640 )
 nodes/fragment/18/size = Vector2( 569, 136 )
 nodes/fragment/18/input_ports = ""
@@ -237,38 +240,40 @@ nodes/fragment/18/output_ports = ""
 nodes/fragment/18/expression = "/*The parallax texture must be passed as sampler2D from a
 TextureUniform node. The texture can be set in the 
 Shader params in the inspector panel */"
-nodes/fragment/19/node = SubResource( 57 )
+nodes/fragment/19/node = SubResource( 11 )
 nodes/fragment/19/position = Vector2( -1520, 480 )
 nodes/fragment/19/size = Vector2( 304, 143 )
 nodes/fragment/19/input_ports = ""
 nodes/fragment/19/output_ports = ""
 nodes/fragment/19/expression = "// Simply use the output 
 // as uv for other textures"
-nodes/fragment/20/node = SubResource( 59 )
+nodes/fragment/20/node = SubResource( 13 )
 nodes/fragment/20/position = Vector2( -1400, 940 )
-nodes/fragment/21/node = SubResource( 60 )
+nodes/fragment/21/node = SubResource( 14 )
 nodes/fragment/21/position = Vector2( -1400, 640 )
-nodes/fragment/23/node = SubResource( 61 )
+nodes/fragment/23/node = SubResource( 15 )
 nodes/fragment/23/position = Vector2( -1800, 820 )
 nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 10, 0, 0, 8, 11, 0, 0, 9, 12, 0, 0, 3, 13, 0, 0, 6, 14, 0, 16, 0, 15, 0, 0, 2, 16, 0, 15, 0, 17, 0, 0, 4, 6, 0, 20, 2, 21, 0, 10, 0, 21, 0, 13, 0, 21, 0, 14, 0, 21, 0, 2, 0, 6, 0, 21, 2, 23, 2, 21, 1, 23, 0, 20, 1 )
 
-[sub_resource type="ShaderMaterial" id=64]
-shader = SubResource( 63 )
+[sub_resource type="ShaderMaterial" id=18]
+shader = SubResource( 17 )
 shader_param/ParallaxTexture = ExtResource( 6 )
 
-[sub_resource type="VisualShaderNodeCustom" id=65]
+[sub_resource type="VisualShaderNodeCustom" id=19]
 default_input_values = [ 2, 4.0 ]
 script = ExtResource( 2 )
 
-[sub_resource type="VisualShaderNodeColorConstant" id=66]
+[sub_resource type="VisualShaderNodeColorConstant" id=20]
 constant = Color( 0.117647, 0.952941, 0, 1 )
 
-[sub_resource type="VisualShaderNodeCustom" id=67]
+[sub_resource type="VisualShaderNodeCustom" id=21]
 default_input_values = [ 2, 4.0 ]
 script = ExtResource( 3 )
 
-[sub_resource type="VisualShader" id=68]
+[sub_resource type="VisualShader" id=22]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // EmissionAdd
@@ -306,41 +311,41 @@ void light() {
 "
 graph_offset = Vector2( -116, 233 )
 nodes/fragment/0/position = Vector2( 460, 180 )
-nodes/fragment/2/node = SubResource( 65 )
+nodes/fragment/2/node = SubResource( 19 )
 nodes/fragment/2/position = Vector2( 160, 260 )
-nodes/fragment/3/node = SubResource( 66 )
+nodes/fragment/3/node = SubResource( 20 )
 nodes/fragment/3/position = Vector2( -20, 300 )
-nodes/fragment/5/node = SubResource( 67 )
+nodes/fragment/5/node = SubResource( 21 )
 nodes/fragment/5/position = Vector2( 160, 360 )
 nodes/fragment/connections = PoolIntArray( 3, 0, 5, 0, 3, 0, 2, 0, 2, 0, 0, 5 )
 
-[sub_resource type="ShaderMaterial" id=69]
-shader = SubResource( 68 )
+[sub_resource type="ShaderMaterial" id=23]
+shader = SubResource( 22 )
 
-[sub_resource type="VisualShaderNodeTexture" id=70]
+[sub_resource type="VisualShaderNodeTexture" id=24]
 texture = ExtResource( 5 )
 texture_type = 2
 
-[sub_resource type="VisualShaderNodeColorConstant" id=71]
+[sub_resource type="VisualShaderNodeColorConstant" id=25]
 constant = Color( 1, 1, 1, 0 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=72]
+[sub_resource type="VisualShaderNodeScalarConstant" id=26]
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=73]
+[sub_resource type="VisualShaderNodeScalarConstant" id=27]
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=74]
+[sub_resource type="VisualShaderNodeScalarConstant" id=28]
 constant = 0.5
 
-[sub_resource type="VisualShaderNodeCustom" id=75]
+[sub_resource type="VisualShaderNodeCustom" id=29]
 default_input_values = [ 1, 0.05, 2, 0.05, 4, 0.05 ]
 script = ExtResource( 4 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=76]
+[sub_resource type="VisualShaderNodeScalarConstant" id=30]
 constant = 0.1
 
-[sub_resource type="VisualShader" id=77]
+[sub_resource type="VisualShader" id=31]
 code = "shader_type spatial;
-render_mode depth_draw_always;
+render_mode depth_draw_always, specular_schlick_ggx;
 
 uniform sampler2D tex_frg_10 : hint_normal;
 
@@ -405,55 +410,57 @@ void light() {
 graph_offset = Vector2( -218, -51 )
 modes/depth_draw = 1
 nodes/fragment/0/position = Vector2( 400, 120 )
-nodes/fragment/2/node = SubResource( 71 )
+nodes/fragment/2/node = SubResource( 25 )
 nodes/fragment/2/position = Vector2( -100, 100 )
-nodes/fragment/3/node = SubResource( 72 )
+nodes/fragment/3/node = SubResource( 26 )
 nodes/fragment/3/position = Vector2( -100, 200 )
-nodes/fragment/4/node = SubResource( 73 )
+nodes/fragment/4/node = SubResource( 27 )
 nodes/fragment/4/position = Vector2( -100, 280 )
-nodes/fragment/5/node = SubResource( 74 )
+nodes/fragment/5/node = SubResource( 28 )
 nodes/fragment/5/position = Vector2( -100, 360 )
-nodes/fragment/8/node = SubResource( 75 )
+nodes/fragment/8/node = SubResource( 29 )
 nodes/fragment/8/position = Vector2( 140, 20 )
-nodes/fragment/9/node = SubResource( 76 )
+nodes/fragment/9/node = SubResource( 30 )
 nodes/fragment/9/position = Vector2( -100, 20 )
-nodes/fragment/10/node = SubResource( 70 )
+nodes/fragment/10/node = SubResource( 24 )
 nodes/fragment/10/position = Vector2( -100, -200 )
 nodes/fragment/connections = PoolIntArray( 3, 0, 0, 2, 5, 0, 0, 4, 4, 0, 0, 3, 8, 0, 0, 0, 2, 0, 8, 3, 2, 1, 8, 4, 8, 1, 0, 5, 4, 0, 8, 2, 9, 0, 8, 1, 10, 0, 8, 0 )
 
-[sub_resource type="ShaderMaterial" id=78]
-shader = SubResource( 77 )
+[sub_resource type="ShaderMaterial" id=32]
+shader = SubResource( 31 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=79]
+[sub_resource type="VisualShaderNodeScalarConstant" id=33]
 
-[sub_resource type="VisualShaderNodeTextureUniformTriplanar" id=80]
+[sub_resource type="VisualShaderNodeTextureUniformTriplanar" id=34]
 uniform_name = "normal_map"
 texture_type = 2
 
-[sub_resource type="VisualShaderNodeCustom" id=81]
+[sub_resource type="VisualShaderNodeCustom" id=35]
 default_input_values = [ 1, 1.5, 2, 0.2, 4, 1.0 ]
 script = ExtResource( 26 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=82]
+[sub_resource type="VisualShaderNodeScalarConstant" id=36]
 constant = 1.5
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=83]
+[sub_resource type="VisualShaderNodeVec3Constant" id=37]
 constant = Vector3( 1, 1, 1 )
 
-[sub_resource type="VisualShaderNodeCustom" id=84]
+[sub_resource type="VisualShaderNodeCustom" id=38]
 script = ExtResource( 27 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=85]
+[sub_resource type="VisualShaderNodeScalarConstant" id=39]
 constant = 0.2
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=86]
+[sub_resource type="VisualShaderNodeScalarConstant" id=40]
 constant = 0.1
 
-[sub_resource type="VisualShaderNodeScalarUniform" id=87]
+[sub_resource type="VisualShaderNodeScalarUniform" id=41]
 uniform_name = "thickness"
 
-[sub_resource type="VisualShader" id=88]
+[sub_resource type="VisualShader" id=42]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 uniform float thickness;
 uniform sampler2D normal_map : hint_normal;
 
@@ -483,257 +490,6 @@ vec3 read_normalmap(in vec3 normalmap, in vec3 normal, in vec3 tangent, in vec3 
 	return normalize(mix(normal, tangent * normalmap.x + binormal * normalmap.y + normal * normalmap.z, normaldepth));
 }
 // ScreenSpaceRefraction
-
-const int SSR_MAX_STEPS = 256;
-
-vec3 line_plane_intersect(vec3 lineorigin, vec3 linedirection, vec3 planeorigin, vec3 planenormal) {
-	float dist = dot(planenormal, planeorigin - lineorigin) / dot(planenormal, linedirection);
-	return lineorigin + linedirection * dist;
-}
-
-float line_unit_box_intersect_dist(vec3 lineorigin, vec3 linedirection) {
-  /* https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
-   */
-  vec3 firstplane = (vec3(1.0) - lineorigin) / linedirection;
-  vec3 secondplane = (vec3(-1.0) - lineorigin) / linedirection;
-  vec3 furthestplane = max(firstplane, secondplane);
-
-  return min(furthestplane.x, min(furthestplane.y, furthestplane.z));
-}
-
-vec3 get_specular_refraction_dominant_dir(vec3 N, vec3 V, float ssr_roughness, float ssr_ior) {
-	/* TODO: This a bad approximation. Better approximation should fit
-	* the refracted vector and ssr_roughness into the best prefiltered reflection
-	* lobe. */
-	/* Correct the ssr_ior for ssr_ior < 1.0 to not see the abrupt delimitation or the TIR */
-	ssr_ior = (ssr_ior < 1.0) ? mix(ssr_ior, 1.0, ssr_roughness) : ssr_ior;
-	float eta = 1.0 / ssr_ior;
-	
-	float NV = dot(N, -V);
-	
-	/* Custom Refraction. */
-	float k = 1.0 - eta * eta * (1.0 - NV * NV);
-	k = max(0.0, k); /* Only this changes. */
-	vec3 R = eta * -V - (eta * NV + sqrt(k)) * N;
-	
-	return R;
-}
-
-vec3 project_point(mat4 projection_matrix, vec3 point) {
-	vec4 ndc = projection_matrix * vec4(point, 1.0);
-	return ndc.xyz / ndc.w;
-}
-
-float F_eta(float eta, float cos_theta) {
-	/* compute fresnel reflectance without explicitly computing
-	* the refracted direction */
-	float c = abs(cos_theta);
-	float g = eta * eta - 1.0 + c * c;
-	float result;
-	
-	if (g > 0.0) {
-		g = sqrt(g);
-		vec2 g_c = vec2(g) + vec2(c, -c);
-		float A = g_c.y / g_c.x;
-		A *= A;
-		g_c *= c;
-		float B = (g_c.y - 1.0) / (g_c.x + 1.0);
-		B *= B;
-		result = 0.5 * A * (1.0 + B);
-	} else {
-		result = 1.0; /* TIR (no refracted component) */
-	}
-	
-	return result;
-}
-
-void prepare_raycast(mat4 projection_matrix, vec3 ray_origin, vec3 ray_dir, float ssr_thickness, vec2 pixel_size, out vec4 ss_step, out vec4 ss_ray, out float max_time) {
-	/* Negate the ray direction if it goes towards the camera.
-	* This way we don't need to care if the projected point
-	* is behind the near plane. */
-	float z_sign = -sign(ray_dir.z);
-	vec3 ray_end = ray_origin + z_sign * ray_dir;
-	
-	/* Project into screen space. */
-	vec4 ss_start, ss_end;
-	ss_start.xyz = project_point(projection_matrix, ray_origin);
-	ss_end.xyz = project_point(projection_matrix, ray_end);
-	
-	/* We interpolate the ray Z + ssr_thickness values to check if depth is within threshold. */
-	ray_origin.z -= ssr_thickness;
-	ray_end.z -= ssr_thickness;
-	ss_start.w = project_point(projection_matrix, ray_origin).z;
-	ss_end.w = project_point(projection_matrix, ray_end).z;
-	
-	/* XXX This is a hack. A better method is welcome! */
-	/* We take the delta between the offsetted depth and the depth and subtract it from the ray
-	* depth. This will change the world space ssr_thickness appearance a bit but we can have negative
-	* values without worries. We cannot do this in viewspace because of the perspective division. */
-	ss_start.w = 2.0 * ss_start.z - ss_start.w;
-	ss_end.w = 2.0 * ss_end.z - ss_end.w;
-	
-	ss_step = ss_end - ss_start;
-	max_time = length(ss_step.xyz);
-	ss_step = z_sign * ss_step / length(ss_step.xyz);
-	
-	/* If the line is degenerate, make it cover at least one pixel
-	* to not have to handle zero-pixel extent as a special case later */
-	ss_step.xy += vec2((dot(ss_step.xy, ss_step.xy) < 0.00001) ? 0.001 : 0.0);
-	
-	/* Make ss_step cover one pixel. */
-	ss_step /= max(abs(ss_step.x), abs(ss_step.y));
-	ss_step *= (abs(ss_step.x) > abs(ss_step.y)) ? pixel_size.x : pixel_size.y;
-	
-	/* Clip to segment's end. */
-	max_time /= length(ss_step.xyz);
-	
-	/* Clipping to frustum sides. */
-	max_time = min(max_time, line_unit_box_intersect_dist(ss_start.xyz, ss_step.xyz));
-	
-	/* Convert to texture coords. Z component included
-	* since this is how it's stored in the depth buffer.
-	* 4th component how far we are on the ray */
-	ss_ray = ss_start * 0.5 + 0.5;
-	ss_step *= 0.5;
-	
-	/* take the center of the texel. */
-}
-
-// #define GROUPED_FETCHES /* is still slower, need to see where is the bottleneck. */
-/* Return the hit position, and negate the z component (making it positive) if not hit occurred. */
-/* __ray_dir__ is the ray direction premultiplied by it's maximum length */
-vec3 raycast(mat4 projection_matrix, sampler2D depth_texture, vec3 ray_origin, vec3 ray_dir, float ssr_thickness, float ray_jitter, float trace_quality, float ssr_roughness, bool discard_backface) {
-	vec4 ss_step, ss_start;
-	float max_time;
-	prepare_raycast(projection_matrix, ray_origin, ray_dir, ssr_thickness, 1.0 / vec2(textureSize(depth_texture, 0)), ss_step, ss_start, max_time);
-	
-	float max_trace_time = max(0.01, max_time - 0.01);
-	
-	/* x : current_time, y: previous_time, z: current_delta, w: previous_delta */
-	vec4 times_and_deltas = vec4(0.0);
-	
-	float ray_time = 0.0;
-	float depth_sample = textureLod(depth_texture, ss_start.xy, 0.0).x;
-	times_and_deltas.z = depth_sample - ss_start.z;
-	
-	float lod_fac = clamp(sqrt(ssr_roughness) * 2.0 - 0.4, 0.0, 1.0);
-	bool hit = false;
-	float iter;
-	for(iter = 1.0; !hit && (ray_time < max_time) && (iter < float(SSR_MAX_STEPS)); iter++) {
-		/* Minimum stride of 2 because we are using half res minmax zbuffer. */
-		float stride = max(1.0, iter * trace_quality) * 2.0;
-		float lod = log2(stride * 0.5 * trace_quality) * lod_fac;
-		ray_time += stride;
-		
-		/* Save previous values. */
-		times_and_deltas.xyzw = times_and_deltas.yxwz;
-		
-		float jit_stride = mix(2.0, stride, ray_jitter);
-		
-		times_and_deltas.x = min(ray_time + jit_stride, max_trace_time);
-		vec4 ss_ray = ss_start + ss_step * times_and_deltas.x;
-		
-		depth_sample = textureLod(depth_texture, ss_ray.xy, lod).x;
-		
-		float prev_w = ss_start.w + ss_step.w * times_and_deltas.y;
-		times_and_deltas.z = depth_sample - ss_ray.z;
-		hit = (times_and_deltas.z <= 0.0) && (prev_w <= depth_sample);
-	}
-	
-	if (discard_backface) {
-		/* Discard backface hits */
-		hit = hit && (times_and_deltas.w > 0.0);
-	}
-	
-	/* Reject hit if background. */
-	hit = hit && (depth_sample != 1.0);
-	
-	times_and_deltas.x = hit ? mix(times_and_deltas.y, times_and_deltas.x, clamp(times_and_deltas.w / (times_and_deltas.w - times_and_deltas.z), 0.0, 1.0)) : times_and_deltas.x;
-	ray_time = hit ? times_and_deltas.x : ray_time;
-	
-	/* Clip to frustum. */
-	ray_time = max(0.001, min(ray_time, max_time - 1.5));
-	
-	vec4 ss_ray = ss_start + ss_step * ray_time;
-	
-	/* Tag Z if ray failed. */
-//	ss_ray.z *= (hit) ? 1.0 : -1.0;
-	return ss_ray.xyz;
-}
-
-float screen_border_mask(vec2 hit_co) {
-	const float ssrBorderFac = 0.1;
-	
-	const float margin = 0.003;
-	float atten = ssrBorderFac + margin; /* Screen percentage */
-	hit_co = smoothstep(margin, atten, hit_co) * (1.0 - smoothstep(1.0 - atten, 1.0 - margin, hit_co));
-	float screenfade = hit_co.x * hit_co.y;
-	return screenfade;
-}
-
-vec4 ssr(vec3 position, mat4 projection_matrix, mat4 view_matrix, sampler2D screen_texture, sampler2D depth_texture, vec3 N, vec3 V, float ssr_ior, float ssr_roughnessSquared) {
-	float a2 = max(5e-6, ssr_roughnessSquared * ssr_roughnessSquared);
-	
-	vec3 H = N;
-	float pdf = 0.0;
-	
-	vec3 vV = V;
-	float eta = 1.0 / ssr_ior;
-	if (dot(H, V) < 0.0) {
-		H = -H;
-		eta = ssr_ior;
-	}
-	
-	vec3 R = refract(-V, H, 1.0 / ssr_ior);
-	
-	R = (view_matrix * vec4(R, 0.0)).xyz;
-	
-	const float ssrssr_thickness = 1.0;
-	const float ssrQuality = 0.0;
-	
-	vec3 hit_pos = raycast(projection_matrix, depth_texture, position, R * 1e16, ssrssr_thickness, 0.0, ssrQuality, ssr_roughnessSquared, false);
-	
-	if ((hit_pos.z > 0.0) && (F_eta(ssr_ior, dot(H, V)) < 1.0)) {
-		vec2 hit_uvs = project_point(projection_matrix, hit_pos).xy * 0.5 + 0.5;
-		
-		vec3 spec = textureLod(screen_texture, hit_pos.xy, ssr_roughnessSquared * 8.0).xyz;
-		float mask = screen_border_mask(hit_uvs);
-		return vec4(spec, mask);
-	}
-	
-	return vec4(0.0);
-}
-
-void screenspace_refraction(in float ssr_ior, in float ssr_roughness, in float ssr_thickness, in vec3 albedo_in, in float alpha_in, in vec3 emission_in, in vec2 screen_uv, in sampler2D screen_texture, in sampler2D depth_texture, in vec3 view, in vec3 normal, in vec3 position, in mat4 view_matrix, in mat4 camera_matrix, in mat4 projection_matrix, out vec3 albedo_out, out vec3 emission_out) { 
-	vec3 V = (camera_matrix * vec4(view, 0.0)).xyz;
-	vec3 N = (camera_matrix * vec4(normal, 0.0)).xyz;
-	vec3 world_pos = (camera_matrix * vec4(position, 1.0)).xyz;
-	
-	/* Refract the view vector using the depth heuristic.
-	* Then later Refract a second time the already refracted
-	* ray using the inverse ssr_ior. */
-	float final_ior = (ssr_thickness > 0.0) ? 1.0 / ssr_ior : ssr_ior;
-	vec3 refr_V = (ssr_thickness > 0.0) ? -refract(-V, N, final_ior) : V;
-	vec3 refr_pos = (ssr_thickness > 0.0) ?
-			line_plane_intersect(world_pos, refr_V, world_pos - N * ssr_thickness, N) :
-			world_pos;
-	vec3 refr_dir = get_specular_refraction_dominant_dir(N, refr_V, ssr_roughness, final_ior);
-	
-	/* ---------------------------- */
-	/*   Screen Space Refraction    */
-	/* ---------------------------- */
-	/* Find approximated position of the 2nd refraction event. */
-	vec3 refr_vpos = (ssr_thickness > 0.0) ? (view_matrix * vec4(refr_pos, 1.0)).xyz :
-			position;
-	vec4 trans = ssr(refr_vpos, projection_matrix, view_matrix, screen_texture, depth_texture, N, refr_V, final_ior, ssr_roughness * ssr_roughness);
-	trans.a *= smoothstep(1.0 + 0.2, 1.0, ssr_roughness);
-	
-	float fac = 1.0 - alpha_in;
-	fac *= 1.0 - pow(1.0 - dot(V, N), 5.0) * (1.0 - ssr_roughness);
-	
-	emission_out = emission_in + trans.rgb * albedo_in * fac;
-	albedo_out = albedo_in * 1.0 - fac;
-}
 
 
 void vertex() {
@@ -784,7 +540,7 @@ void fragment() {
 	vec3 n_out2p0;
 	vec3 n_out2p1;
 	{
-		screenspace_refraction(n_out3p0, n_out8p0, n_out9p0, n_out4p0, n_out10p0, vec3(0.0), SCREEN_UV, SCREEN_TEXTURE, DEPTH_TEXTURE, VIEW, n_out6p0, VERTEX, INV_CAMERA_MATRIX, CAMERA_MATRIX, PROJECTION_MATRIX, n_out2p0, n_out2p1);
+		
 	}
 
 // Output:0
@@ -802,28 +558,28 @@ void light() {
 "
 graph_offset = Vector2( -392, 128 )
 nodes/fragment/0/position = Vector2( 380, 160 )
-nodes/fragment/2/node = SubResource( 81 )
+nodes/fragment/2/node = SubResource( 35 )
 nodes/fragment/2/position = Vector2( 20, 180 )
-nodes/fragment/3/node = SubResource( 82 )
+nodes/fragment/3/node = SubResource( 36 )
 nodes/fragment/3/position = Vector2( -240, 160 )
-nodes/fragment/4/node = SubResource( 83 )
+nodes/fragment/4/node = SubResource( 37 )
 nodes/fragment/4/position = Vector2( -380, 280 )
-nodes/fragment/6/node = SubResource( 84 )
+nodes/fragment/6/node = SubResource( 38 )
 nodes/fragment/6/position = Vector2( -160, 440 )
-nodes/fragment/7/node = SubResource( 85 )
+nodes/fragment/7/node = SubResource( 39 )
 nodes/fragment/7/position = Vector2( -360, 560 )
-nodes/fragment/8/node = SubResource( 86 )
+nodes/fragment/8/node = SubResource( 40 )
 nodes/fragment/8/position = Vector2( -240, 80 )
-nodes/fragment/9/node = SubResource( 87 )
+nodes/fragment/9/node = SubResource( 41 )
 nodes/fragment/9/position = Vector2( -240, 220 )
-nodes/fragment/10/node = SubResource( 79 )
+nodes/fragment/10/node = SubResource( 33 )
 nodes/fragment/10/position = Vector2( -240, 360 )
-nodes/fragment/11/node = SubResource( 80 )
+nodes/fragment/11/node = SubResource( 34 )
 nodes/fragment/11/position = Vector2( -540, 380 )
 nodes/fragment/connections = PoolIntArray( 4, 0, 2, 3, 7, 0, 6, 4, 6, 0, 0, 7, 6, 0, 2, 6, 2, 0, 0, 0, 2, 1, 0, 5, 3, 0, 2, 0, 8, 0, 0, 3, 8, 0, 2, 2, 10, 0, 2, 4, 9, 0, 2, 1, 11, 0, 6, 0 )
 
-[sub_resource type="ShaderMaterial" id=89]
-shader = SubResource( 88 )
+[sub_resource type="ShaderMaterial" id=43]
+shader = SubResource( 42 )
 shader_param/thickness = 1.467
 shader_param/triplanar_scale = Vector3( 0.5, 0.5, 0.5 )
 shader_param/triplanar_offset = Vector3( 0, 0, 0 )
@@ -839,6 +595,8 @@ constant = 0.2
 
 [sub_resource type="VisualShader" id=46]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // Dither
@@ -907,45 +665,47 @@ nodes/fragment/3/node = SubResource( 45 )
 nodes/fragment/3/position = Vector2( -140, 500 )
 nodes/fragment/connections = PoolIntArray( 3, 0, 2, 0, 2, 0, 0, 18 )
 
-[sub_resource type="ShaderMaterial" id=90]
+[sub_resource type="ShaderMaterial" id=47]
 shader = SubResource( 46 )
 
-[sub_resource type="VisualShaderNodeCustom" id=91]
+[sub_resource type="VisualShaderNodeCustom" id=48]
 script = ExtResource( 10 )
 
-[sub_resource type="VisualShaderNodeGlobalExpression" id=92]
+[sub_resource type="VisualShaderNodeGlobalExpression" id=49]
 size = Vector2( 478, 165 )
 expression = "/* Optional you can pass depth position manually
 
 Recommeded if depth position is used elsewhere
  so it is only calculate once (Performance) */"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=93]
+[sub_resource type="VisualShaderNodeScalarConstant" id=50]
 
-[sub_resource type="VisualShaderNodeCustom" id=94]
+[sub_resource type="VisualShaderNodeCustom" id=51]
 default_input_values = [ 0, 2.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShaderNodeInput" id=95]
+[sub_resource type="VisualShaderNodeInput" id=52]
 input_name = "vertex"
 
-[sub_resource type="VisualShaderNodeScalarFunc" id=96]
+[sub_resource type="VisualShaderNodeScalarFunc" id=53]
 function = 0
 
-[sub_resource type="VisualShaderNodeInput" id=97]
+[sub_resource type="VisualShaderNodeInput" id=54]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeVectorOp" id=98]
+[sub_resource type="VisualShaderNodeVectorOp" id=55]
 
-[sub_resource type="VisualShaderNodeVectorCompose" id=99]
+[sub_resource type="VisualShaderNodeVectorCompose" id=56]
 
-[sub_resource type="VisualShaderNodeGlobalExpression" id=100]
+[sub_resource type="VisualShaderNodeGlobalExpression" id=57]
 size = Vector2( 499, 128 )
 expression = "/* This is just for up down animation 
 Distance fade is in the fragment shader */"
 
-[sub_resource type="VisualShader" id=101]
+[sub_resource type="VisualShader" id=58]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // ProximityFade
@@ -1018,17 +778,17 @@ void light() {
 "
 graph_offset = Vector2( -390, 28 )
 nodes/vertex/0/position = Vector2( 520, 120 )
-nodes/vertex/2/node = SubResource( 95 )
+nodes/vertex/2/node = SubResource( 52 )
 nodes/vertex/2/position = Vector2( 120, 160 )
-nodes/vertex/3/node = SubResource( 96 )
+nodes/vertex/3/node = SubResource( 53 )
 nodes/vertex/3/position = Vector2( -40, 260 )
-nodes/vertex/4/node = SubResource( 97 )
+nodes/vertex/4/node = SubResource( 54 )
 nodes/vertex/4/position = Vector2( -200, 260 )
-nodes/vertex/6/node = SubResource( 98 )
+nodes/vertex/6/node = SubResource( 55 )
 nodes/vertex/6/position = Vector2( 340, 160 )
-nodes/vertex/7/node = SubResource( 99 )
+nodes/vertex/7/node = SubResource( 56 )
 nodes/vertex/7/position = Vector2( 140, 240 )
-nodes/vertex/8/node = SubResource( 100 )
+nodes/vertex/8/node = SubResource( 57 )
 nodes/vertex/8/position = Vector2( -80, 20 )
 nodes/vertex/8/size = Vector2( 499, 128 )
 nodes/vertex/8/input_ports = ""
@@ -1036,9 +796,9 @@ nodes/vertex/8/output_ports = ""
 nodes/vertex/8/expression = "/* This is just for up down animation 
 Distance fade is in the fragment shader */"
 nodes/vertex/connections = PoolIntArray( 4, 0, 3, 0, 6, 0, 0, 0, 2, 0, 6, 0, 7, 0, 6, 1, 3, 0, 7, 1 )
-nodes/fragment/5/node = SubResource( 91 )
+nodes/fragment/5/node = SubResource( 48 )
 nodes/fragment/5/position = Vector2( -80, 320 )
-nodes/fragment/6/node = SubResource( 92 )
+nodes/fragment/6/node = SubResource( 49 )
 nodes/fragment/6/position = Vector2( -360, 140 )
 nodes/fragment/6/size = Vector2( 478, 165 )
 nodes/fragment/6/input_ports = ""
@@ -1047,40 +807,42 @@ nodes/fragment/6/expression = "/* Optional you can pass depth position manually
 
 Recommeded if depth position is used elsewhere
  so it is only calculate once (Performance) */"
-nodes/fragment/7/node = SubResource( 93 )
+nodes/fragment/7/node = SubResource( 50 )
 nodes/fragment/7/position = Vector2( 200, 260 )
-nodes/fragment/8/node = SubResource( 94 )
+nodes/fragment/8/node = SubResource( 51 )
 nodes/fragment/8/position = Vector2( 140, 140 )
 nodes/fragment/connections = PoolIntArray( 7, 0, 0, 3, 8, 0, 0, 1 )
 
-[sub_resource type="ShaderMaterial" id=102]
-shader = SubResource( 101 )
+[sub_resource type="ShaderMaterial" id=59]
+shader = SubResource( 58 )
 
-[sub_resource type="VisualShaderNodeCustom" id=103]
+[sub_resource type="VisualShaderNodeCustom" id=60]
 default_input_values = [ 0, 1.0 ]
 script = ExtResource( 9 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=104]
+[sub_resource type="VisualShaderNodeScalarConstant" id=61]
 
-[sub_resource type="VisualShaderNodeCustom" id=105]
+[sub_resource type="VisualShaderNodeCustom" id=62]
 default_input_values = [ 0, 2.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShaderNodeVectorCompose" id=106]
+[sub_resource type="VisualShaderNodeVectorCompose" id=63]
 
-[sub_resource type="VisualShaderNodeInput" id=107]
+[sub_resource type="VisualShaderNodeInput" id=64]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeScalarFunc" id=108]
+[sub_resource type="VisualShaderNodeScalarFunc" id=65]
 function = 0
 
-[sub_resource type="VisualShaderNodeInput" id=109]
+[sub_resource type="VisualShaderNodeInput" id=66]
 input_name = "vertex"
 
-[sub_resource type="VisualShaderNodeVectorOp" id=110]
+[sub_resource type="VisualShaderNodeVectorOp" id=67]
 
-[sub_resource type="VisualShader" id=111]
+[sub_resource type="VisualShader" id=68]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // ProximityFade
@@ -1183,43 +945,45 @@ void light() {
 }
 "
 graph_offset = Vector2( -263, 124 )
-nodes/vertex/2/node = SubResource( 106 )
+nodes/vertex/2/node = SubResource( 63 )
 nodes/vertex/2/position = Vector2( -20, 180 )
-nodes/vertex/3/node = SubResource( 107 )
+nodes/vertex/3/node = SubResource( 64 )
 nodes/vertex/3/position = Vector2( -360, 180 )
-nodes/vertex/4/node = SubResource( 108 )
+nodes/vertex/4/node = SubResource( 65 )
 nodes/vertex/4/position = Vector2( -200, 240 )
-nodes/vertex/5/node = SubResource( 109 )
+nodes/vertex/5/node = SubResource( 66 )
 nodes/vertex/5/position = Vector2( 20, 80 )
-nodes/vertex/6/node = SubResource( 110 )
+nodes/vertex/6/node = SubResource( 67 )
 nodes/vertex/6/position = Vector2( 184, 103 )
 nodes/vertex/connections = PoolIntArray( 6, 0, 0, 0, 3, 0, 4, 0, 4, 0, 2, 1, 5, 0, 6, 0, 2, 0, 6, 1 )
 nodes/fragment/0/position = Vector2( 640, 160 )
-nodes/fragment/7/node = SubResource( 103 )
+nodes/fragment/7/node = SubResource( 60 )
 nodes/fragment/7/position = Vector2( 380, 540 )
-nodes/fragment/8/node = SubResource( 104 )
+nodes/fragment/8/node = SubResource( 61 )
 nodes/fragment/8/position = Vector2( 400, 220 )
-nodes/fragment/9/node = SubResource( 105 )
+nodes/fragment/9/node = SubResource( 62 )
 nodes/fragment/9/position = Vector2( 120, 480 )
 nodes/fragment/connections = PoolIntArray( 7, 0, 0, 18, 8, 0, 0, 3, 9, 0, 7, 0 )
 
-[sub_resource type="ShaderMaterial" id=112]
-shader = SubResource( 111 )
+[sub_resource type="ShaderMaterial" id=69]
+shader = SubResource( 68 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=113]
+[sub_resource type="VisualShaderNodeScalarConstant" id=70]
 constant = 2.0
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=114]
+[sub_resource type="VisualShaderNodeScalarConstant" id=71]
 
-[sub_resource type="VisualShaderNodeCustom" id=115]
+[sub_resource type="VisualShaderNodeCustom" id=72]
 default_input_values = [ 0, 0, 1, 10 ]
 script = ExtResource( 8 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=116]
+[sub_resource type="VisualShaderNodeScalarConstant" id=73]
 constant = 4.0
 
-[sub_resource type="VisualShader" id=117]
+[sub_resource type="VisualShader" id=74]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // DistanceFade
@@ -1261,37 +1025,39 @@ void light() {
 }
 "
 graph_offset = Vector2( -453.668, -13.5 )
-nodes/fragment/3/node = SubResource( 113 )
+nodes/fragment/3/node = SubResource( 70 )
 nodes/fragment/3/position = Vector2( -280, 100 )
-nodes/fragment/7/node = SubResource( 114 )
+nodes/fragment/7/node = SubResource( 71 )
 nodes/fragment/7/position = Vector2( 200, 220 )
-nodes/fragment/8/node = SubResource( 115 )
+nodes/fragment/8/node = SubResource( 72 )
 nodes/fragment/8/position = Vector2( -60, 160 )
-nodes/fragment/9/node = SubResource( 116 )
+nodes/fragment/9/node = SubResource( 73 )
 nodes/fragment/9/position = Vector2( -280, 180 )
 nodes/fragment/connections = PoolIntArray( 7, 0, 0, 3, 3, 0, 8, 0, 9, 0, 8, 1, 8, 0, 0, 1 )
 
-[sub_resource type="ShaderMaterial" id=118]
-shader = SubResource( 117 )
+[sub_resource type="ShaderMaterial" id=75]
+shader = SubResource( 74 )
 
-[sub_resource type="VisualShaderNodeCustom" id=119]
+[sub_resource type="VisualShaderNodeCustom" id=76]
 default_input_values = [ 0, 1.0 ]
 script = ExtResource( 9 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=120]
+[sub_resource type="VisualShaderNodeScalarConstant" id=77]
 constant = 2.0
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=121]
+[sub_resource type="VisualShaderNodeScalarConstant" id=78]
 
-[sub_resource type="VisualShaderNodeCustom" id=122]
+[sub_resource type="VisualShaderNodeCustom" id=79]
 default_input_values = [ 0, 0, 1, 10 ]
 script = ExtResource( 8 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=123]
+[sub_resource type="VisualShaderNodeScalarConstant" id=80]
 constant = 4.0
 
-[sub_resource type="VisualShader" id=124]
+[sub_resource type="VisualShader" id=81]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // DistanceFade
@@ -1372,57 +1138,59 @@ void light() {
 }
 "
 graph_offset = Vector2( -491, -10 )
-nodes/fragment/3/node = SubResource( 120 )
+nodes/fragment/3/node = SubResource( 77 )
 nodes/fragment/3/position = Vector2( -420, 400 )
-nodes/fragment/7/node = SubResource( 121 )
+nodes/fragment/7/node = SubResource( 78 )
 nodes/fragment/7/position = Vector2( 200, 220 )
-nodes/fragment/8/node = SubResource( 122 )
+nodes/fragment/8/node = SubResource( 79 )
 nodes/fragment/8/position = Vector2( -200, 460 )
-nodes/fragment/9/node = SubResource( 123 )
+nodes/fragment/9/node = SubResource( 80 )
 nodes/fragment/9/position = Vector2( -420, 480 )
-nodes/fragment/10/node = SubResource( 119 )
+nodes/fragment/10/node = SubResource( 76 )
 nodes/fragment/10/position = Vector2( 60, 500 )
 nodes/fragment/connections = PoolIntArray( 7, 0, 0, 3, 10, 0, 0, 18, 8, 0, 10, 0, 9, 0, 8, 1, 3, 0, 8, 0 )
 
-[sub_resource type="ShaderMaterial" id=125]
-shader = SubResource( 124 )
+[sub_resource type="ShaderMaterial" id=82]
+shader = SubResource( 81 )
 
-[sub_resource type="CubeMesh" id=126]
+[sub_resource type="CubeMesh" id=83]
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=127]
+[sub_resource type="VisualShaderNodeScalarConstant" id=84]
 constant = 0.5
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=128]
+[sub_resource type="VisualShaderNodeScalarConstant" id=85]
 
-[sub_resource type="VisualShaderNodeScalarFunc" id=129]
+[sub_resource type="VisualShaderNodeScalarFunc" id=86]
 function = 27
 
-[sub_resource type="VisualShaderNodeInput" id=130]
+[sub_resource type="VisualShaderNodeInput" id=87]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeGlobalExpression" id=131]
+[sub_resource type="VisualShaderNodeGlobalExpression" id=88]
 size = Vector2( 662, 154 )
 expression = "/* angle is in radians, you can use the radians node to convert 
 degrees to radians before passing it to the rotation node*/"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=132]
+[sub_resource type="VisualShaderNodeScalarConstant" id=89]
 constant = 45.0
 
-[sub_resource type="VisualShaderNodeCustom" id=133]
+[sub_resource type="VisualShaderNodeCustom" id=90]
 default_input_values = [ 1, 0.0 ]
 script = ExtResource( 20 )
 
-[sub_resource type="VisualShaderNodeInput" id=134]
+[sub_resource type="VisualShaderNodeInput" id=91]
 input_name = "vertex"
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=135]
+[sub_resource type="VisualShaderNodeVec3Constant" id=92]
 constant = Vector3( 0.5, 1, 0.5 )
 
-[sub_resource type="VisualShaderNodeInput" id=136]
+[sub_resource type="VisualShaderNodeInput" id=93]
 input_name = "normal"
 
-[sub_resource type="VisualShader" id=137]
+[sub_resource type="VisualShader" id=94]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // Rotation3D
@@ -1500,76 +1268,78 @@ void light() {
 "
 graph_offset = Vector2( -378, 4.25 )
 nodes/vertex/0/position = Vector2( 400, 200 )
-nodes/vertex/3/node = SubResource( 134 )
+nodes/vertex/3/node = SubResource( 91 )
 nodes/vertex/3/position = Vector2( -140, 400 )
-nodes/vertex/6/node = SubResource( 135 )
+nodes/vertex/6/node = SubResource( 92 )
 nodes/vertex/6/position = Vector2( -320, 160 )
-nodes/vertex/8/node = SubResource( 136 )
+nodes/vertex/8/node = SubResource( 93 )
 nodes/vertex/8/position = Vector2( -100, 480 )
-nodes/vertex/10/node = SubResource( 129 )
+nodes/vertex/10/node = SubResource( 86 )
 nodes/vertex/10/position = Vector2( -160, 340 )
-nodes/vertex/11/node = SubResource( 130 )
+nodes/vertex/11/node = SubResource( 87 )
 nodes/vertex/11/position = Vector2( -140, 260 )
-nodes/vertex/12/node = SubResource( 131 )
+nodes/vertex/12/node = SubResource( 88 )
 nodes/vertex/12/position = Vector2( -120, -20 )
 nodes/vertex/12/size = Vector2( 662, 154 )
 nodes/vertex/12/input_ports = ""
 nodes/vertex/12/output_ports = ""
 nodes/vertex/12/expression = "/* angle is in radians, you can use the radians node to convert 
 degrees to radians before passing it to the rotation node*/"
-nodes/vertex/13/node = SubResource( 132 )
+nodes/vertex/13/node = SubResource( 89 )
 nodes/vertex/13/position = Vector2( -380, 340 )
-nodes/vertex/14/node = SubResource( 133 )
+nodes/vertex/14/node = SubResource( 90 )
 nodes/vertex/14/position = Vector2( 100, 260 )
 nodes/vertex/connections = PoolIntArray( 13, 0, 10, 0, 14, 0, 0, 0, 11, 0, 14, 1, 3, 0, 14, 3, 6, 0, 14, 0, 14, 1, 0, 1, 8, 0, 14, 4 )
-nodes/fragment/2/node = SubResource( 127 )
+nodes/fragment/2/node = SubResource( 84 )
 nodes/fragment/2/position = Vector2( 120, 200 )
-nodes/fragment/3/node = SubResource( 128 )
+nodes/fragment/3/node = SubResource( 85 )
 nodes/fragment/3/position = Vector2( 120, 280 )
 nodes/fragment/connections = PoolIntArray( 2, 0, 0, 2, 3, 0, 0, 3 )
 
-[sub_resource type="ShaderMaterial" id=138]
-shader = SubResource( 137 )
+[sub_resource type="ShaderMaterial" id=95]
+shader = SubResource( 94 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=139]
+[sub_resource type="VisualShaderNodeScalarConstant" id=96]
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=140]
+[sub_resource type="VisualShaderNodeScalarConstant" id=97]
 constant = 0.5
 
-[sub_resource type="VisualShaderNodeScalarFunc" id=141]
+[sub_resource type="VisualShaderNodeScalarFunc" id=98]
 function = 27
 
-[sub_resource type="VisualShaderNodeInput" id=142]
+[sub_resource type="VisualShaderNodeInput" id=99]
 input_name = "time"
 
-[sub_resource type="VisualShaderNodeGlobalExpression" id=143]
+[sub_resource type="VisualShaderNodeGlobalExpression" id=100]
 size = Vector2( 662, 154 )
 expression = "/* Rotation aroun pivot local to objects position */
 
 /* angle is in radians, you can use the radians node to convert 
 degrees to radians before passing it to the rotation node*/"
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=144]
+[sub_resource type="VisualShaderNodeScalarConstant" id=101]
 constant = 45.0
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=145]
+[sub_resource type="VisualShaderNodeVec3Constant" id=102]
 constant = Vector3( 0, 2, 0 )
 
-[sub_resource type="VisualShaderNodeCustom" id=146]
+[sub_resource type="VisualShaderNodeCustom" id=103]
 default_input_values = [ 1, 0.0 ]
 script = ExtResource( 20 )
 
-[sub_resource type="VisualShaderNodeInput" id=147]
+[sub_resource type="VisualShaderNodeInput" id=104]
 input_name = "vertex"
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=148]
+[sub_resource type="VisualShaderNodeVec3Constant" id=105]
 constant = Vector3( 0, 0, 1 )
 
-[sub_resource type="VisualShaderNodeInput" id=149]
+[sub_resource type="VisualShaderNodeInput" id=106]
 input_name = "normal"
 
-[sub_resource type="VisualShader" id=150]
+[sub_resource type="VisualShader" id=107]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 
 
 // Rotation3D
@@ -1652,17 +1422,17 @@ void light() {
 "
 graph_offset = Vector2( -350, 105 )
 nodes/vertex/0/position = Vector2( 400, 200 )
-nodes/vertex/3/node = SubResource( 147 )
+nodes/vertex/3/node = SubResource( 104 )
 nodes/vertex/3/position = Vector2( -100, 420 )
-nodes/vertex/6/node = SubResource( 148 )
+nodes/vertex/6/node = SubResource( 105 )
 nodes/vertex/6/position = Vector2( -280, 160 )
-nodes/vertex/8/node = SubResource( 149 )
+nodes/vertex/8/node = SubResource( 106 )
 nodes/vertex/8/position = Vector2( -100, 500 )
-nodes/vertex/10/node = SubResource( 141 )
+nodes/vertex/10/node = SubResource( 98 )
 nodes/vertex/10/position = Vector2( -320, 260 )
-nodes/vertex/11/node = SubResource( 142 )
+nodes/vertex/11/node = SubResource( 99 )
 nodes/vertex/11/position = Vector2( -140, 260 )
-nodes/vertex/12/node = SubResource( 143 )
+nodes/vertex/12/node = SubResource( 100 )
 nodes/vertex/12/position = Vector2( -120, -20 )
 nodes/vertex/12/size = Vector2( 662, 154 )
 nodes/vertex/12/input_ports = ""
@@ -1671,62 +1441,64 @@ nodes/vertex/12/expression = "/* Rotation aroun pivot local to objects position 
 
 /* angle is in radians, you can use the radians node to convert 
 degrees to radians before passing it to the rotation node*/"
-nodes/vertex/13/node = SubResource( 144 )
+nodes/vertex/13/node = SubResource( 101 )
 nodes/vertex/13/position = Vector2( -520, 260 )
-nodes/vertex/14/node = SubResource( 145 )
+nodes/vertex/14/node = SubResource( 102 )
 nodes/vertex/14/position = Vector2( -280, 320 )
-nodes/vertex/15/node = SubResource( 146 )
+nodes/vertex/15/node = SubResource( 103 )
 nodes/vertex/15/position = Vector2( 188, 256 )
 nodes/vertex/connections = PoolIntArray( 15, 0, 0, 0, 15, 1, 0, 1, 8, 0, 15, 4, 3, 0, 15, 3, 14, 0, 15, 2, 13, 0, 10, 0, 11, 0, 15, 1, 6, 0, 15, 0 )
-nodes/fragment/2/node = SubResource( 139 )
+nodes/fragment/2/node = SubResource( 96 )
 nodes/fragment/2/position = Vector2( -20, 160 )
-nodes/fragment/3/node = SubResource( 140 )
+nodes/fragment/3/node = SubResource( 97 )
 nodes/fragment/3/position = Vector2( -20, 100 )
 nodes/fragment/connections = PoolIntArray( 2, 0, 0, 3, 3, 0, 0, 2 )
 
-[sub_resource type="ShaderMaterial" id=151]
-shader = SubResource( 150 )
+[sub_resource type="ShaderMaterial" id=108]
+shader = SubResource( 107 )
 
-[sub_resource type="PlaneMesh" id=152]
+[sub_resource type="PlaneMesh" id=109]
 size = Vector2( 2.5, 2.5 )
 
-[sub_resource type="VisualShaderNodeVectorCompose" id=153]
+[sub_resource type="VisualShaderNodeVectorCompose" id=110]
 default_input_values = [ 0, 1.0, 1, -1.0, 2, 0.0 ]
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=154]
+[sub_resource type="VisualShaderNodeScalarConstant" id=111]
 
-[sub_resource type="VisualShaderNodeColorConstant" id=155]
+[sub_resource type="VisualShaderNodeColorConstant" id=112]
 constant = Color( 0, 0.462745, 0.690196, 0.960784 )
 
-[sub_resource type="VisualShaderNodeScalarConstant" id=156]
+[sub_resource type="VisualShaderNodeScalarConstant" id=113]
 constant = 0.3
 
-[sub_resource type="VisualShaderNodeCustom" id=157]
+[sub_resource type="VisualShaderNodeCustom" id=114]
 default_input_values = [ 1, 5.0, 2, 0.5, 5, 0.0 ]
 script = ExtResource( 22 )
 
-[sub_resource type="VisualShaderNodeCustom" id=158]
+[sub_resource type="VisualShaderNodeCustom" id=115]
 default_input_values = [ 1, 5.0 ]
 script = ExtResource( 21 )
 
-[sub_resource type="VisualShaderNodeInput" id=159]
+[sub_resource type="VisualShaderNodeInput" id=116]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeTexture" id=160]
+[sub_resource type="VisualShaderNodeTexture" id=117]
 texture = ExtResource( 24 )
 
-[sub_resource type="VisualShaderNodeTexture" id=161]
+[sub_resource type="VisualShaderNodeTexture" id=118]
 texture = ExtResource( 5 )
 texture_type = 2
 
-[sub_resource type="VisualShaderNodeTexture" id=162]
+[sub_resource type="VisualShaderNodeTexture" id=119]
 texture = ExtResource( 5 )
 texture_type = 2
 
-[sub_resource type="VisualShaderNodeVectorScalarMix" id=163]
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=120]
 
-[sub_resource type="VisualShader" id=164]
+[sub_resource type="VisualShader" id=121]
 code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
 uniform sampler2D tex_frg_5;
 uniform sampler2D tex_frg_6 : hint_normal;
 uniform sampler2D tex_frg_7 : hint_normal;
@@ -1846,131 +1618,152 @@ void light() {
 "
 graph_offset = Vector2( -1237.68, 131.2 )
 nodes/fragment/0/position = Vector2( 780, 0 )
-nodes/fragment/2/node = SubResource( 157 )
+nodes/fragment/2/node = SubResource( 114 )
 nodes/fragment/2/position = Vector2( -341, 300 )
-nodes/fragment/3/node = SubResource( 158 )
+nodes/fragment/3/node = SubResource( 115 )
 nodes/fragment/3/position = Vector2( -41, 260 )
-nodes/fragment/4/node = SubResource( 159 )
+nodes/fragment/4/node = SubResource( 116 )
 nodes/fragment/4/position = Vector2( -580, 100 )
-nodes/fragment/5/node = SubResource( 160 )
+nodes/fragment/5/node = SubResource( 117 )
 nodes/fragment/5/position = Vector2( -620, 180 )
-nodes/fragment/6/node = SubResource( 161 )
+nodes/fragment/6/node = SubResource( 118 )
 nodes/fragment/6/position = Vector2( 240, 60 )
-nodes/fragment/7/node = SubResource( 162 )
+nodes/fragment/7/node = SubResource( 119 )
 nodes/fragment/7/position = Vector2( 240, 280 )
-nodes/fragment/9/node = SubResource( 163 )
+nodes/fragment/9/node = SubResource( 120 )
 nodes/fragment/9/position = Vector2( 480, 240 )
-nodes/fragment/10/node = SubResource( 153 )
+nodes/fragment/10/node = SubResource( 110 )
 nodes/fragment/10/position = Vector2( -600, 420 )
-nodes/fragment/13/node = SubResource( 154 )
+nodes/fragment/13/node = SubResource( 111 )
 nodes/fragment/13/position = Vector2( 520, 80 )
-nodes/fragment/14/node = SubResource( 155 )
+nodes/fragment/14/node = SubResource( 112 )
 nodes/fragment/14/position = Vector2( 560, -20 )
-nodes/fragment/15/node = SubResource( 156 )
+nodes/fragment/15/node = SubResource( 113 )
 nodes/fragment/15/position = Vector2( 500, 380 )
 nodes/fragment/connections = PoolIntArray( 2, 1, 3, 2, 2, 2, 3, 3, 4, 0, 2, 3, 5, 0, 2, 0, 10, 0, 2, 4, 4, 0, 3, 0, 2, 0, 9, 2, 3, 1, 7, 0, 3, 0, 6, 0, 7, 0, 9, 1, 6, 0, 9, 0, 13, 0, 0, 3, 9, 0, 0, 8, 15, 0, 0, 9, 14, 0, 0, 0, 14, 1, 0, 1 )
 
-[sub_resource type="ShaderMaterial" id=165]
-shader = SubResource( 164 )
+[sub_resource type="ShaderMaterial" id=122]
+shader = SubResource( 121 )
 
-[sub_resource type="InputEventAction" id=166]
+[sub_resource type="InputEventAction" id=123]
 action = "ui_left"
 
-[sub_resource type="ShortCut" id=167]
-shortcut = SubResource( 166 )
+[sub_resource type="ShortCut" id=124]
+shortcut = SubResource( 123 )
 
-[sub_resource type="InputEventAction" id=168]
+[sub_resource type="InputEventAction" id=125]
 action = "ui_right"
 
-[sub_resource type="ShortCut" id=169]
-shortcut = SubResource( 168 )
+[sub_resource type="ShortCut" id=126]
+shortcut = SubResource( 125 )
 
-[sub_resource type="VisualShaderNodeCustom" id=170]
+[sub_resource type="VisualShaderNodeCustom" id=127]
 script = ExtResource( 23 )
 
-[sub_resource type="VisualShaderNodeCustom" id=171]
+[sub_resource type="VisualShaderNodeCustom" id=128]
 default_input_values = [ 1, 0.05, 2, 0.0, 4, 1.0 ]
 script = ExtResource( 4 )
 
-[sub_resource type="VisualShaderNodeCustom" id=172]
+[sub_resource type="VisualShaderNodeCustom" id=129]
 default_input_values = [ 1, 5.0, 2, 1.0, 5, 0.0 ]
 script = ExtResource( 22 )
 
-[sub_resource type="VisualShaderNodeCustom" id=173]
+[sub_resource type="VisualShaderNodeCustom" id=130]
 default_input_values = [ 1, 1.0 ]
 script = ExtResource( 21 )
 
-[sub_resource type="VisualShaderNodeCustom" id=174]
+[sub_resource type="VisualShaderNodeCustom" id=131]
 script = ExtResource( 11 )
 
-[sub_resource type="VisualShaderNodeCustom" id=175]
+[sub_resource type="VisualShaderNodeCustom" id=132]
 default_input_values = [ 1, 0.0 ]
 script = ExtResource( 20 )
 
-[sub_resource type="VisualShaderNodeCustom" id=176]
+[sub_resource type="VisualShaderNodeCustom" id=133]
 default_input_values = [ 2, 0.05, 3, 8, 4, 32, 9, Vector2( 1, 1 ) ]
 script = ExtResource( 12 )
 
-[sub_resource type="VisualShaderNodeCustom" id=177]
+[sub_resource type="VisualShaderNodeCustom" id=134]
 default_input_values = [ 2, 0.05, 9, Vector2( 1, 1 ) ]
 script = ExtResource( 19 )
 
-[sub_resource type="VisualShaderNodeCustom" id=178]
+[sub_resource type="VisualShaderNodeCustom" id=135]
 script = ExtResource( 10 )
 
-[sub_resource type="VisualShaderNodeCustom" id=179]
+[sub_resource type="VisualShaderNodeCustom" id=136]
 default_input_values = [ 0, 1.0 ]
 script = ExtResource( 9 )
 
-[sub_resource type="VisualShaderNodeCustom" id=180]
+[sub_resource type="VisualShaderNodeCustom" id=137]
 default_input_values = [ 2, 1.0 ]
 script = ExtResource( 2 )
 
-[sub_resource type="VisualShaderNodeCustom" id=181]
+[sub_resource type="VisualShaderNodeCustom" id=138]
 default_input_values = [ 2, 1.0 ]
 script = ExtResource( 3 )
 
-[sub_resource type="VisualShaderNodeCustom" id=182]
+[sub_resource type="VisualShaderNodeCustom" id=139]
 default_input_values = [ 0, 0, 1, 10 ]
 script = ExtResource( 8 )
 
-[sub_resource type="VisualShaderNodeCustom" id=183]
+[sub_resource type="VisualShaderNodeCustom" id=140]
 default_input_values = [ 0, 1.0 ]
 script = ExtResource( 15 )
 
-[sub_resource type="VisualShader" id=184]
+[sub_resource type="VisualShader" id=141]
+code = "shader_type spatial;
+render_mode specular_schlick_ggx;
+
+
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Output:0
+
+}
+
+void light() {
+// Output:0
+
+}
+"
 nodes/fragment/0/position = Vector2( 980, 300 )
-nodes/fragment/2/node = SubResource( 176 )
+nodes/fragment/2/node = SubResource( 133 )
 nodes/fragment/2/position = Vector2( 40, 40 )
-nodes/fragment/3/node = SubResource( 177 )
+nodes/fragment/3/node = SubResource( 134 )
 nodes/fragment/3/position = Vector2( 320, 40 )
-nodes/fragment/4/node = SubResource( 178 )
+nodes/fragment/4/node = SubResource( 135 )
 nodes/fragment/4/position = Vector2( 580, 360 )
-nodes/fragment/5/node = SubResource( 179 )
+nodes/fragment/5/node = SubResource( 136 )
 nodes/fragment/5/position = Vector2( 580, 280 )
-nodes/fragment/6/node = SubResource( 180 )
+nodes/fragment/6/node = SubResource( 137 )
 nodes/fragment/6/position = Vector2( 40, 340 )
-nodes/fragment/7/node = SubResource( 181 )
+nodes/fragment/7/node = SubResource( 138 )
 nodes/fragment/7/position = Vector2( 40, 460 )
-nodes/fragment/8/node = SubResource( 182 )
+nodes/fragment/8/node = SubResource( 139 )
 nodes/fragment/8/position = Vector2( 580, 40 )
-nodes/fragment/9/node = SubResource( 183 )
+nodes/fragment/9/node = SubResource( 140 )
 nodes/fragment/9/position = Vector2( 580, 160 )
-nodes/fragment/10/node = SubResource( 170 )
+nodes/fragment/10/node = SubResource( 127 )
 nodes/fragment/10/position = Vector2( 580, 440 )
-nodes/fragment/11/node = SubResource( 171 )
+nodes/fragment/11/node = SubResource( 128 )
 nodes/fragment/11/position = Vector2( 280, 280 )
-nodes/fragment/12/node = SubResource( 172 )
+nodes/fragment/12/node = SubResource( 129 )
 nodes/fragment/12/position = Vector2( 40, 600 )
-nodes/fragment/13/node = SubResource( 173 )
+nodes/fragment/13/node = SubResource( 130 )
 nodes/fragment/13/position = Vector2( 320, 640 )
-nodes/fragment/14/node = SubResource( 174 )
+nodes/fragment/14/node = SubResource( 131 )
 nodes/fragment/14/position = Vector2( 320, 500 )
-nodes/fragment/15/node = SubResource( 175 )
+nodes/fragment/15/node = SubResource( 132 )
 nodes/fragment/15/position = Vector2( 580, 520 )
 
-[sub_resource type="ShaderMaterial" id=185]
-shader = SubResource( 184 )
+[sub_resource type="ShaderMaterial" id=142]
+shader = SubResource( 141 )
 
 [node name="MaterialTester" type="Spatial"]
 script = ExtResource( 18 )
@@ -1985,8 +1778,8 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, 0 )
 
 [node name="MeshInstance6" type="MeshInstance" parent="Testers/Deep Parallax (Depth)"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.32702, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 64 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 18 )
 
 [node name="Emission" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, 0 )
@@ -1996,79 +1789,79 @@ light_energy = 0.0
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Emission"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.32702, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 69 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 23 )
 
 [node name="Refraction" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, 0 )
 
 [node name="MeshInstance5" type="MeshInstance" parent="Testers/Refraction"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.32702, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 78 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 32 )
 
 [node name="Screen Space Refraction" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 0 )
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Screen Space Refraction"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.32702, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 89 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 43 )
 
 [node name="Pixel Dither" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 0 )
 
 [node name="MeshInstance6" type="MeshInstance" parent="Testers/Pixel Dither"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.32702, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 90 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 47 )
 
 [node name="Proximity Fade" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0 )
 
 [node name="MeshInstance3" type="MeshInstance" parent="Testers/Proximity Fade"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.69747, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 102 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 59 )
 
 [node name="Proximity Fade Dither" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0 )
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Proximity Fade Dither"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.69747, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 112 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 69 )
 
 [node name="Distance Fade (Zoom in and out)" parent="Testers" instance=ExtResource( 17 )]
 
 [node name="MeshInstance3" type="MeshInstance" parent="Testers/Distance Fade (Zoom in and out)"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.69747, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 118 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 75 )
 
 [node name="Distance Fade Pixel Dither (Zoom in and out)" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0 )
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Distance Fade Pixel Dither (Zoom in and out)"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.69747, -4 )
-mesh = SubResource( 47 )
-material/0 = SubResource( 125 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 82 )
 
 [node name="Rotation Around origin (local)" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0 )
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Rotation Around origin (local)"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.69747, -4 )
-mesh = SubResource( 126 )
-material/0 = SubResource( 138 )
+mesh = SubResource( 83 )
+material/0 = SubResource( 95 )
 
 [node name="Rotation Around Pivot (local)" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 0 )
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Rotation Around Pivot (local)"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.69747, -4 )
-mesh = SubResource( 126 )
-material/0 = SubResource( 151 )
+mesh = SubResource( 83 )
+material/0 = SubResource( 108 )
 
 [node name="Flowmap UV Animation" parent="Testers" instance=ExtResource( 17 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 0 )
@@ -2078,8 +1871,36 @@ transform = Transform( 0.04, 0, 0, 0, 0.04, -2.45869e-08, 0, 2.45869e-08, 0.04, 
 
 [node name="MeshInstance4" type="MeshInstance" parent="Testers/Flowmap UV Animation"]
 transform = Transform( 1.6, 0, 0, 0, 1.6, 9.53674e-08, 0, -9.53674e-08, 1.6, 0, 2.70468, -4 )
-mesh = SubResource( 152 )
-material/0 = SubResource( 165 )
+mesh = SubResource( 109 )
+material/0 = SubResource( 122 )
+
+[node name="Procedural wood texture" parent="Testers" instance=ExtResource( 17 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, 0 )
+
+[node name="CSGCombiner" type="CSGCombiner" parent="Testers/Procedural wood texture"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62688, -3.98016 )
+
+[node name="CSGBox" type="CSGBox" parent="Testers/Procedural wood texture/CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.59124, 0.27598, 0 )
+width = 0.306
+height = 2.615
+depth = 2.287
+material = ExtResource( 28 )
+
+[node name="CSGCylinder" type="CSGCylinder" parent="Testers/Procedural wood texture/CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.000206232 )
+radius = 0.511
+height = 2.0
+sides = 64
+material = ExtResource( 28 )
+
+[node name="CSGBox2" type="CSGBox" parent="Testers/Procedural wood texture/CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66795, -0.00229144, 0.746688 )
+operation = 2
+width = 1.13479
+height = 2.14966
+depth = 1.3885
+material = ExtResource( 28 )
 
 [node name="CameraHolder" type="Spatial" parent="."]
 transform = Transform( 0.877582, 0, -0.479427, 0, 1, 0, 0.479427, 0, 0.877582, -36, 2.8, -4 )
@@ -2107,7 +1928,7 @@ margin_left = 30.0
 margin_top = -50.0
 margin_right = 97.0
 margin_bottom = -30.0
-shortcut = SubResource( 167 )
+shortcut = SubResource( 124 )
 text = "Previous"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -2122,7 +1943,7 @@ margin_left = -72.0
 margin_top = -50.0
 margin_right = -30.0
 margin_bottom = -30.0
-shortcut = SubResource( 169 )
+shortcut = SubResource( 126 )
 text = "Next"
 
 [node name="MaterialName" type="Label" parent="UI"]
@@ -2142,7 +1963,7 @@ __meta__ = {
 }
 
 [node name="Node Overview" type="MeshInstance" parent="."]
-material_override = SubResource( 185 )
+material_override = SubResource( 142 )
 [connection signal="pressed" from="UI/Previous" to="." method="_on_Previous_pressed"]
 [connection signal="pressed" from="UI/Next" to="." method="_on_Next_pressed"]
 
