@@ -1,0 +1,1165 @@
+[gd_scene load_steps=83 format=2]
+
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFExtractBorder.gd" type="Script" id=1]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFCircle.gd" type="Script" id=2]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/rotation_2d.gd" type="Script" id=3]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/random.gd" type="Script" id=7]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/cellular_2d.gd" type="Script" id=8]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFBrickPattern.gd" type="Script" id=13]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRoundIntersect.gd" type="Script" id=14]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/step_mix_s.gd" type="Script" id=15]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFTilesPattern.gd" type="Script" id=16]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFChampferIntersect.gd" type="Script" id=17]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFHexagonPattern.gd" type="Script" id=21]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/sdf/SDFRectangle.gd" type="Script" id=22]
+
+[sub_resource type="VisualShaderNodeVectorOp" id=13]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.523, 0.5641, 0 ) ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeCustom" id=14]
+output_port_for_preview = 0
+script = ExtResource( 7 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=15]
+constant = Color( 0.242188, 0.144176, 0.101227, 1 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=16]
+constant = Color( 0.394531, 0.181589, 0.0261993, 1 )
+
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=17]
+output_port_for_preview = 0
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=18]
+constant = 0.03
+
+[sub_resource type="VisualShaderNodeCustom" id=19]
+output_port_for_preview = 0
+default_input_values = [ 2, 0.05 ]
+script = ExtResource( 14 )
+
+[sub_resource type="VisualShaderNodeCustom" id=20]
+output_port_for_preview = 0
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0, 4, 0.0 ]
+script = ExtResource( 15 )
+
+[sub_resource type="VisualShaderNodeCustom" id=21]
+script = ExtResource( 13 )
+
+[sub_resource type="VisualShaderNodeInput" id=22]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeVectorOp" id=23]
+operator = 2
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=24]
+constant = 4.0
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=25]
+constant = 0.1
+
+[sub_resource type="VisualShader" id=26]
+code = "shader_type canvas_item;
+
+
+// SDFPatternBrick
+
+// RandomNoise
+
+	float gpu_random_float(vec4 co){
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
+		return fract(sin(f) * 437588.5453);
+	}
+	
+// StepMixS
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Color:15
+	vec3 n_out15p0 = vec3(0.242188, 0.144176, 0.101227);
+	float n_out15p1 = 1.000000;
+
+// Color:16
+	vec3 n_out16p0 = vec3(0.394531, 0.181589, 0.026199);
+	float n_out16p1 = 1.000000;
+
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Scalar:5
+	float n_out5p0 = 4.000000;
+
+// VectorOp:4
+	vec3 n_out4p0 = n_out3p0 * vec3(n_out5p0);
+
+// Scalar:21
+	float n_out21p0 = 0.030000;
+
+// SDFPatternBrick:24
+	vec3 n_out24p0;
+	float n_out24p1;
+	float n_out24p2;
+	vec3 n_out24p3;
+	{
+		
+				vec2 uv = n_out4p0.xy * vec2(1.0, 2.0);
+				vec2 size = vec3(n_out21p0).xy;
+				vec2 bid;
+				
+				bid.y = floor(uv.y);
+				uv.x += bid.y * 0.5;
+				
+				bid.x = floor(uv.x);
+				
+				uv = fract(uv);
+				vec2 res = size - min(uv, vec2(1.0) - uv) * vec2(1.0, 0.5);
+				n_out24p0 = vec3(res, 0.0);
+				n_out24p1 = res.x;
+				n_out24p2 = res.y;
+				n_out24p3 = vec3(bid, 0.0);
+			
+	}
+
+// VectorOp:13
+	vec3 n_in13p1 = vec3(0.52300, 0.56410, 0.00000);
+	vec3 n_out13p0 = n_out24p3 * n_in13p1;
+
+// RandomNoise:14
+	float n_out14p0;
+	{
+		n_out14p0 = gpu_random_float(vec4(n_out13p0, 0.0));
+	}
+
+// VectorScalarMix:17
+	vec3 n_out17p0 = mix(n_out15p0, n_out16p0, n_out14p0);
+
+// Scalar:8
+	float n_out8p0 = 0.100000;
+
+// SDFRoundIntersect:22
+	float n_out22p0;
+	{
+		
+				vec2 is = max(vec2(0), vec2(n_out24p1 + n_out8p0, n_out24p2 + n_out8p0));
+				n_out22p0 = min(max(n_out24p1, n_out24p2), -n_out8p0) + length(is);
+			
+	}
+
+// StepMixS:23
+	vec3 n_in23p1 = vec3(0.00000, 0.00000, 0.00000);
+	float n_in23p3 = 0.00000;
+	float n_in23p4 = 0.00000;
+	vec3 n_out23p0;
+	{
+		
+				n_out23p0 = mix(n_out17p0, n_in23p1, smoothstep(n_in23p3 - n_in23p4, n_in23p3 + n_in23p4, n_out22p0));
+			
+	}
+
+// Output:0
+	COLOR.rgb = n_out23p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -259.442, -123.5 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 960, -120 )
+nodes/fragment/3/node = SubResource( 22 )
+nodes/fragment/3/position = Vector2( -700, -140 )
+nodes/fragment/4/node = SubResource( 23 )
+nodes/fragment/4/position = Vector2( -520, -140 )
+nodes/fragment/5/node = SubResource( 24 )
+nodes/fragment/5/position = Vector2( -740, -80 )
+nodes/fragment/8/node = SubResource( 25 )
+nodes/fragment/8/position = Vector2( -240, 60 )
+nodes/fragment/13/node = SubResource( 13 )
+nodes/fragment/13/position = Vector2( 0, -260 )
+nodes/fragment/14/node = SubResource( 14 )
+nodes/fragment/14/position = Vector2( 220, -340 )
+nodes/fragment/15/node = SubResource( 15 )
+nodes/fragment/15/position = Vector2( 280, -540 )
+nodes/fragment/16/node = SubResource( 16 )
+nodes/fragment/16/position = Vector2( 280, -440 )
+nodes/fragment/17/node = SubResource( 17 )
+nodes/fragment/17/position = Vector2( 460, -340 )
+nodes/fragment/21/node = SubResource( 18 )
+nodes/fragment/21/position = Vector2( -540, 0 )
+nodes/fragment/22/node = SubResource( 19 )
+nodes/fragment/22/position = Vector2( 0, -80 )
+nodes/fragment/23/node = SubResource( 20 )
+nodes/fragment/23/position = Vector2( 740, -140 )
+nodes/fragment/24/node = SubResource( 21 )
+nodes/fragment/24/position = Vector2( -300, -100 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 4, 0, 5, 0, 4, 1, 13, 0, 14, 0, 15, 0, 17, 0, 16, 0, 17, 1, 14, 0, 17, 2, 8, 0, 22, 2, 23, 0, 0, 0, 22, 0, 23, 2, 17, 0, 23, 0, 4, 0, 24, 0, 24, 1, 22, 0, 24, 2, 22, 1, 21, 0, 24, 1, 24, 3, 13, 0 )
+
+[sub_resource type="ShaderMaterial" id=27]
+shader = SubResource( 26 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=28]
+constant = Color( 0.5625, 0.5625, 0.5625, 1 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=29]
+constant = Color( 0.347656, 0.347656, 0.347656, 1 )
+
+[sub_resource type="VisualShaderNodeCustom" id=30]
+script = ExtResource( 16 )
+
+[sub_resource type="VisualShaderNodeCustom" id=31]
+default_input_values = [ 2, 0.05 ]
+script = ExtResource( 17 )
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=32]
+constant = 0.1
+
+[sub_resource type="VisualShader" id=33]
+code = "shader_type canvas_item;
+
+
+// SDFPatternTiles
+
+// RandomNoise
+
+	float gpu_random_float(vec4 co){
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
+		return fract(sin(f) * 437588.5453);
+	}
+	
+// StepMixS
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Color:25
+	vec3 n_out25p0 = vec3(0.562500, 0.562500, 0.562500);
+	float n_out25p1 = 1.000000;
+
+// Color:26
+	vec3 n_out26p0 = vec3(0.347656, 0.347656, 0.347656);
+	float n_out26p1 = 1.000000;
+
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// Scalar:5
+	float n_out5p0 = 4.000000;
+
+// VectorOp:4
+	vec3 n_out4p0 = n_out3p0 * vec3(n_out5p0);
+
+// Scalar:21
+	float n_out21p0 = 0.030000;
+
+// SDFPatternTiles:27
+	vec3 n_out27p0;
+	float n_out27p1;
+	float n_out27p2;
+	vec3 n_out27p3;
+	{
+		
+				vec2 uv = n_out4p0.xy;
+				vec2 size = vec3(n_out21p0).xy; 
+				
+				vec2 local_uv = fract(uv);
+				vec2 res = size - min(local_uv, vec2(1.0) - local_uv);
+		
+				n_out27p0 = vec3(res, 0.0);
+				n_out27p1 = res.x;
+				n_out27p2 = res.y;
+				n_out27p3 = vec3(floor(uv), 0.0);
+			
+	}
+
+// VectorOp:13
+	vec3 n_in13p1 = vec3(0.52300, 0.56410, 0.00000);
+	vec3 n_out13p0 = n_out27p3 * n_in13p1;
+
+// RandomNoise:14
+	float n_out14p0;
+	{
+		n_out14p0 = gpu_random_float(vec4(n_out13p0, 0.0));
+	}
+
+// VectorScalarMix:17
+	vec3 n_out17p0 = mix(n_out25p0, n_out26p0, n_out14p0);
+
+// Scalar:29
+	float n_out29p0 = 0.100000;
+
+// SDFChampferIntersect:28
+	float n_out28p0;
+	{
+		
+				float cc = n_out29p0 + (n_out27p1 + n_out27p2) * 0.70710678118;
+				n_out28p0 = max(max(n_out27p1, n_out27p2), cc);
+			
+	}
+
+// StepMixS:23
+	vec3 n_in23p1 = vec3(0.00000, 0.00000, 0.00000);
+	float n_in23p3 = 0.00000;
+	float n_in23p4 = 0.00000;
+	vec3 n_out23p0;
+	{
+		
+				n_out23p0 = mix(n_out17p0, n_in23p1, smoothstep(n_in23p3 - n_in23p4, n_in23p3 + n_in23p4, n_out28p0));
+			
+	}
+
+// Output:0
+	COLOR.rgb = n_out23p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( 290.981, -239 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 960, -120 )
+nodes/fragment/3/node = SubResource( 22 )
+nodes/fragment/3/position = Vector2( -700, -140 )
+nodes/fragment/4/node = SubResource( 23 )
+nodes/fragment/4/position = Vector2( -520, -140 )
+nodes/fragment/5/node = SubResource( 24 )
+nodes/fragment/5/position = Vector2( -740, -80 )
+nodes/fragment/13/node = SubResource( 13 )
+nodes/fragment/13/position = Vector2( 0, -260 )
+nodes/fragment/14/node = SubResource( 14 )
+nodes/fragment/14/position = Vector2( 220, -340 )
+nodes/fragment/17/node = SubResource( 17 )
+nodes/fragment/17/position = Vector2( 460, -340 )
+nodes/fragment/21/node = SubResource( 18 )
+nodes/fragment/21/position = Vector2( -540, 0 )
+nodes/fragment/23/node = SubResource( 20 )
+nodes/fragment/23/position = Vector2( 740, -140 )
+nodes/fragment/25/node = SubResource( 28 )
+nodes/fragment/25/position = Vector2( 300, -560 )
+nodes/fragment/26/node = SubResource( 29 )
+nodes/fragment/26/position = Vector2( 300, -460 )
+nodes/fragment/27/node = SubResource( 30 )
+nodes/fragment/27/position = Vector2( -300, -120 )
+nodes/fragment/28/node = SubResource( 31 )
+nodes/fragment/28/position = Vector2( 140, -40 )
+nodes/fragment/29/node = SubResource( 32 )
+nodes/fragment/29/position = Vector2( -220, 60 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 4, 0, 5, 0, 4, 1, 13, 0, 14, 0, 14, 0, 17, 2, 23, 0, 0, 0, 17, 0, 23, 0, 26, 0, 17, 1, 25, 0, 17, 0, 4, 0, 27, 0, 21, 0, 27, 1, 27, 3, 13, 0, 27, 1, 28, 0, 27, 2, 28, 1, 28, 0, 23, 2, 29, 0, 28, 2 )
+
+[sub_resource type="ShaderMaterial" id=34]
+shader = SubResource( 33 )
+
+[sub_resource type="VisualShaderNodeCustom" id=35]
+default_input_values = [ 2, 0.05 ]
+script = ExtResource( 14 )
+
+[sub_resource type="VisualShaderNodeCustom" id=36]
+default_input_values = [ 2, 0.05 ]
+script = ExtResource( 14 )
+
+[sub_resource type="VisualShaderNodeCustom" id=37]
+script = ExtResource( 7 )
+
+[sub_resource type="VisualShaderNodeVectorOp" id=38]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.23123, 0.32423, 0.324 ) ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=39]
+constant = 0.02
+
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=40]
+
+[sub_resource type="VisualShaderNodeColorConstant" id=41]
+constant = Color( 0.282718, 1, 0.932755, 1 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=42]
+constant = Color( 0.28515, 0.0427733, 0.292969, 1 )
+
+[sub_resource type="VisualShaderNodeCustom" id=43]
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0 ]
+script = ExtResource( 15 )
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=44]
+function = 19
+
+[sub_resource type="VisualShaderNodeCustom" id=45]
+default_input_values = [ 2, 0.1 ]
+script = ExtResource( 14 )
+
+[sub_resource type="VisualShaderNodeCustom" id=46]
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0 ]
+script = ExtResource( 15 )
+
+[sub_resource type="VisualShaderNodeScalarOp" id=47]
+default_input_values = [ 0, 0.0, 1, 0.2 ]
+
+[sub_resource type="VisualShaderNodeColorConstant" id=48]
+constant = Color( 0.376953, 0.376953, 0.376953, 1 )
+
+[sub_resource type="VisualShaderNodeCustom" id=49]
+output_port_for_preview = 0
+default_input_values = [ 1, Vector3( 1, 1.5, 0 ), 2, Vector3( 5, 5, 0 ), 3, 0.8 ]
+script = ExtResource( 22 )
+
+[sub_resource type="VisualShaderNodeInput" id=50]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeScalarOp" id=51]
+output_port_for_preview = 0
+default_input_values = [ 0, 0.0, 1, -2.0 ]
+
+[sub_resource type="VisualShaderNodeCustom" id=52]
+default_input_values = [ 1, Vector3( 1, 1, 1 ), 2, 0.5 ]
+script = ExtResource( 8 )
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=53]
+constant = 1.0
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=54]
+constant = 1.5
+
+[sub_resource type="VisualShaderNodeScalarOp" id=55]
+output_port_for_preview = 0
+operator = 1
+
+[sub_resource type="VisualShaderNodeScalarOp" id=56]
+output_port_for_preview = 0
+default_input_values = [ 0, 0.2, 1, 0.1 ]
+operator = 1
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=58]
+function = 19
+
+[sub_resource type="VisualShaderNodeScalarOp" id=59]
+output_port_for_preview = 0
+default_input_values = [ 0, -0.3, 1, 0.0 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeCustom" id=61]
+output_port_for_preview = 0
+default_input_values = [ 2, 0.2 ]
+script = ExtResource( 17 )
+
+[sub_resource type="VisualShaderNodeScalarOp" id=83]
+output_port_for_preview = 0
+operator = 1
+
+[sub_resource type="VisualShaderNodeScalarClamp" id=84]
+default_input_values = [ 0, 0.0, 1, -1.0, 2, 0.02 ]
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=62]
+constant = 0.1
+
+[sub_resource type="VisualShaderNodeCustom" id=63]
+script = ExtResource( 21 )
+
+[sub_resource type="VisualShaderNodeVectorOp" id=64]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 10, 10, 0 ) ]
+operator = 2
+
+[sub_resource type="VisualShader" id=65]
+code = "shader_type canvas_item;
+
+
+// SDFPatternHexTiles
+
+
+void hexagon_pattern(
+	in vec2 offset,
+	in vec3 border,
+	out vec3 distances,
+	out vec3 id
+) {
+	float c_30 = 0.8660254037844387;
+	float s_30 = 0.5;
+
+	vec2 alpha = vec2(0.0, 1.0);
+	vec2 beta = vec2(c_30, s_30);
+	vec2 gamma = vec2(-c_30, s_30);
+
+	vec2 Xk = vec2(1.0, -1.0) * 0.5 / c_30;
+	vec2 alphaX = alpha.yx * Xk;
+	vec2 betaX = beta.yx * Xk;
+	vec2 gammaX = gamma.yx * Xk;
+
+	vec3 v = vec3(dot(offset, alpha), dot(offset, beta), dot(offset, gamma)) + vec3(0.5);
+	vec3 vx = vec3(dot(offset, alphaX), dot(offset, betaX), dot(offset, gammaX));
+	vec3 vfr = fract(v);
+	vec3 vfrx = fract(vx);
+	vec3 vfl = floor(v);
+	vec3 vflx = floor(vx);
+	
+	vec3 vc = min(vfr, vec3(1.0) - vfr) * 2.0;
+	vec3 vcx = min(vfrx, vec3(1.0) - vfrx) * 2.0;
+
+	vec3 vmx = step(vcx * 3.0 - 1.0, vc);
+
+	id = mix(vfl + 0.5 * sign(vfr - vec3(0.5)), vfl, vmx);
+	distances = border - mix(vec3(1.0) - vc, vc, vmx);
+}
+
+// RandomNoise
+
+	float gpu_random_float(vec4 co){
+		float f = dot(fract(co) + fract(co * 2.32184321231),vec4(129.898,782.33,944.32214932,122.2834234542));
+		return fract(sin(f) * 437588.5453);
+	}
+	
+// SDFFieldRectangle
+
+// StepMixS
+
+// CellularNoise2D
+
+
+// Cellular noise (\"Worley noise\") in 2D in GLSL.
+// Copyright (c) Stefan Gustavson 2011-04-19. All rights reserved.
+// This code is released under the conditions of the MIT license.
+// See LICENSE file for details.
+// https://github.com/stegu/webgl-noise
+
+// Modulo 289 without a division (only multiplications)
+vec3 HELPER_CellularNoise2D_mod289_3(vec3 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec2 HELPER_CellularNoise2D_mod289_2(vec2 x) {
+    return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+// Modulo 7 without a division
+vec3 HELPER_CellularNoise2D_mod7(vec3 x) {
+    return x - floor(x * (1.0 / 7.0)) * 7.0;
+}
+
+// Permutation polynomial: (34x^2 + x) mod 289
+vec3 HELPER_CellularNoise2D_permute(vec3 x) {
+    return HELPER_CellularNoise2D_mod289_3((34.0 * x + 1.0) * x);
+}
+
+// Cellular noise, returning F1 and F2 in a vec2.
+// Standard 3x3 search window for good F1 and F2 values
+vec2 cellular_noise_2d(vec2 P, float jitter) {
+    float K = 0.142857142857; // 1/7
+    float Ko = 0.428571428571; // 3/7
+
+    vec2 Pi = HELPER_CellularNoise2D_mod289_2(floor(P));
+    vec2 Pf = fract(P);
+    vec3 oi = vec3(-1.0, 0.0, 1.0);
+    vec3 of = vec3(-0.5, 0.5, 1.5);
+    vec3 px = HELPER_CellularNoise2D_permute(Pi.x + oi);
+    vec3 p = HELPER_CellularNoise2D_permute(px.x + Pi.y + oi); // p11, p12, p13
+    vec3 ox = fract(p*K) - Ko;
+    vec3 oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
+    vec3 dx = Pf.x + 0.5 + jitter*ox;
+    vec3 dy = Pf.y - of + jitter*oy;
+    vec3 d1 = dx * dx + dy * dy; // d11, d12 and d13, squared
+    p = HELPER_CellularNoise2D_permute(px.y + Pi.y + oi); // p21, p22, p23
+    ox = fract(p*K) - Ko;
+    oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
+    dx = Pf.x - 0.5 + jitter*ox;
+    dy = Pf.y - of + jitter*oy;
+    vec3 d2 = dx * dx + dy * dy; // d21, d22 and d23, squared
+    p = HELPER_CellularNoise2D_permute(px.z + Pi.y + oi); // p31, p32, p33
+    ox = fract(p*K) - Ko;
+    oy = HELPER_CellularNoise2D_mod7(floor(p*K))*K - Ko;
+    dx = Pf.x - 1.5 + jitter*ox;
+    dy = Pf.y - of + jitter*oy;
+    vec3 d3 = dx * dx + dy * dy; // d31, d32 and d33, squared
+    // Sort out the two smallest distances (F1, F2)
+    vec3 d1a = min(d1, d2);
+    d2 = max(d1, d2); // Swap to keep candidates for F2
+    d2 = min(d2, d3); // neither F1 nor F2 are now in d3
+    d1 = min(d1a, d2); // F1 is now in d1
+    d2 = max(d1a, d2); // Swap to keep candidates for F2
+    d1.xy = (d1.x < d1.y) ? d1.xy : d1.yx; // Swap if smaller
+    d1.xz = (d1.x < d1.z) ? d1.xz : d1.zx; // F1 is in d1.x
+    d1.yz = min(d1.yz, d2.yz); // F2 is now not in d2.yz
+    d1.y = min(d1.y, d1.z); // nor in  d1.z
+    d1.y = min(d1.y, d2.x); // F2 is in d1.y, we're done.
+    return sqrt(d1.xy);
+}
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Color:19
+	vec3 n_out19p0 = vec3(0.282718, 1.000000, 0.932755);
+	float n_out19p1 = 1.000000;
+
+// Color:20
+	vec3 n_out20p0 = vec3(0.285150, 0.042773, 0.292969);
+	float n_out20p1 = 1.000000;
+
+// Input:3
+	vec3 n_out3p0 = vec3(UV, 0.0);
+
+// VectorOp:8
+	vec3 n_in8p1 = vec3(10.00000, 10.00000, 0.00000);
+	vec3 n_out8p0 = n_out3p0 * n_in8p1;
+
+// SDFPatternHexTiles:7
+	vec3 n_out7p0;
+	float n_out7p1;
+	float n_out7p2;
+	float n_out7p3;
+	vec3 n_out7p4;
+	{
+		
+				hexagon_pattern(n_out8p0.xy, vec3(0.1, 0.1, 0.1), n_out7p0, n_out7p4);
+				n_out7p1 = n_out7p0.x;
+				n_out7p2 = n_out7p0.y;
+				n_out7p3 = n_out7p0.z;
+			
+	}
+
+// VectorOp:16
+	vec3 n_in16p1 = vec3(0.23123, 0.32423, 0.32400);
+	vec3 n_out16p0 = n_out7p4 * n_in16p1;
+
+// RandomNoise:15
+	float n_out15p0;
+	{
+		n_out15p0 = gpu_random_float(vec4(n_out16p0, 0.0));
+	}
+
+// VectorScalarMix:18
+	vec3 n_out18p0 = mix(n_out19p0, n_out20p0, n_out15p0);
+
+// Color:28
+	vec3 n_out28p0 = vec3(0.376953, 0.376953, 0.376953);
+	float n_out28p1 = 1.000000;
+
+// SDFFieldRectangle:29
+	vec3 n_in29p1 = vec3(1.00000, 1.50000, 0.00000);
+	vec3 n_in29p2 = vec3(5.00000, 5.00000, 0.00000);
+	float n_in29p3 = 0.80000;
+	float n_out29p0;
+	{
+		
+			vec2 cd = abs(n_out8p0.xy - n_in29p2.xy) - n_in29p1.xy + n_in29p3;
+			float od = length(max(cd, vec2(0.0)));
+			float id = min(0.0, max(cd.x, cd.y));
+			
+			n_out29p0 = od + id - n_in29p3;
+			
+	}
+
+// ScalarOp:27
+	float n_in27p1 = 0.20000;
+	float n_out27p0 = n_out29p0 + n_in27p1;
+
+// Scalar:17
+	float n_out17p0 = 0.020000;
+
+// StepMixS:26
+	vec3 n_in26p1 = vec3(0.00000, 0.00000, 0.00000);
+	float n_in26p3 = 0.00000;
+	vec3 n_out26p0;
+	{
+		
+				n_out26p0 = mix(n_out28p0, n_in26p1, smoothstep(n_in26p3 - n_out17p0, n_in26p3 + n_out17p0, n_out27p0));
+			
+	}
+
+// Scalar:6
+	float n_out6p0 = 0.100000;
+
+// SDFRoundIntersect:13
+	float n_out13p0;
+	{
+		
+				vec2 is = max(vec2(0), vec2(n_out7p2 + n_out6p0, n_out7p3 + n_out6p0));
+				n_out13p0 = min(max(n_out7p2, n_out7p3), -n_out6p0) + length(is);
+			
+	}
+
+// SDFRoundIntersect:14
+	float n_out14p0;
+	{
+		
+				vec2 is = max(vec2(0), vec2(n_out7p1 + n_out6p0, n_out13p0 + n_out6p0));
+				n_out14p0 = min(max(n_out7p1, n_out13p0), -n_out6p0) + length(is);
+			
+	}
+
+// ScalarFunc:24
+	float n_out24p0 = -(n_out29p0);
+
+// SDFRoundIntersect:25
+	float n_in25p2 = 0.10000;
+	float n_out25p0;
+	{
+		
+				vec2 is = max(vec2(0), vec2(n_out14p0 + n_in25p2, n_out24p0 + n_in25p2));
+				n_out25p0 = min(max(n_out14p0, n_out24p0), -n_in25p2) + length(is);
+			
+	}
+
+// Scalar:38
+	float n_out38p0 = 1.500000;
+
+// Scalar:33
+	float n_out33p0 = 1.000000;
+
+// CellularNoise2D:31
+	vec3 n_out31p0;
+	float n_out31p1;
+	float n_out31p2;
+	{
+		
+			n_out31p0 = vec3(cellular_noise_2d((n_out8p0).xy * (vec3(n_out38p0)).xy, n_out33p0), 0.0);
+			n_out31p1 = n_out31p0.x;
+			n_out31p2 = n_out31p0.y;
+			
+	}
+
+// ScalarOp:39
+	float n_out39p0 = n_out31p2 - n_out31p1;
+
+// ScalarOp:40
+	float n_in40p1 = 0.10000;
+	float n_out40p0 = n_out39p0 - n_in40p1;
+
+// ScalarOp:30
+	float n_in30p1 = -2.00000;
+	float n_out30p0 = n_out29p0 + n_in30p1;
+
+// ScalarOp:43
+	float n_in43p0 = -0.30000;
+	float n_out43p0 = n_in43p0 * n_out30p0;
+
+// ScalarClamp:47
+	float n_in47p1 = -1.00000;
+	float n_in47p2 = 0.02000;
+	float n_out47p0 = clamp(n_out43p0, n_in47p1, n_in47p2);
+
+// ScalarOp:46
+	float n_out46p0 = n_out40p0 - n_out47p0;
+
+// ScalarFunc:42
+	float n_out42p0 = -(n_out46p0);
+
+// SDFChampferIntersect:45
+	float n_in45p2 = 0.20000;
+	float n_out45p0;
+	{
+		
+				float cc = n_in45p2 + (n_out25p0 + n_out42p0) * 0.70710678118;
+				n_out45p0 = max(max(n_out25p0, n_out42p0), cc);
+			
+	}
+
+// StepMixS:21
+	float n_in21p3 = 0.00000;
+	vec3 n_out21p0;
+	{
+		
+				n_out21p0 = mix(n_out18p0, n_out26p0, smoothstep(n_in21p3 - n_out17p0, n_in21p3 + n_out17p0, n_out45p0));
+			
+	}
+
+// Output:0
+	COLOR.rgb = n_out21p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -35.1167, 440 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 1340, 100 )
+nodes/fragment/3/node = SubResource( 50 )
+nodes/fragment/3/position = Vector2( -520, 80 )
+nodes/fragment/6/node = SubResource( 62 )
+nodes/fragment/6/position = Vector2( 228, 270 )
+nodes/fragment/7/node = SubResource( 63 )
+nodes/fragment/7/position = Vector2( 20, 20 )
+nodes/fragment/8/node = SubResource( 64 )
+nodes/fragment/8/position = Vector2( -284.981, 51 )
+nodes/fragment/13/node = SubResource( 35 )
+nodes/fragment/13/position = Vector2( 360, 120 )
+nodes/fragment/14/node = SubResource( 36 )
+nodes/fragment/14/position = Vector2( 620, 80 )
+nodes/fragment/15/node = SubResource( 37 )
+nodes/fragment/15/position = Vector2( 380, -160 )
+nodes/fragment/16/node = SubResource( 38 )
+nodes/fragment/16/position = Vector2( 160, -180 )
+nodes/fragment/17/node = SubResource( 39 )
+nodes/fragment/17/position = Vector2( 640, 200 )
+nodes/fragment/18/node = SubResource( 40 )
+nodes/fragment/18/position = Vector2( 760, -260 )
+nodes/fragment/19/node = SubResource( 41 )
+nodes/fragment/19/position = Vector2( 560, -340 )
+nodes/fragment/20/node = SubResource( 42 )
+nodes/fragment/20/position = Vector2( 560, -260 )
+nodes/fragment/21/node = SubResource( 43 )
+nodes/fragment/21/position = Vector2( 1120, 40 )
+nodes/fragment/24/node = SubResource( 44 )
+nodes/fragment/24/position = Vector2( 460, 380 )
+nodes/fragment/25/node = SubResource( 45 )
+nodes/fragment/25/position = Vector2( 857.558, 255.5 )
+nodes/fragment/26/node = SubResource( 46 )
+nodes/fragment/26/position = Vector2( 860, 380 )
+nodes/fragment/27/node = SubResource( 47 )
+nodes/fragment/27/position = Vector2( 460, 460 )
+nodes/fragment/28/node = SubResource( 48 )
+nodes/fragment/28/position = Vector2( 640, 520 )
+nodes/fragment/29/node = SubResource( 49 )
+nodes/fragment/29/position = Vector2( 100, 360 )
+nodes/fragment/30/node = SubResource( 51 )
+nodes/fragment/30/position = Vector2( 460, 580 )
+nodes/fragment/31/node = SubResource( 52 )
+nodes/fragment/31/position = Vector2( -100, 680 )
+nodes/fragment/33/node = SubResource( 53 )
+nodes/fragment/33/position = Vector2( -342, 801 )
+nodes/fragment/38/node = SubResource( 54 )
+nodes/fragment/38/position = Vector2( -338.035, 732.25 )
+nodes/fragment/39/node = SubResource( 55 )
+nodes/fragment/39/position = Vector2( 117, 630 )
+nodes/fragment/40/node = SubResource( 56 )
+nodes/fragment/40/position = Vector2( 279, 630 )
+nodes/fragment/42/node = SubResource( 58 )
+nodes/fragment/42/position = Vector2( 860, 540 )
+nodes/fragment/43/node = SubResource( 59 )
+nodes/fragment/43/position = Vector2( 630, 612 )
+nodes/fragment/45/node = SubResource( 61 )
+nodes/fragment/45/position = Vector2( 1120, 280 )
+nodes/fragment/46/node = SubResource( 83 )
+nodes/fragment/46/position = Vector2( 1017, 630 )
+nodes/fragment/47/node = SubResource( 84 )
+nodes/fragment/47/position = Vector2( 819, 630 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 8, 0, 8, 0, 7, 0, 13, 0, 14, 1, 6, 0, 13, 2, 6, 0, 14, 2, 7, 1, 14, 0, 7, 2, 13, 0, 7, 3, 13, 1, 16, 0, 15, 0, 7, 4, 16, 0, 15, 0, 18, 2, 20, 0, 18, 1, 19, 0, 18, 0, 17, 0, 21, 4, 18, 0, 21, 0, 14, 0, 25, 0, 24, 0, 25, 1, 26, 0, 21, 1, 27, 0, 26, 2, 17, 0, 26, 4, 28, 0, 26, 0, 8, 0, 29, 0, 29, 0, 27, 0, 29, 0, 24, 0, 29, 0, 30, 0, 8, 0, 31, 0, 33, 0, 31, 2, 38, 0, 31, 1, 21, 0, 0, 0, 31, 1, 39, 1, 31, 2, 39, 0, 39, 0, 40, 0, 25, 0, 45, 0, 42, 0, 45, 1, 45, 0, 21, 2, 40, 0, 46, 0, 46, 0, 42, 0, 30, 0, 43, 1, 43, 0, 47, 0, 47, 0, 46, 1 )
+
+[sub_resource type="ShaderMaterial" id=66]
+shader = SubResource( 65 )
+
+[sub_resource type="VisualShaderNodeCustom" id=67]
+output_port_for_preview = 0
+default_input_values = [ 2, 0.01 ]
+script = ExtResource( 14 )
+
+[sub_resource type="VisualShaderNodeCustom" id=68]
+output_port_for_preview = 0
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 0, 0, 0 ), 3, 0.0 ]
+script = ExtResource( 15 )
+
+[sub_resource type="VisualShaderNodeScalarConstant" id=69]
+constant = 0.005
+
+[sub_resource type="VisualShaderNodeColorConstant" id=70]
+constant = Color( 0.425781, 1, 0.569336, 1 )
+
+[sub_resource type="VisualShaderNodeColorConstant" id=71]
+constant = Color( 0, 0, 0, 1 )
+
+[sub_resource type="VisualShaderNodeScalarOp" id=82]
+default_input_values = [ 0, 0.0, 1, 3.0 ]
+operator = 2
+
+[sub_resource type="VisualShaderNodeInput" id=72]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeVectorOp" id=73]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 0.5, 0.5, 0 ) ]
+operator = 1
+
+[sub_resource type="VisualShaderNodeCustom" id=74]
+output_port_for_preview = 0
+script = ExtResource( 3 )
+
+[sub_resource type="VisualShaderNodeInput" id=75]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeCustom" id=76]
+output_port_for_preview = 0
+default_input_values = [ 1, Vector3( 0.04, 0.5, 0 ), 2, Vector3( 0, 0, 0 ), 3, 0.0 ]
+script = ExtResource( 22 )
+
+[sub_resource type="VisualShaderNodeCustom" id=77]
+output_port_for_preview = 0
+default_input_values = [ 1, 0.3, 2, Vector3( 0, 0, 0 ) ]
+script = ExtResource( 2 )
+
+[sub_resource type="VisualShaderNodeCustom" id=78]
+output_port_for_preview = 0
+default_input_values = [ 1, 0.05 ]
+script = ExtResource( 1 )
+
+[sub_resource type="VisualShaderNodeScalarFunc" id=79]
+output_port_for_preview = 0
+function = 19
+
+[sub_resource type="VisualShader" id=80]
+code = "shader_type canvas_item;
+
+
+// Rotation2D
+
+void rotation_2d(float angle, vec3 pivot, in vec3 position_in,  out vec3 position_out) {
+	mat2 rotation_matrix = mat2( vec2(cos(angle), -sin(angle)), vec2(sin(angle), cos(angle)));
+	position_in -= pivot;
+	position_out.xy = rotation_matrix * position_in.xy;
+	position_out.z = position_in.z;
+	position_out += pivot;
+	
+}
+// SDFFieldRectangle
+
+// SDFFieldCircle
+
+// SDFExtractBorder
+
+// StepMixS
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Color:13
+	vec3 n_out13p0 = vec3(0.425781, 1.000000, 0.569336);
+	float n_out13p1 = 1.000000;
+
+// Color:14
+	vec3 n_out14p0 = vec3(0.000000, 0.000000, 0.000000);
+	float n_out14p1 = 1.000000;
+
+// Input:5
+	float n_out5p0 = TIME;
+
+// ScalarOp:15
+	float n_in15p1 = 3.00000;
+	float n_out15p0 = n_out5p0 * n_in15p1;
+
+// Input:2
+	vec3 n_out2p0 = vec3(UV, 0.0);
+
+// VectorOp:3
+	vec3 n_in3p1 = vec3(0.50000, 0.50000, 0.00000);
+	vec3 n_out3p0 = n_out2p0 - n_in3p1;
+
+// Rotation2D:4
+	vec3 n_out4p0;
+	{
+		rotation_2d(n_out15p0, vec3(0.0, 0.0, 0.0), n_out3p0, n_out4p0);
+	}
+
+// SDFFieldRectangle:6
+	vec3 n_in6p1 = vec3(0.04000, 0.50000, 0.00000);
+	vec3 n_in6p2 = vec3(0.00000, 0.00000, 0.00000);
+	float n_in6p3 = 0.00000;
+	float n_out6p0;
+	{
+		
+			vec2 cd = abs(n_out4p0.xy - n_in6p2.xy) - n_in6p1.xy + n_in6p3;
+			float od = length(max(cd, vec2(0.0)));
+			float id = min(0.0, max(cd.x, cd.y));
+			
+			n_out6p0 = od + id - n_in6p3;
+			
+	}
+
+// ScalarFunc:9
+	float n_out9p0 = -(n_out6p0);
+
+// SDFFieldCircle:7
+	float n_in7p1 = 0.30000;
+	vec3 n_in7p2 = vec3(0.00000, 0.00000, 0.00000);
+	float n_out7p0;
+	{
+		
+			n_out7p0 = length(n_out4p0 - n_in7p2) - n_in7p1;
+			
+	}
+
+// SDFExtractBorder:8
+	float n_in8p1 = 0.05000;
+	float n_out8p0;
+	{
+		
+			n_out8p0 = abs(n_out7p0) - n_in8p1;
+			
+	}
+
+// SDFRoundIntersect:10
+	float n_in10p2 = 0.01000;
+	float n_out10p0;
+	{
+		
+				vec2 is = max(vec2(0), vec2(n_out9p0 + n_in10p2, n_out8p0 + n_in10p2));
+				n_out10p0 = min(max(n_out9p0, n_out8p0), -n_in10p2) + length(is);
+			
+	}
+
+// Scalar:12
+	float n_out12p0 = 0.005000;
+
+// StepMixS:11
+	float n_in11p3 = 0.00000;
+	vec3 n_out11p0;
+	{
+		
+				n_out11p0 = mix(n_out13p0, n_out14p0, smoothstep(n_in11p3 - n_out12p0, n_in11p3 + n_out12p0, n_out10p0));
+			
+	}
+
+// Output:0
+	COLOR.rgb = n_out11p0;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -225.465, -98.5 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 1197, -45 )
+nodes/fragment/2/node = SubResource( 72 )
+nodes/fragment/2/position = Vector2( -680, 100 )
+nodes/fragment/3/node = SubResource( 73 )
+nodes/fragment/3/position = Vector2( -500, 100 )
+nodes/fragment/4/node = SubResource( 74 )
+nodes/fragment/4/position = Vector2( -320, 40 )
+nodes/fragment/5/node = SubResource( 75 )
+nodes/fragment/5/position = Vector2( -693, 9 )
+nodes/fragment/6/node = SubResource( 76 )
+nodes/fragment/6/position = Vector2( -40, -140 )
+nodes/fragment/7/node = SubResource( 77 )
+nodes/fragment/7/position = Vector2( -40, 120 )
+nodes/fragment/8/node = SubResource( 78 )
+nodes/fragment/8/position = Vector2( 160, 120 )
+nodes/fragment/9/node = SubResource( 79 )
+nodes/fragment/9/position = Vector2( 180, -140 )
+nodes/fragment/10/node = SubResource( 67 )
+nodes/fragment/10/position = Vector2( 499, 16.5 )
+nodes/fragment/11/node = SubResource( 68 )
+nodes/fragment/11/position = Vector2( 900, -72 )
+nodes/fragment/12/node = SubResource( 69 )
+nodes/fragment/12/position = Vector2( 495, 243 )
+nodes/fragment/13/node = SubResource( 70 )
+nodes/fragment/13/position = Vector2( 588, -323.5 )
+nodes/fragment/14/node = SubResource( 71 )
+nodes/fragment/14/position = Vector2( 585, -225 )
+nodes/fragment/15/node = SubResource( 82 )
+nodes/fragment/15/position = Vector2( -504, -27 )
+nodes/fragment/connections = PoolIntArray( 2, 0, 3, 0, 3, 0, 4, 2, 4, 0, 6, 0, 4, 0, 7, 0, 7, 0, 8, 0, 6, 0, 9, 0, 9, 0, 10, 0, 8, 0, 10, 1, 10, 0, 11, 2, 12, 0, 11, 4, 13, 0, 11, 0, 14, 0, 11, 1, 11, 0, 0, 0, 5, 0, 15, 0, 15, 0, 4, 0 )
+
+[sub_resource type="ShaderMaterial" id=81]
+shader = SubResource( 80 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="SDF - bricks" type="ColorRect" parent="."]
+material = SubResource( 27 )
+margin_left = 108.464
+margin_top = 16.7026
+margin_right = 169.465
+margin_bottom = 77.7026
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="SDF - bricks"]
+margin_left = -3.55059
+margin_top = 63.5826
+margin_right = 62.4494
+margin_bottom = 111.583
+text = "SDF bricks
+  texture"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SDF - tiles" type="ColorRect" parent="."]
+material = SubResource( 34 )
+margin_left = 194.657
+margin_top = 17.1236
+margin_right = 255.657
+margin_bottom = 78.1236
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="SDF - tiles"]
+margin_left = 1.88626
+margin_top = 64.0
+margin_right = 60.8863
+margin_bottom = 112.0
+text = "SDF tiles
+ texture"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SDF - hex tiles" type="ColorRect" parent="."]
+material = SubResource( 66 )
+margin_left = 289.722
+margin_top = 18.8236
+margin_right = 350.722
+margin_bottom = 79.8236
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="SDF - hex tiles"]
+margin_left = -13.3165
+margin_top = 63.6464
+margin_right = 69.6835
+margin_bottom = 111.646
+text = "SDF hex tiles
+ with cracks
+     texture"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Loading" type="ColorRect" parent="."]
+material = SubResource( 81 )
+margin_left = 21.454
+margin_top = 17.4872
+margin_right = 82.454
+margin_bottom = 78.4872
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Loading"]
+margin_left = -0.0819702
+margin_top = 63.1091
+margin_right = 63.918
+margin_bottom = 111.109
+text = "  Loading
+animation"
+__meta__ = {
+"_edit_use_anchors_": false
+}
